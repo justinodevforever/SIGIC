@@ -1,0 +1,183 @@
+{% extends "principal.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  
+    <div style="display: flex; width: 100%; align-items: center; justify-content: center; flex-direction: column;">
+        <div style="display: flex; width: 97%; justify-content: space-between; align-items: center;">
+            <h1 class="text-warning">Lista da perícia</h1>
+            <a href="/create_expertise/" class="btn btn-success" style="display:flex; height: 40px; gap: 10px;">
+                <i class="bi bi-plus-circle" aria-hidden="true"></i></i>Novo
+            </a>
+        </div>
+        <div style="display: flex; width: 97%; justify-content: space-between; align-items: center;">
+            
+            <form action="/list_evidence/" method="get" 
+             class="btn-group btn-group-sm" style="margin-bottom: 10px;">
+                {% csrf_token %}
+                <input type="search" name="tipo" style="border-radius: 4px 0px 0px 4px;"
+                class="form-control" placeholder="tipo de perícia">
+                <button class="btn text-white"  style="background-color: #2c5aa0;"><i class="bi bi-search"></i></button>
+            </form>
+            <form action="/list_evidence/" method="get" 
+             class="btn-group btn-group-sm">
+                {% csrf_token %}
+                <input type="search" name="numero_evidencia" style="border-radius: 4px 0px 0px 4px;"
+                class="form-control" placeholder="Número da evidência">
+                <button class="btn btn-warning"><i class="bi bi-search"></i></button>
+            </form>
+        </div>
+        <div class="card" style="display:flex; width: 97%; align-self: center;">
+            <div class="card-body" style="border-radius: 4px;">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Número da evidência</th>
+                                <th>Tipo</th>
+                                <th>Resultado</th>
+                                <th>Conclusão</th>
+                                <th>Data da criação</th>
+                                <th>Opções</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pericia in pericias %}
+                            <tr>
+                                <td>{{ pericia.evidencia.numero_evidencia }}</td>
+                                <td>{{ pericia.get_tipo_display }}</td>
+                                <td>{{ pericia.resultado }}</td>
+                                <td>{{ pericia.conclusao }}</td>
+                                <td>{{ pericia.data_criacao }}</td>
+                                
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'detail_expertise' pericia.id %}" 
+                                            class="btn btn-outline-primary" title="Ver detalhes">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        
+                                        <a href="{% url 'edit_expertise' pericia.id %}" 
+                                            class="btn btn-outline-warning" title="Editar">
+                                            <i class="fas bi-pencil-square"></i>
+                                        </a>
+                                        <button onclick="confirmardelecao('{{pericia.id}}')"
+                                        class="btn btn-outline-danger" title="Deletar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">
+                                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                                    <br>Nenhum registro encontrado.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if eventos.has_other_pages %}
+                    <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                        {% if eventos.has_previous %}
+                            <li class="page-item">
+                                
+                                <a class="page-link" href="?page={{ eventos.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Anterior</span>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in eventos.paginator.page_range %}
+                            {% if eventos.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    {% if eventos.has_next %}
+                        
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ eventos.next_page_number }}" aria-label="Próximo">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Próximo</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div id="modalconfirmacao" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; min-width: 300px;">
+            <h3>confirmar exclusão</h3>
+            <p id="mensagemconfirmacao">Tem certeza que deseja deletar estes dados da perícia?</p>
+            <div style="text-align: right; margin-top: 20px;">
+                <button onclick="fecharmodal()" class="btn" style="background: #6c757d; color: white; margin-right: 10px;">
+                    cancelar
+                </button>
+                <button onclick="deletaritem()" class="btn btn-danger">
+                    confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let itemparadeletar = null;
+        
+        function confirmardelecao(itemid) {
+            itemparadeletar = itemid;
+            document.getElementById('modalconfirmacao').style.display = 'block';
+        }
+        
+        function fecharmodal() {
+            document.getElementById('modalconfirmacao').style.display = 'none';
+            itemparadeletar = null;
+        }
+        
+        function deletaritem() {
+            if (itemparadeletar) {
+                
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = `/delete_expertise/${itemparadeletar}/`;
+                
+                const csrfinput = document.createElement('span');
+
+                csrfinput.type = 'hidden';
+                csrfinput.name = 'csrfmiddlewaretoken';
+                csrfinput.innerHTML = '{% csrf_token %}';
+                form.appendChild(csrfinput);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        
+        document.getElementById('modalconfirmacao').onclick = (e)=>{
+            if (e.target === this) {
+                fecharmodal();
+            }
+        }
+    </script>
+</body>
+</html>
+{% endblock  %}

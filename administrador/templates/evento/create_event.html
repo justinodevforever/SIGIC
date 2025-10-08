@@ -1,0 +1,325 @@
+{% extends 'principal.html' %}
+
+{% block content %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% load static %}
+        <script src="{% static 'js/jquery.inputmask.min.js' %}"></script>
+        <style>
+            .form-control{
+                height: 40px;
+            }
+        </style>
+    </head>
+    <body style="background-color: #ddd;">
+        <form action="{% url 'create_event' caso.id %}" method="post" class="card"
+        style="display: flex; gap: 20px;  width: 80%; flex-direction: column;
+        background-color: #f8f9fa; padding: 10px; border-radius: 10px;
+         align-self: center; align-items: center;">
+
+            {% csrf_token %}
+            <div class="d-flex justify-content-between" style="width: 100%;">
+                <h3 class="text-warning">Cadastro de Eventos Timeline</h3>
+                <a href="/list_case/" class="btn btn-primary">Listar</a>
+            </div>
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                    
+                        <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                            <strong>{{message}}</strong>
+                            <button type="button" class="btn-close"
+                            data-bs-dismiss="alert" aria-label="close"
+                            ></button>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>{{message}}</strong>
+                            <button type="button" class="btn-close"
+                            data-bs-dismiss="alert" aria-label="close"
+                            ></button>
+                        </div>
+                    {% endif %}
+                
+                {% endfor %}
+            {% endif %}
+          
+
+            <div class="form-group" 
+            style="display: flex; gap: 20px;  width: 100%;">
+
+                <label for="titulo" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                    <span >
+                        Título
+                        <span class="text-danger">*</span>
+                    </span>
+                    <input type="text" style=" width: 100%;"
+                        class="form-control" name="titulo" 
+                        aria-describedby="helpId" >
+                        
+                    {% if form.titulo.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.titulo.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+
+                <label for="localizacao" 
+                style="display: flex; flex-direction: column;  width: 100%;">
+
+                    Localização
+                    <input type="text" style=" width: 100%;"
+                        class="form-control" name="localizacao" 
+                        aria-describedby="helpId" >
+                        
+                    {% if form.localizacao.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.localizacao.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            </div>
+            
+            <div class="form-group" 
+            style="display: flex; gap: 20px;  width: 100%;">
+                <label for="coordenadas_lat" 
+                style="display: flex; flex-direction: column;  width: 100%;">
+
+                    Latitude
+                    <input type="text" style=" width: 100%;" step="0.00000001" id="la"
+                        class="form-control" name="coordenadas_lat" 
+                        aria-describedby="helpId" >
+                        
+                        {% if form.coordenadas_lat.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.coordenadas_lat.errors}}
+                            </div>
+                        {% endif %}
+                </label>
+    
+                <label for="coordenadas_lng" style="display: flex;
+                 width: 100%; flex-direction: column;">
+
+                    Longitude
+                    <input type="text" style=" width: 100%;" step="0.00000001" id="lo"
+                    class="form-control" name="coordenadas_lng" 
+                    aria-describedby="helpId">
+
+
+                    {% if form.coordenadas_lng.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.coordenadas_lng.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            </div>
+    
+            <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                
+                <label for="tipo_evento" style="display: flex;
+                 flex-direction: column; width: 100%;">
+
+                    <span >
+                        Tipo de evento 
+                        <span class="text-danger">*</span>
+                    </span>
+        
+                    <select name="tipo_evento" class="form-control" >
+                        <option value="">Selecione </option>
+                        <option value="crime">Ocorrência do Crime</option>
+                        <option value="denuncia">Denúncia/Descoberta</option>
+                        <option value="prisao">Prisão</option>
+                        <option value="depoimento">Depoimento</option>
+                        <option value="pericia">Perícia</option>
+                        <option value="busca_apreensao">Busca e Apreensão</option>
+                        <option value="audiencia">Audiência</option>
+                        <option value="sentenca">Sentença</option>
+                        <option value="recurso">Recurso</option>
+                        <option value="outro">Outro</option>
+                    </select>
+
+                    {% if form.tipo_evento.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.tipo_evento.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+                
+                <label for="importancia" style="display: flex;
+                 flex-direction: column; width: 100%;">
+
+                    <span >
+                        Importância
+                        <span class="text-danger">*</span>
+                    </span>
+                    <select name="importancia" class="form-control" >
+                        <option value="">Selecione</option>
+                        <option value="1">Baixa</option>
+                        <option value="2">Media</option>
+                        <option value="3">Alta</option>
+                        <option value="4">Crítica</option>                
+                    </select>
+
+                    {% if form.importancia.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.importancia.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            </div>
+
+            <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                
+                <label for="investigador_principal" style="display: flex;
+                 flex-direction: column; width: 100%;">
+
+                    <span >
+                        Investigador principal 
+                        <span class="text-danger">*</span>
+                    </span>
+                    <select name="investigador_principal" class="form-control" >
+                        <option value="">Selecione</option>
+                        {% for inv in investigadores %}
+                            <option value="{{inv.id}}">
+                                {{inv.get_full_name}}
+                            </option>
+                        {% endfor %}  
+                    </select>
+
+                    {% if form.investigador_principal.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.investigador_principal.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+
+                <label for="data_hora" style="display: flex;
+                flex-direction: column; width: 100%;">
+
+                    <span >
+                        Data/Horas
+                        <span class="text-danger">*</span>
+                    </span>
+                    <input type="datetime-local" style=" width: 100%;"
+                    class="form-control" name="data_hora" 
+                    aria-describedby="helpId">
+
+                    {% if form.data_hora.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.data_hora.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            </div>
+
+            <div class="form-group" 
+            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+
+                <label for="descricao" style="display: flex;
+                flex-direction: column; width: 100%;">
+            
+                    <span >
+                        Descrição
+                    <span class="text-danger">*</span>
+                    </span>
+                    <textarea  name="descricao" class="form-control" 
+                    style="height: 70px; resize: none;"
+                    ></textarea>
+
+                    {% if form.descricao1.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.descricao1.errors}}
+                        </div>
+                    {% endif %}
+                  
+                </label>
+
+                <label for="observacoes" style="display: flex;
+                flex-direction: column; width: 100%;">
+            
+                    Observações
+                    <textarea  name="observacoes" class="form-control" 
+                    style="height: 70px; resize: none;"
+                    ></textarea>
+
+                    {% if form.observacoes.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.observacoes.errors}}
+                        </div>
+                    {% endif %}
+                  
+                </label>
+            </div>
+            
+            <div class="form-group" 
+            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+            
+                <label for="pessoas_envolvidas" style="display: flex;
+                flex-direction: column; width: 100%;">
+
+                    Pessoas envolvidas
+                    <select  name="pessoas_envolvidas" multiple 
+                    class="form-control" style="height: 100px;">
+                        {% for pessoa in pessoas %}
+                            <option value="{{pessoa.pessoa.id}}">
+                                {{pessoa.pessoa.nome_completo}}
+                            </option>
+                        {% endfor %}            
+                    </select>
+
+                    {% if form.pessoas_envolvidas.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.pessoas_envolvidas.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+
+            </div>
+
+            <div class="form-group" 
+            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+            
+                <label for="evidencias_relacionadas" style="display: flex;
+                flex-direction: column; width: 100%;">
+
+                    Evidências
+                    <select  name="evidencias_relacionadas" multiple 
+                    class="form-control" style="height: 100px;">
+                        {% for ev in evidencias %}
+                            <option value="{{ev.id}}">
+                                {{ev.numero_evidencia}}-{{ev.tipo.nome}}
+                            </option>
+                        {% endfor %}            
+                    </select>
+
+                    {% if form.evidencias_relacionadas.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.evidencias_relacionadas.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+
+            </div>
+
+            <button type="submit" class="btn" 
+            style="width: 80%; background-color: #2c5aa0; color: #fff;">
+                Cadastrar
+            </button>
+        </form> 
+        <script>
+            $(document).ready(function(){
+                $('#lo').mask('000.00000000', {reverse: true})
+                $('#la').mask('0000.0000000', {reverse: true})
+            })
+        </script>
+            
+    </body>
+    </html>
+{% endblock content %}

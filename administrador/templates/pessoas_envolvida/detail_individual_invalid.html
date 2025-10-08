@@ -1,0 +1,171 @@
+{% extends 'principal.html' %}
+
+
+
+{% block content %}
+
+<div class="column" style="display: flex; gap: 10px; padding: 20px; width: 100%;
+     justify-content: center;">
+    <div class="col-md-8" style="width: 100%;">
+        <div class="card" style="width: 97%;">
+            <div class="d-flex justify-content-between card-header bg-primary text-white" >
+                <h5 class="mb-0">
+                    <i class="fas fa-user"></i> Informações da pessoa envolvidas
+                </h5>
+                <a href="/list_indiidual_involved/" class="btn" 
+                style="background: #1e3a5f; color: #fff;">
+                    lista
+                </a>
+            </div>        
+
+            <div class="card-body">
+
+                <div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Nome completo:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.nome_completo }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>B.I:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.bi }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Data de nascimeno:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.data_nascimento}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Idade:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.idade}} anos</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Gênero:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.get_genero_display }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Estado Civil:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.get_estado_civil_display}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Altura:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.altura|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Peso:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.peso|default:"Sem Informações"}}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Cor de olhos:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.cor_olhos|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Cor de cabelo:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.cor_cabelo|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Profissão:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.profissao|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Escolaridade:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.escolaridade|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Nacionalidade:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.nacionalidade|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Telefone principal:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.telefone_principal|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Telefone secundário:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.telefone_secundario|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Escolaridade:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.escolaridade|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>E-mail:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.email|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Observações:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.observacoes|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Data da criação:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.data_criacao|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Criado por:</strong></div>
+                        <div class="col-sm-9">{{ pessoa.criado_por.get_full_name|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Está Ativo?:</strong></div>
+                        <div class="col-sm-9">
+                            {% if pessoa.ativo == True %}
+                                <span class="badge bg-success">Sim</span>
+                            {% else %}
+                                <span class="badge bg-danger">Não</span>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+
+                <h4>Dados do endereço</h4>
+                <hr>
+
+                {% for endereco in enderecos %}
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Tipo de endereço:</strong></div>
+                        <div class="col-sm-9">{{ endereco.get_tipo_display|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Logradouro:</strong></div>
+                        <div class="col-sm-9">{{ endereco.logradouro|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Número:</strong></div>
+                        <div class="col-sm-9">{{ endereco.numero|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Complemento:</strong></div>
+                        <div class="col-sm-9">{{ endereco.complemento|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Bairro:</strong></div>
+                        <div class="col-sm-9">{{ endereco.bairro|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Cidade:</strong></div>
+                        <div class="col-sm-9">{{ endereco.cidade|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Ponto de referência:</strong></div>
+                        <div class="col-sm-9">{{ endereco.ponto_referencia|default:"Sem Informações"}}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Está Ativo?:</strong></div>
+                        <div class="col-sm-9">
+                            {% if endereco.ativo == True %}
+                                <span class="badge bg-success">Sim</span>
+                            {% else %}
+                                <span class="badge bg-danger">Não</span>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                <hr>
+                {%empty%}
+                    <h4>Nenhuma informação de endereço encontrada!</h4>
+                {% endfor %}
+            </div>
+        </div>   
+</div>
+{% endblock %}
+

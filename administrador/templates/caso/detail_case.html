@@ -1,0 +1,338 @@
+{% extends 'principal.html' %}
+
+
+{% comment %} {% load static %} {% endcomment %}
+{% block content %}
+
+<div class="column" style="display: flex; gap: 10px; padding: 20px; width: 100%;
+     justify-content: center;">
+    <div class="col-md-8" style="width: 100%;">
+        <div class="card" style="width: 97%;">
+            <div class="d-flex justify-content-between card-header bg-primary text-white" >
+                <h5 class="mb-0">
+                    <i class="fas fa-user"></i> Informações do caso nº {{caso.numero_caso}}
+                </h5>
+                <a href="/list_case/" class="btn" 
+                style="background: #1e3a5f; color: #fff;">
+                    lista
+                </a>
+            </div>
+
+            <div class="bg-warning" style="display: flex; width: 100%; align-items: center; 
+             padding: 10px; justify-content: center; gap:30px; ">
+
+                <div style="display: flex; position: relative;">
+
+                    <span class="bg-danger" style="display: flex; position: absolute; justify-content: center;
+                    border-radius: 50%; padding: 4px; right: 0px; top: -14px; height: 20px; align-items: center;
+                    width: 26px; color: #fff; font-size: 10pt;
+                    ">
+                        {% if tamanho_caso > 10 %}
+                            +10
+                        {% else %}
+                            {{tamanho_caso}}
+                        {% endif %}
+                    </span>
+                    <button class="btn btn-primary" onclick="abrir_modal()">
+                        Envolvimentos
+                    </button>
+                </div>
+                {% include "evidencia/views_evidence.html" with evidencia_obj=evidencia_obj caso=caso  tamanho_evidencia=tamanho_evidencia%} 
+
+                
+            </div>
+
+            <div  id="modalconfirmacao" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
+                <div class="card"  style="position: absolute; top: 50% ; left: 50%; transform: translate(-50%, -50%); height: 630px;
+                 background: white; min-width: 70%;">
+
+                    <div id="previous">
+
+                        <li class="page-item" style="display: flex;
+                            position: absolute; left: 10px; top: 50%;" id="li1">
+                            
+                        </li>
+                    </div>
+
+
+                    <div class="d-flex justify-content-between card-header bg-primary text-white"
+                    style="width: 100%;"
+                  
+                    >
+
+                        <h3 >Pessoas envolvidas no caso nº {{caso.numero_caso}}</h3>
+                        <button onclick="fecharmodal()" class="btn" style=" background-color: 
+                        blue; color: red;
+                         margin-right: 10px; width: 40px; height: 40px; border-radius: 50%;">
+                            X
+                        </button>
+                        
+                    </div>
+                    {% for envolvimento in  envolvimentos%}
+                        <div style="display: flex; flex-direction: column; gap: 10px;
+                        margin-left: 50px; padding-top: 10px; overflow-y: auto;"   id="pessoa">
+                            
+                        </div>
+                    {% endfor %}
+                    
+                    <div id="proximo"  data-id="{{caso.id}}">
+                            
+                        <li class="page-item"  style="display: flex; 
+                            position: absolute; right: 10px; top: 50%;" id="li"
+                            
+                        >
+                            
+                        </li>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Título:</strong></div>
+                    <div class="col-sm-9">{{ caso.titulo|default:"Não informado" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Nº de caso:</strong></div>
+                    <div class="col-sm-9">{{ caso.numero_caso }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Tipo de crime:</strong></div>
+                    <div class="col-sm-9">{{ caso.tipo_crime }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Número de processo:</strong></div>
+                    <div class="col-sm-9">{{ caso.numero_processo|default:"sem informações" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Status:</strong></div>
+                    <div class="col-sm-9">{{ caso.get_status_display }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Prioridade:</strong></div>
+                    <div class="col-sm-9">{{ caso.get_prioridade_display }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Data de ocorrência:</strong></div>
+                    <div class="col-sm-9">{{ caso.data_ocorrencia }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Data de abertura:</strong></div>
+                    <div class="col-sm-9">{{ caso.data_abertura|default:"não marcada" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Data de conclusão:</strong></div>
+                    <div class="col-sm-9">{{ caso.data_conclusao|default:'não marcada' }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Data de conclusão:</strong></div>
+                    <div class="col-sm-9">{{ caso.prazo_conclusao|default:'não marcada' }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Local de ocorrência:</strong></div>
+                    <div class="col-sm-9">{{ caso.local_ocorrencia }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Comando:</strong></div>
+                    <div class="col-sm-9">{{ caso.delegacia_origem }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Investigador principal:</strong></div>
+                    <div class="col-sm-9">{{ caso.investigador_principal.get_full_name }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Delegado responsável:</strong></div>
+                    <div class="col-sm-9">{{ caso.delegado_responsavel.get_full_name }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Investigador de apoio:</strong></div>
+                    <div class="col-sm-9">{{ caso.investigadores_apoio.get_full_name|default:"sem informações" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Observação:</strong></div>
+                    <div class="col-sm-9">{{ caso.observacoes|default:"sem informações" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Obs. interna:</strong></div>
+                    <div class="col-sm-9">{{ caso.observacoes_internas|default:"sem informações" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Confidencial:</strong></div>
+                    <div class="col-sm-9">
+                        {% if caso.confidencial == True %}
+                            <span class="badge bg-warning">Sim</span>
+
+                        {% else %}
+                            <span class="badge bg-info">Não </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Estado:</strong></div>
+                    <div class="col-sm-9">
+                        {% if caso.ativo == True %}
+                            <span class="badge bg-success">Ativo</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inativo</span>
+                        {% endif %}
+                    </div>
+                </div>
+            
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Criado por:</strong></div>
+                    <div class="col-sm-9">{{caso.criado_por.get_full_name}} </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let itemparadeletar = null;
+        
+        function abrir_modal() {
+            document.getElementById('modalconfirmacao').style.display = 'block';
+        }
+        
+        function fecharmodal() {
+            document.getElementById('modalconfirmacao').style.display = 'none';
+            itemparadeletar = null;
+        }
+
+        document.getElementById('modalconfirmacao').onclick = (e)=>{
+            if (e.target === this) {
+                fecharmodal();
+            }
+        }
+
+        $(document).ready(function(){
+
+            function loadPaginacao(page=1){
+                let caso_id = $('#proximo').data('id')
+             
+                let nome = $(this).data('nome')
+                
+                $.ajax(
+                    {
+                        url: `/detail_case/${caso_id}?page=${page}`,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(res){
+                           
+                            pessaosDados(res.evidencia_obj[0].dados[0].pessoa, res.evidencia_obj[0].dados[0])
+                            proximo(res.evidencia_obj[0].paginacao)
+                        }
+                    }
+                )
+            }
+
+            function proximo(paginacao){
+                
+                const co1 = $('#li1')
+                const co = $('#li')
+                co.empty()
+                co1.empty()
+                if(paginacao.has_next){
+                    v= paginacao.page_atual + 1
+
+                    co.append(
+                        $('<button>').text('>').addClass('btn btn-primary').click(()=>loadPaginacao(v))
+                    )
+                }
+
+                if (paginacao.has_previous){
+
+                    v= paginacao.page_atual - 1
+
+                    co1.append(
+                        $('<button>').text('<').addClass('btn btn-primary').click(()=>loadPaginacao(v))
+                    )
+                }
+
+                
+            }
+            function anterior(has_previous, previous_page_number){
+                $('#previous1').hide()
+                v= previous_page_number - 1
+                $('#previous').html(`
+                ${
+                    has_previous ? ` <li class="page-item" style="display: flex;
+                                position: absolute; left: 10px; top: 50%;">
+                                
+                                <button class="btn btn-primary" id="anterior" data-id="{{caso.id}}"
+                                data-nome="?page=${ v }" 
+                                aria-label="Previous">
+                                    <span aria-hidden="true"><</span>
+                                </button>
+                            </li>`: ''
+                }
+                `)
+                
+            }
+
+            function pessaosDados(pessoa, envolvimento){
+                const p = $('#pessoa')
+
+                p.empty()
+                p.html(`
+                        <div style="display: flex; flex-direction: column; gap: 10px;
+                         padding-top: 0px; overflow-y: auto;">
+
+                            <h4 class="text-danger">PAPEL: ${envolvimento.tipo_envolvimento.toUpperCase()}</h4>
+
+                            <div class="d-flex" style="margin-top: 10px; margin-left: 10px; gap: 10px;">
+                                <div style="padding: 20px; font-size: 20pt; border: 1px solid #ddd;">
+                                    <i class="bi bi-person-fill"></i>
+                                </div> 
+
+                                <div style="display: flex; flex-direction: column;">
+                                    <span><strong>NOME COMPLETO :</strong> ${pessoa.nome_completo}</span>
+                                    <span><strong>NOME SOCIAL:</strong> ${pessoa.nome_social}</span>
+                                    <span><strong>BI:</strong> ${pessoa.bi}</span>
+                                    <span><strong>IDADE:</strong> ${pessoa.idade} anos</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; margin-left: 20px; gap: 10px;">
+                                <span><strong>Estado do envolvimento:</strong> 
+                                    
+                                    ${ envolvimento.ativo?
+                                        '<span class="badge bg-success">Ativo</span>'
+                                        :
+                                        '<span class="badge bg-danger">Inativo</span>'
+
+                                    }
+                                </span>
+                                ${
+
+                                pessoa.genero == 'F' ? '<span><strong>Gênego: </strong>Feminino</span>': ''
+                                || 'Sem Informação'}
+                                ${pessoa.genero == 'M'? '<span><strong>Gênego: </strong>Masculino</span>': ''
+                                || 'Sem Informação'}
+                                ${pessoa.genero == 'O' ? '<span><strong>Gênego: </strong>Outro</span>': ''
+                                || 'Sem Informação'}
+                                
+                                <span><strong>Cor dos olhos: </strong>${pessoa.cor_olhos || 'Sem Informação'}</span>
+                                <span><strong>Cor de cabelo: </strong>${pessoa.cor_cabelo || 'Sem Informação'}</span>
+                                <span><strong>Peso: </strong>${pessoa.peso || 'Sem Informação'}</span>
+                                <span><strong>Altura: </strong>${pessoa.altura || 'Sem Informação'}</span>
+                                <span><strong>Profissão: </strong>${pessoa.profissao || 'Sem Informação'}</span>
+                                <span><strong>Nível acadêmico: </strong>${pessoa.escolaridade || 'Sem Informação'}</span>
+                                <span><strong>Nacionalidade: </strong>${pessoa.nacionalidade || 'Sem Informação'}</span>
+                                <span><strong>Telefone principal: </strong>${pessoa.telefone_principal || 'Sem Informação'}</span>
+                                <span><strong>Telefone secundário: </strong>${pessoa.telefone_secundario || 'Sem Informação'}</span>
+                                <span><strong>E-mail: </strong>${pessoa.email || 'Sem Informação'}</span>
+                                <span><strong>Descrição: </strong>${envolvimento.descricao || "Sem informações"}</span>
+                            </div>
+                        </div>
+                `)
+            }
+            loadPaginacao(1)
+        })
+
+
+    </script>
+   
+</div>
+{% endblock %}
+

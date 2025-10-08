@@ -1,0 +1,242 @@
+{% extends 'principal.html' %}
+
+
+{% block content %}
+
+<div>
+
+    <form action="/criminal_record/" method="get" style="
+    width: 100%; background-color: #fff; margin-top: 30px; padding: 10px;" 
+        class="btn-group btn-group-sm">
+        
+        <input type="search" name="bi" style="border-radius: 4px 0px 0px 4px;"
+            class="form-control" placeholder="Número de B.I">
+        <button class="btn btn-warning"><i class="bi bi-search"></i></button>
+    </form>
+
+    {% for pessoa in pessoas %}
+        <div class="window text-white card" id="window{{pessoa.id}}"
+            style="top: 20x; left: calc((100% - 700px)/2); width: 900px; height: 500px;
+                position: fixed; background: #000; ">
+            <div class="titlebar card-header text-white
+            d-flex justify-content-between w-100" style="background: #000; cursor: default; color: #00ff00;">
+                <h6 style="color: #00ff00;">Ficha Criminal do {{pessoa.nome_completo}}</h6>
+                <button class="text-danger bg-black" onclick="fechar_modal('window{{pessoa.id}}')">X</button>
+            </div>
+
+            <div class="card-body" style="overflow-y: auto;
+                overflow-x: hidden; display: flex; flex-direction: row;">
+                <div style=" width: 99%; border-right: 1px solid #00ff00;">
+                    <h4 style="color: #00ff00;">Dados pessoais</h4>
+                    <hr style="width: 100%; background-color: #00ff00;">
+                    <div class="row mb-3" style="color: #00ff00;">
+                        <div class="col-sm-9" style="color: #00ff00;">NOME COMPLETO:{{ pessoa.nome_completo}}</div>
+                    </div>
+                    <div class="row mb-3" style="color: #00ff00;">
+                        <div class="col-sm-9" >Nome social: {{ pessoa.nome_social|lower}}</div>
+                    </div>
+                    <div class="row mb-3" style="color: #00ff00;">
+                        <div class="col-sm-9">Número de B.I: {{ pessoa.bi}}</div>
+                    </div>
+                    <div class="row mb-3" style="color: #00ff00;">
+                        <div class="col-sm-9">Data de nascimento: {{ pessoa.data_nascimento}}</div>
+                    </div>
+                    <div class="row mb-3" style="color: #00ff00;">
+                        <div class="col-sm-9">Idade: {{ pessoa.idade}}</div>
+                    </div>
+                    <div class="row mb-3" style="color: #00ff00;">
+                        <div class="col-sm-9">genero: {{ pessoa.get_genero_display}}</div>
+                    </div>
+                    <div class="row mb-3" style="color: #00ff00;">
+                        <div class="col-sm-9">Estado civil: {{ pessoa.get_estado_civil_display}}</div>
+                    </div>
+                    <div class="row mb-3" style="color: #00ff00;">
+                        <div class="col-sm-9">Altura: {{ pessoa.altura|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3" style="color: #00ff00;">
+                        <div class="col-sm-9">Peso: {{ pessoa.peso|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3" style="color: #00ff00;">
+                        <div class="col-sm-9">Cor de olhos: {{ pessoa.cor_olhos|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3" style="color: #00ff00;">
+                        <div class="col-sm-9">Cor de olhos: {{ pessoa.cor_olhos|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-9" style="color: #00ff00;">Cor de cabelo: {{ pessoa.cor_cabelo|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-9" style="color: #00ff00;">Profissão: {{ pessoa.profissao|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-9" style="color: #00ff00;">Escolaridade: {{ pessoa.escolaridade|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-9" style="color: #00ff00;">Nacionalidade: {{ pessoa.nacionalidade|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-9" style="color: #00ff00;">Telefone P.: {{ pessoa.telefone_principal|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-9" style="color: #00ff00;">Telefone S.: {{ pessoa.telefone_secundario|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-9" style="color: #00ff00;">E-mail: {{ pessoa.email|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-9" style="color: #00ff00;">Observações: {{ pessoa.observacoes|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-9" style="color: #00ff00;">Data da criação: {{ pessoa.data_criacao|default:"Sem Informsções"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-9" style="color: #00ff00;">Ativo?:
+
+                            {% if pessoa.ativo %}
+                                Sim
+                            {% else %}
+                                Não
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div style=" width: 99%; padding-left: 7px;"> 
+                    <h4 style="color: #00ff00;">Dados crimainais</h4>
+                    <hr style="width: 100%; background-color: #ddd;">
+                    {% for env in envolvimentos %}
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Tipo de envolvimento: 
+                                {{ env.tipo_envolvimento|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Descrição: 
+                                {{ env.descricao|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Número de caso: 
+                                {{ env.caso.numero_caso|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Título: 
+                                {{ env.caso.titulo|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Tipo de crime: 
+                                {{ env.caso.tipo_crime|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Estado: 
+                                {{ env.caso.get_status_display|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Prioridade: 
+                                {{ env.caso.prioridade|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Data da ocorrência: 
+                                {{ env.caso.data_ocorrencia|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Data de abertura: 
+                                {{ env.caso.data_abertura|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Data da conclusão: 
+                                {{ env.caso.data_conclusao|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Local da occorrência: 
+                                {{ env.caso.local_ocorrencia|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Delegado de origem: 
+                                {{ env.caso.delegacia_origem.get_full_name|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Investigador reponsável: 
+                                {{ env.caso.investigador_principal.get_full_name|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Número de processo: 
+                                {{ env.caso.numero_processo|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Observações: 
+                                {{ env.caso.observacoes|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-9" style="color: #00ff00;">Data de envolvimento: 
+                                {{ env.data_envolvimento|default:"Sem Informsções"}}
+                            </div>
+                        </div>
+                    {%empty%}
+                        <h6 style="color: #00ff00;">Cidadão sem ficha criminal</h6>
+                        
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    {%empty%}
+        <div class="window text-white card" id="window{{pessoa.id}}"
+            style="top: 20x; left: calc((100% - 700px)/2); width: 900px; height: 500px;
+                position: fixed; background: #000; ">
+            <div class="titlebar card-header text-white
+            d-flex justify-content-between w-100" style="background: #000; cursor: default;">
+                <h6 style="color: #00ff00;">Ficha Criminal do {{pessoa.nome_completo}}</h6>
+                <button class="text-danger bg-black" onclick="fechar_modal('window{{pessoa.id}}')">X</button>
+            </div>
+
+            <div class="card-body" style="overflow-y: auto;">
+                <h4 style="color: #00ff00;">Cidadão sem ficha criminal</h4>
+            </div>
+        </div>
+    {% endfor %}
+
+    <script>
+        function abrir_modal() {
+            document.querySelector('.window').style.display = 'flex';
+        }
+        function fechar_modal(nome) {
+            console.log(nome)
+            document.getElementById(`${nome}`).style.display = 'none';
+        }
+        $(function(){
+            $(".window").draggable({
+                handle: ".titlebar",
+                containment: "window"
+            })
+        })
+
+        $(".window").resizable({
+            minWidth: 200,
+            minHeight: 120
+        })
+
+        let z = 100
+
+        $(".window").mousedown(function(){
+            $(this).css("z-index", ++z)
+        })
+
+    </script>
+
+</div>
+
+{% endblock content %}

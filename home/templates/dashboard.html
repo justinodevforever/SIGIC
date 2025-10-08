@@ -1,0 +1,409 @@
+{% extends "principal.html" %}
+
+{% block content %}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGIC</title>
+
+    <style>
+      .dashboard-content {
+        padding: 30px;
+        width: 99%;
+      }
+
+      .stat-card {
+          background: white;
+          border-radius: 12px;
+          padding: 25px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+          border: 1px solid var(--border-color);
+          transition: all 0.3s ease;
+          height: 100%;
+      }
+
+      .stat-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      }
+
+      .stat-card.orange {
+          border-left: 4px solid var(--primary-orange);
+      }
+
+      .stat-card.blue {
+          border-left: 4px solid var(--secondary-blue);
+      }
+
+      .stat-icon {
+          width: 60px;
+          height: 60px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.8rem;
+          color: white;
+          margin-bottom: 15px;
+      }
+
+      .stat-icon.orange {
+          background: linear-gradient(135deg, var(--primary-orange), var(--light-orange));
+      }
+
+      .stat-icon.blue {
+          background: linear-gradient(135deg, var(--secondary-blue), #4a90e2);
+      }
+
+      .stat-value {
+          font-size: 2.5rem;
+          font-weight: bold;
+          color: var(--dark-blue);
+          margin-bottom: 5px;
+      }
+
+      .stat-label {
+          color: #6c757d;
+          font-weight: 500;
+      }
+
+      .chart-container {
+          background: white;
+          border-radius: 12px;
+          padding: 25px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+          border: 1px solid var(--border-color);
+          margin-top: 30px;
+      }
+
+      .chart-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+      }
+
+      .chart-title {
+          font-size: 1.3rem;
+          font-weight: 600;
+          color: var(--dark-blue);
+      }
+
+      .btn-custom {
+          background: var(--primary-orange);
+          border: none;
+          color: white;
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-size: 0.9rem;
+          transition: all 0.3s ease;
+      }
+
+      .btn-custom:hover {
+          background: var(--dark-blue);
+          transform: translateY(-2px);
+      }
+
+      .table-container {
+          background: white;
+          border-radius: 12px;
+          overflow: hidden;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+          border: 1px solid var(--border-color);
+      }
+
+      .table thead th {
+          background: var(--secondary-blue);
+          color: white;
+          border: none;
+          padding: 15px;
+          font-weight: 600;
+      }
+
+      .table tbody td {
+          padding: 15px;
+          border-color: var(--border-color);
+          vertical-align: middle;
+      }
+
+      .badge-status {
+          padding: 6px 12px;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: 500;
+      }
+
+      .badge-active { background: #d4edda; color: #155724; }
+      .badge-pending { background: #fff3cd; color: #856404; }
+      .badge-closed { background: #f8d7da; color: #721c24; }
+
+    </style>
+  </head>
+  <body>
+     
+    <div class="dashboard-content" id="dashboardContent">
+      
+        <div class="row g-4 mb-4">
+          <div class="col-xl-3 col-md-6">
+              <div class="stat-card orange">
+                  <div class="stat-icon bg-success">
+                      <i class="bi bi-check-circle"></i>
+                  </div>
+                  <div class="stat-value">{{casos_concluido}}</div>
+                  <div class="stat-label">Casos Concluídos</div>
+              </div>
+          </div>
+            
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card blue">
+                    <div class="stat-icon blue">
+                        <i class="bi bi-person-exclamation"></i>
+                    </div>
+                    <div class="stat-value">{{casos_abertos}}</div>
+                    <div class="stat-label">Casos abertos</div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card orange">
+                    <div class="stat-icon orange">
+                        <i class="bi bi-archive"></i>
+                    </div>
+                    <div class="stat-value">{{total_evidencias}}</div>
+                    <div class="stat-label">Evidências</div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card blue">
+                    <div class="stat-icon bg-black">
+                        <i class="bi bi-folder2-open"></i>
+                    </div>
+                    <div class="stat-value">{{total_casos}}</div>
+                    <div class="stat-label">Total de casos</div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="stat-card blue">
+                    <div class="stat-icon bg-danger">
+                        <i class="bi bi-folder2-open"></i>
+                    </div>
+                    <div class="stat-value">{{casos_urgentes}}</div>
+                    <div class="stat-label">Casos urgente</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h5 class="chart-title">Casos por Mês</h5>
+                        <button class="btn-custom">
+                            <i class="bi bi-download me-2"></i>Exportar
+                        </button>
+                    </div>
+                    <div style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-bar-chart-line" style="font-size: 3rem;"></i>
+                            <p class="mt-2">Gráfico de Casos por Mês</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h5 class="chart-title">Status dos Casos</h5>
+                    </div>
+                    <div style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-pie-chart" style="font-size: 3rem;"></i>
+                            <p class="mt-2">Gráfico de Pizza</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container mt-4">
+            <div class="chart-header">
+                <h5 class="chart-title">Casos Recentes</h5>
+                <a href="/create_case/" class="btn btn-success">
+                    <i class="bi bi-plus-lg me-2"></i>Novo Caso
+                </a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Investigador</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in casos_recentes %}
+                        <tr>
+                            <td>{{c.numero_caso}}</td>
+                            <td>{{c.titulo}}</td>
+                            <td>{{c.tipo_crime.nome}}</td>
+                            <td>{{c.investigador_principal.get_full_name}}</td>
+                            <td>{{c.data_ocorrencia}}</td>
+                            
+                            <td>{{c.get_status_display}}</td>
+                        </tr>
+                            {% endfor %}
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="chart-container mt-4">
+            <div class="chart-header">
+                <h5 class="chart-title text-danger">Casos com prazo vencido</h5>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Investigador</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in casos_prazo %}
+                        <tr>
+                            <td>{{c.numero_caso}}</td>
+                            <td>{{c.titulo}}</td>
+                            <td>{{c.tipo_crime.nome}}</td>
+                            <td>{{c.investigador_principal.get_full_name}}</td>
+                            <td>{{c.data_ocorrencia}}</td>
+                            
+                            <td>{{c.get_status_display}}</td>
+                            
+                        </tr>
+                            {% endfor %}
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="chart-container mt-4">
+            <div class="chart-header">
+                <h5 class="chart-title">Meus Casos Recentes</h5>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Investigador</th>
+                            <th>Data</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in meus_casos %}
+                        <tr>
+                            <td>{{c.numero_caso}}</td>
+                            <td>{{c.titulo}}</td>
+                            <td>{{c.tipo_crime.nome}}</td>
+                            <td>{{c.investigador_principal.get_full_name}}</td>
+                            <td>{{c.data_ocorrencia}}</td>
+                            
+                            <td>{{c.get_status_display}}</td>
+                            
+                        </tr>
+                            {% endfor %}
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="chart-container mt-4">
+            <div class="chart-header">
+                <h5 class="chart-title">Meus Eventos Recentes</h5>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Número de caso</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Importância</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in eventos_recentes %}
+                        <tr>
+                            <td>{{c.caso.numero_caso}}</td>
+                            <td>{{c.titulo}}</td>
+                            <td>{{c.get_tipo_evento_display}}</td>
+                            <td>{{c.get_importancia_display}}</td>
+                            <td>{{c.data_hora}}</td>
+                            
+                        </tr>
+                            {% endfor %}
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="chart-container mt-4">
+            <div class="chart-header">
+                <h5 class="chart-title">Minhas Evidências Recentes</h5>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Número de caso</th>
+                            <th>Número de evidência</th>
+                            <th>Local armazanado</th>
+                            <th>Tipo</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in evidencias_pendentes %}
+                        <tr>
+                            <td>{{c.caso.numero_caso}}</td>
+                            <td>{{c.numero_evidencia}}</td>
+                            <td>{{c.local_armazenamento}}</td>
+                            <td>{{c.tipo.nome}}</td>
+                            <td>{{c.get_status_display}}</td>
+                        </tr>
+                            {% endfor %}
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+  </body>
+  </html>
+{% endblock  %}

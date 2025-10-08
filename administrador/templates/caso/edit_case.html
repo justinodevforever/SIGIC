@@ -1,0 +1,293 @@
+{% extends 'principal.html' %}
+
+{% block content %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            .form-control{
+                height: 40px;
+            }
+        </style>
+    </head>
+    <body style="background-color: #ddd;">
+        <form action="{% url 'edit_case' caso.id%}" method="post" class="card"
+        style="display: flex; gap: 20px;  width: 80%; flex-direction: column;
+        background-color: #f8f9fa; padding: 10px; border-radius: 10px;
+         align-self: center; align-items: center;">
+
+            {% csrf_token %}
+            <div class="d-flex justify-content-between" style="width: 100%;">
+                <h3 class="text-warning">Atualização de Caso</h3>
+                <a href="/list_case/" class="btn btn-primary">Listar</a>
+            </div>
+            {% if sucesso %}
+                <div class="alert alert-success" role="alert">
+                    <strong>{{sucesso}}</strong>
+                </div>
+
+            {% elif erro%}
+
+                <div class="alert alert-danger" role="alert">
+                    <strong>{{erro}}</strong>
+                </div>
+            {% endif %}
+
+            <div class="form-group" 
+            style="display: flex; gap: 20px;  width: 100%;">
+                <label for="delegacia_origem" 
+                style="display: flex; flex-direction: column;  width: 100%;">
+
+                    <span >
+                        Piquente de origem
+                        <span class="text-danger">*</span>
+                    </span>
+                    <input type="text" style=" width: 100%;" value="{{caso.delegacia_origem}}"
+                        class="form-control" name="delegacia_origem" 
+                        aria-describedby="helpId" autocomplete="off">
+                        
+                        {% if form.delegacia_origem.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.delegacia_origem.errors}}
+                            </div>
+                        {% endif %}
+                </label>
+
+                <label for="titulo" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                    <span >
+                        Título
+                        <span class="text-danger">*</span>
+                    </span>
+                    <input type="text" style=" width: 100%;" value="{{caso.titulo}}"
+                        class="form-control" name="titulo" 
+                        aria-describedby="helpId" autocomplete="off">
+                        
+                    {% if form.titulo.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.titulo.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            </div>
+            
+            <div class="form-group" 
+            style="display: flex; gap: 20px;  width: 100%;">
+                <label for="username" 
+                style="display: flex; flex-direction: column;  width: 100%;">
+
+                    Data da conclusão
+                    <input type="datetime-local" style=" width: 100%;" value="{{caso.data_conclusao}}"
+                        class="form-control" name="data_conclusao" 
+                        aria-describedby="helpId" autocomplete="off">
+                        
+                        {% if form.data_conclusao.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.data_conclusao.errors}}
+                            </div>
+                        {% endif %}
+                </label>
+    
+                <label for="email" style="display: flex;
+                 width: 100%; flex-direction: column;">
+
+                    Prazo da conclusão
+                    <input type="datetime-local" style=" width: 100%;" value="{{caso.prazo_conclusao}}"
+                    class="form-control" name="prazo_conclusao" autocomplete="off"
+                    aria-describedby="helpId">
+
+
+                    {% if form.prazo_conclusao.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.prazo_conclusao.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            </div>
+    
+            <div class="form-group" 
+            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                <label for="first_name" style="display: flex;
+                flex-direction: column; width: 100%;">
+
+                    <span >
+                        Data da ocorrência
+                        <span class="text-danger">*</span>
+                    </span>
+                    <input type="datetime-local" style=" width: 100%;" value="{{caso.data_ocorrencia}}"
+                    class="form-control" name="data_ocorrencia" autocomplete="off"
+                    aria-describedby="helpId">
+
+                    {% if form.data_ocorrencia.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.data_ocorrencia.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            
+                <label for="last_name" style="display: flex; 
+                 flex-direction: column; width: 100%;">
+
+                    <span >
+                        Local da corrênca
+                        <span class="text-danger">*</span>
+                    </span>
+                    <textarea  style=" width: 100%; resize: none;" 
+                    class="form-control" name="local_ocorrencia" autocomplete="off"
+                    aria-describedby="helpId"> {{caso.local_ocorrencia}}</textarea>
+
+                    {% if form.local_ocorrencia.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.local_ocorrencia.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+    
+                
+            </div>
+    
+            <div class="form-group" 
+            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                <label for="observacoes" style="display: flex;
+                 flex-direction: column;  width: 100%;">
+
+                    observações 
+                    <textarea style=" width: 100%; height: 100px; resize: none;" 
+                    class="form-control" name="observacoes" 
+                    aria-describedby="helpId" autocomplete="off">{{caso.observacoes}}</textarea>
+
+                    {% if form.observacoes.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.observacoes.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+    
+                <label for="observacoes_internas" style="display: flex;
+                 flex-direction: column;  width: 100%;">
+
+                    Obs. interna
+                    <textarea style=" width: 100%; height: 100px; resize: none;"
+                    class="form-control" name="observacoes_internas" 
+                    aria-describedby="helpId" autocomplete="off">{{caso.observacoes_internas}}</textarea>
+
+                    {% if form.observacoes_internas.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.observacoes_internas.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            </div>
+    
+            <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                
+                <label for="status" style="display: flex;
+                 flex-direction: column; width: 100%;">
+
+                    <span >
+                        Status 
+                        <span class="text-danger">*</span>
+                    </span>
+                    <select name="status" class="form-control" >
+                        <option value="{{caso.status}}">{{caso.get_status_display}}</option>
+                        <option value="aberto">Aberto</option>
+                        <option value="em_andamento">Em andamento</option>
+                        <option value="suspenso">Suspenso</option>
+                        <option value="concluido">Concluido</option>
+                        <option value="arquivado">Arquivado</option>
+                    </select>
+
+                    {% if form.status.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.status.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+                
+                <label for="prioridade" style="display: flex;
+                 flex-direction: column; width: 100%;">
+
+                    <span >
+                        Prioridade
+                        <span class="text-danger">*</span>
+                    </span>
+                    <select name="prioridade" class="form-control" >
+                        <option value="{{caso.prioridade}}">{{caso.get_prioridade_display}}</option>
+                        <option value="1">Baixa</option>
+                        <option value="2">Normal</option>
+                        <option value="3">Alta</option>
+                        <option value="4">Urgente</option>                
+                        <option value="5">Crítica</option>                
+                    </select>
+
+                    {% if form.prioridade.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.prioridade.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            </div>
+
+            <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                
+                <label for="investigador_principal" style="display: flex;
+                 flex-direction: column; width: 100%;">
+
+                    <span >
+                        Investigador principal 
+                        <span class="text-danger">*</span>
+                    </span>
+                    <select name="investigador_principal" class="form-control" >
+                        <option value="{{caso.investigador_principal.id}}">{{caso.investigador_principal.get_full_name}}</option>
+                        {% for inv in investigadores %}
+                            <option value="{{inv.id}}">
+                                {{inv.get_full_name}}
+                            </option>
+                        {% endfor %}  
+                    </select>
+
+                    {% if form.investigador_principal.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.investigador_principal.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+
+                <label for="delegado_responsavel" style="display: flex;
+                flex-direction: column; width: 100%;">
+            
+                    <span >
+                        Delegado Responsável 
+                        <span class="text-danger">*</span>
+                    </span>
+                    <select  name="delegado_responsavel" class="form-control" >
+                        <option value="{{caso.delegado_responsavel.id}}">{{caso.delegado_responsavel.get_full_name}}</option>
+                        {% for inv in delegados %}
+                            <option value="{{inv.id}}">
+                                {{inv.get_full_name}}
+                            </option>
+                        {% endfor %}                 
+                    </select>
+
+                    {% if form.delegado_responsavel.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.delegado_responsavel.errors}}
+                        </div>
+                    {% endif %}
+                  
+                </label>
+            </div>
+
+            <button type="submit" class="btn" 
+            style="width: 80%; background-color: #2c5aa0; color: #fff;">
+                Cadastrar
+            </button>
+        </form> 
+    </body>
+    </html>
+{% endblock content %}

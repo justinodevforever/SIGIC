@@ -1,0 +1,347 @@
+<!-- ==========================================
+     TEMPLATE: cadastrar_pessoa.html
+     ========================================== -->
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Pessoa</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 { color: #333; margin-bottom: 30px; text-align: center; }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input[type="file"] {
+            padding: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background: #5568d3; }
+        .message {
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .preview {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+        .nav-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📸 Cadastrar Pessoa</h1>
+        
+        <form id="cadastroForm" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="nome">Nome completo:</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="foto">Foto (somente o rosto):</label>
+                <input type="file" id="foto" name="foto" accept="image/*" required>
+            </div>
+            
+            <div class="preview" id="preview"></div>
+            
+            <button type="submit">Cadastrar</button>
+        </form>
+        
+        <div id="message" class="message"></div>
+        
+        <div class="nav-links">
+            <a href="/pessoas/">Ver Pessoas</a> | 
+            <a href="/reconhecer/">Reconhecer Rosto</a>
+        </div>
+    </div>
+
+    <script>
+        const fotoInput = document.getElementById('foto');
+        const preview = document.getElementById('preview');
+        
+        fotoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('cadastroForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const messageDiv = document.getElementById('message');
+            
+            try {
+                const response = await fetch('/cadastrar/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                messageDiv.style.display = 'block';
+                if (data.success) {
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = data.message;
+                    this.reset();
+                    preview.innerHTML = '';
+                } else {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = data.message;
+                }
+            } catch (error) {
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'message error';
+                messageDiv.textContent = 'Erro ao cadastrar pessoa';
+            }
+        });
+    </script>
+</body>
+</html>
+
+<!-- ==========================================
+     TEMPLATE: reconhecer_rosto.html
+     ========================================== -->
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reconhecimento Facial</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 { color: #333; margin-bottom: 20px; text-align: center; }
+        #video {
+            width: 100%;
+            max-width: 640px;
+            border-radius: 10px;
+            border: 3px solid #667eea;
+            display: block;
+            margin: 0 auto;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 15px 30px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background: #5568d3; }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        #resultado {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        .reconhecida {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        .nao-reconhecida {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+        .nav-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Reconhecimento Facial</h1>
+        
+        <video id="video" autoplay></video>
+        
+        <div class="controls">
+            <button id="iniciarBtn">Iniciar Câmera</button>
+            <button id="capturarBtn" disabled>Capturar e Reconhecer</button>
+        </div>
+        
+        <div id="resultado"></div>
+        
+        <div class="nav-links">
+            <a href="/cadastrar/">Cadastrar Pessoa</a> | 
+            <a href="/pessoas/">Ver Pessoas</a> |
+            <a href="/historico/">Histórico</a>
+        </div>
+    </div>
+
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const iniciarBtn = document.getElementById('iniciarBtn');
+        const capturarBtn = document.getElementById('capturarBtn');
+        const resultado = document.getElementById('resultado');
+        
+        let stream = null;
+
+        iniciarBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: 640, height: 480 } 
+                });
+                video.srcObject = stream;
+                iniciarBtn.disabled = true;
+                capturarBtn.disabled = false;
+                
+                resultado.style.display = 'block';
+                resultado.className = 'info';
+                resultado.innerHTML = '✓ Câmera iniciada. Posicione seu rosto e clique em "Capturar"';
+            } catch (error) {
+                alert('Erro ao acessar a câmera: ' + error.message);
+            }
+        });
+
+        capturarBtn.addEventListener('click', async () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            
+            const imagemBase64 = canvas.toDataURL('image/jpeg');
+            
+            resultado.style.display = 'block';
+            resultado.className = 'info';
+            resultado.innerHTML = '⏳ Processando...';
+            
+            try {
+                const formData = new FormData();
+                formData.append('imagem', imagemBase64);
+                
+                const response = await fetch('/reconhecer/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.reconhecida) {
+                    resultado.className = 'reconhecida';
+                    resultado.innerHTML = `
+                        <h2>✓ Pessoa Reconhecida!</h2>
+                        <p style="font-size: 24px; margin: 10px 0;"><strong>${data.nome}</strong></p>
+                        <p>Confiança: ${data.confianca}%</p>
+                    `;
+                } else if (data.success && !data.reconhecida) {
+                    resultado.className = 'nao-reconhecida';
+                    resultado.innerHTML = `
+                        <h2>✗ Pessoa Não Reconhecida</h2>
+                        <p>Esta pessoa não está cadastrada no sistema.</p>
+                    `;
+                } else {
+                    resultado.className = 'nao-reconhecida';
+                    resultado.innerHTML = `<p>✗ ${data.message}</p>`;
+                }
+            } catch (error) {
+                resultado.className = 'nao-reconhecida';
+                resultado.innerHTML = '<p>✗ Erro ao processar imagem</p>';
+            }
+        });
+    </script>
+</body>
+</html>
