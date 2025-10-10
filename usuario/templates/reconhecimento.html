@@ -40,6 +40,7 @@
         .card {
             background: white;
             border-radius: 15px;
+            min-height: 20px;
             padding: 25px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
@@ -252,16 +253,37 @@
             color: #721c24;
         }
         #image img{
-            width: 200px;
-            height: 200px;
-            border: 1px solid #000;
-            margin-top: 20px;
+            max-width: 200px;
+            max-height: 100%;
+            border-radius: 10px;
+            margin-top: 20;
+            border: 3px solid #00ff00;
         }
 
         @media (max-width: 768px) {
             .main-grid {
                 grid-template-columns: 1fr;
             }
+        }
+        #imagePreview {
+            max-width: 200px;
+            max-height: 300px;
+            border-radius: 10px;
+            display: none;
+            margin: 0 auto;
+            margin-top: 20;
+            border: 3px solid #667eea;
+        }
+        
+       #image{
+        display: flex;
+        width: 200px;
+        height: 300px;
+        display: none;
+       }
+       .icon {
+            width: 20px;
+            height: 20px;
         }
     </style>
 </head>
@@ -278,17 +300,25 @@
             </div>
 
             <div class="controls">
-                <button class="btn-primary" onclick="iniciarCamera()">Iniciar Câmera</button>
+                <button class="btn-primary" onclick="iniciarCamera()" id="openCameraBtn">
+                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                    </svg>
+                    Iniciar Câmera
+                </button>
                 <button class="btn-success" onclick="verificarFace()">Verificar</button>
-                <button class="btn-secondary" onclick="pararCamera('verificacao')">Parar</button>
+                <button class="btn-secondary" onclick="stopCamera()" id="parar">Parar</button>
             </div >
             <div class="p-2 card mt-2 w-100">
                 <h3>Selecionar a imagem</h3>
                 <input type="file" id="file" name="file" class="m-2">
                 <button class="btn-success" onclick="VerificarFoto()">verificarFace</button>
             </div>
-                
-            <div id="image"></div>
+
+            <div class="d-flex row w-50 h-auto">
+                <img id="imagePreview" alt="Preview da imagem">
+                <div id="image" style="margin-right: 40px;"></div>
+            </div>
             <div id="mensagemVerificacao"></div>
 
         </div>
@@ -296,22 +326,59 @@
     <script>
         let streamCadastro = null;
         let streamVerificacao = null;
+        let stream = null;
+        const fileInput = document.getElementById('file');
+        const imagePreview = document.getElementById('imagePreview');
+        const video = document.getElementById('videoVerificacao');
+        const openCameraBtn = document.getElementById('openCameraBtn');
+        
+        const video1 = document.getElementById('video');
+        const parar = document.getElementById('parar');
 
-        function pararCamera(tipo) {
-            const video1 = document.getElementById('video');
+        fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = (event) => {
+                        fotoBase64 = reader.result;
+                        imagePreview.src = fotoBase64;
+                        imagePreview.style.display = 'block';
+                        
+                    };
+                }
+            });
 
+        function stopCamera() {
+              
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            video.style.display = 'none';
             video1.style.display = 'none'
+            parar.style.display = 'none'
+
             document.getElementById('videoVerificacao').srcObject = null;
+            openCameraBtn.innerHTML = `
+                <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                </svg>
+                Capturar Foto
+            `;
                 
-            mostrarMensagem(tipo, 'Câmera desligada', 'info');
+            mostrarMensagem(tipo='parar', 'Câmera desligada', 'info');
             
         }
+ 
         
         async function iniciarCamera() {
-            const video = document.getElementById('videoVerificacao');
+            
             const video1 = document.getElementById('video');
 
             video1.style.display = 'flex'
+            video.style.display = 'block';
+            parar.style.display = 'block'
 
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 alert("Seu navegador não suporta acesso à câmera.");
@@ -320,7 +387,7 @@
 
             try {
 
-                const stream = await navigator.mediaDevices.getUserMedia({
+                stream = await navigator.mediaDevices.getUserMedia({
                     video: {
                         width: { ideal: 640 },
                         height: { ideal: 480 },
@@ -328,6 +395,7 @@
                     },
                     audio: false
                 });
+                openCameraBtn.textContent = '🔴 Câmera Ativa';
 
                 video.srcObject = stream;
                 await video.play();
@@ -350,6 +418,10 @@
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             const fotoBase64 = canvas.toDataURL('image/jpeg');
+
+    
+            imagePreview.src = fotoBase64;
+            imagePreview.style.display = 'block';
 
             
             try {
@@ -396,6 +468,7 @@
 
             reader.onload = async function () {
                 const fotoBase64 = reader.result;
+                console.log(fotoBase64)
 
                 try {
                     const response = await fetch('/verificar/', {
@@ -413,8 +486,8 @@
                     
                     if (data.success) {
                         if (data.reconhecido) {
-                            console.log(data.image[1])
-                            image.innerHTML = `<img src=${data.image}/>`
+                            image.style.display = 'flex'
+                            image.innerHTML = `<img src=${data.image} id='recoImg'/>`
                             mostrarMensagem('verificacao', 
                                 `✅ ${data.pessoa} - Confiança: ${data.confianca}%`, 
                                 'success');

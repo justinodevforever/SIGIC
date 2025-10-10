@@ -95,8 +95,7 @@ from deepface import DeepFace
 import base64
 import json
 import numpy as np
-import cv2
-import os
+
 
 def index(request):
     pessoas = Pessoa.objects.all()
@@ -143,7 +142,6 @@ def cadastrar_pessoa(request):
                 model_name="ArcFace",
                 enforce_detection=False
             )
-            print(embedding_obj[0]['embedding'])
 
             pessoa.embedding = embedding_obj[0]['embedding']
             pessoa.save()
@@ -205,8 +203,8 @@ def verificar_face(request):
                     img1_path=historico.foto_verificacao.path,
                     img2_path=pessoa.foto.path,
                     detector_backend=backends[3],
-                    distance_metric="cosine",
                     model_name='ArcFace',
+                    distance_metric="cosine",
                     align=True,
                 )    
                 melhor_match = pessoa

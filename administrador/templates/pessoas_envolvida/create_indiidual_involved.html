@@ -10,30 +10,218 @@
             .form-control{
                 height: 40px;
             }
+          
+            .button-group {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                border: none;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .btn-camera {
+                background: #667eea;
+                color: white;
+            }
+
+            .btn-camera:hover {
+                background: #5568d3;
+                transform: translateY(-2px);
+            }
+
+            .btn-upload {
+                background: #764ba2;
+                color: white;
+            }
+
+            .btn-upload:hover {
+                background: #643a8a;
+                transform: translateY(-2px);
+            }
+
+            .btn-submit {
+                background: #10b981;
+                color: white;
+                width: 100%;
+            }
+
+            .btn-submit:hover {
+                background: #059669;
+                transform: translateY(-2px);
+            }
+
+            .btn-submit:disabled {
+                background: #d1d5db;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .preview-container {
+                margin-bottom: 25px;
+                text-align: center;
+            }
+
+            #videoElement {
+                width: 100%;
+                max-width: 400px;
+                border-radius: 10px;
+                border: 3px solid #667eea;
+                display: none;
+            }
+
+            #canvas {
+                display: none;
+            }
+
+            #imagePreview {
+                max-width: 100%;
+                max-height: 400px;
+                border-radius: 10px;
+                border: 3px solid #667eea;
+                display: none;
+                margin: 0 auto;
+            }
+
+            #captureBtn {
+                margin-top: 15px;
+                display: none;
+            }
+
+            #fileInput {
+                display: none;
+            }
+
+            .alert {
+                padding: 15px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                font-weight: 500;
+                display: none;
+            }
+
+            .alert-success {
+                background: #d1fae5;
+                color: #065f46;
+                border: 2px solid #10b981;
+            }
+
+            .alert-error {
+                background: #fee2e2;
+                color: #991b1b;
+                border: 2px solid #ef4444;
+            }
+
+            .loading {
+                display: none;
+                text-align: center;
+                margin: 20px 0;
+            }
+
+            .spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #667eea;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin: 0 auto;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+
+            .icon {
+                width: 20px;
+                height: 20px;
+            }
         </style>
     </head>
-    <body style="background-color: #ddd;">
-        <form action="{% url 'create_indiidual_involved' caso.id %}" method="post" class="card"
+    <body style="background-color: #ddd;"  >
+        <form action="{% url 'create_indiidual_involved' caso.id %}" method="post" class="card" enctype="multipart/form-data" 
         style="display: flex; gap: 20px;  width: 80%; flex-direction: column;
         background-color: #f8f9fa; padding: 10px; border-radius: 10px;
          align-self: center; align-items: center;">
 
             {% csrf_token %}
+             
+            
             <div class="d-flex justify-content-between" style="width: 100%;">
                 <h3 class="text-warning">Envolvimento no caso Nº {{caso.numero_caso}}</h3>
                 <a href="/list_case/" class="btn btn-primary">Listar</a>
             </div>
             {% if sucesso %}
-                <div class="alert alert-success" role="alert">
-                    <strong>{{sucesso}}</strong>
-                </div>
-
+            <div class="alert alert-success" role="alert">
+                <strong>{{sucesso}}</strong>
+            </div>
+            
             {% elif erro%}
-
-                <div class="alert alert-danger" role="alert">
-                    <strong>{{erro}}</strong>
-                </div>
+            
+            <div class="alert alert-danger" role="alert">
+                <strong>{{erro}}</strong>
+            </div>
             {% endif %}
+
+            <div class="container">
+
+                <div id="alertBox" class="alert"></div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-camera" id="openCameraBtn" style="width: 200px;">
+                            <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                            </svg>
+                            Capturar Foto
+                        </button>
+                        <button type="button" class="btn btn-upload" id="uploadBtn" style="width: 200px;">
+                            <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z"/>
+                            </svg>
+                            Carregar Imagem
+                        </button>
+                        <button type="button" 
+                        onclick="stopCamera()"
+                        class="btn btn-camera" id="stopCameraBtn" 
+                        style="display: none; margin-bottom: 15px; width: 200px; background: #ef4444;">
+                            <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z"/>
+                            </svg>
+                            Parar Câmera
+                        </button>
+                    </div>
+
+                    <input type="file" id="fileInput" name="foto_data" accept="image/*">
+                   
+                    <input type="hidden" id="fotoBase64Input" name="foto_base64">
+                    
+                    <div class="preview-container" id="video">
+                        <video id="videoElement" autoplay></video>
+                        <button type="button" class="btn btn-camera" id="captureBtn">Capturar Imagem</button>
+                        <canvas id="canvas"></canvas>
+                        <img id="imagePreview" alt="Preview da imagem">
+                    </div>
+
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p style="margin-top: 10px; color: #667eea; font-weight: 600;">Processando...</p>
+                    </div>
+
+                    
+                
+            </div>
 
             <div class="form-group" 
             style="display: flex; gap: 20px;  width: 100%;">
@@ -583,11 +771,12 @@
                 </label>
             </div>
 
-            <button type="submit" class="btn" 
-            style="width: 80%; background-color: #2c5aa0; color: #fff;">
-                Cadastrar
+            <button type="submit" class="btn btn-submit" >
+                <i class="bi bi-check"></i>
+                Cadastrar Pessoa
             </button>
-        </form> 
+            
+    </form> 
 
         <script>
             $(document).ready(function(){
@@ -596,6 +785,125 @@
                 $('#telefone_principal').mask('900 000 000', {reverse: true})
                 $('#telefone_secundario').mask('900 000 000', {reverse: true})
             })
+        </script>
+
+        <script>
+            const video = document.getElementById('videoElement');
+            const canvas = document.getElementById('canvas');
+            const imagePreview = document.getElementById('imagePreview');
+            const captureBtn = document.getElementById('captureBtn');
+            const openCameraBtn = document.getElementById('openCameraBtn');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const fileInput = document.getElementById('fileInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const alertBox = document.getElementById('alertBox');
+            const loading = document.querySelector('.loading');
+            const stopCameraBtn = document.getElementById('stopCameraBtn');
+            const fotoBase64Input = document.getElementById('fotoBase64Input');
+            let stream = null;
+            let fotoBase64 = null;
+
+            function stopCamera() {
+              
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                video.style.display = 'none';
+                captureBtn.style.display = 'none';
+                stopCameraBtn.style.display = 'none';
+                openCameraBtn.innerHTML = `
+                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                    </svg>
+                    Capturar Foto
+                `;
+            }
+            
+            function showAlert(message, type) {
+                alertBox.textContent = message;
+                alertBox.className = `alert alert-${type}`;
+                alertBox.style.display = 'block';
+                setTimeout(() => {
+                    alertBox.style.display = 'none';
+                }, 5000);
+            }
+
+            openCameraBtn.addEventListener('click', async () => {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    captureBtn.style.display = 'inline-block';
+                    imagePreview.style.display = 'none';stopCameraBtn.style.display = 'block';
+                    openCameraBtn.textContent = '🔴 Câmera Ativa';
+                } catch (err) {
+                    showAlert('Erro ao acessar a câmera: ' + err.message, 'error');
+                }
+            });
+
+
+            function base64ToFile(base64String, fileName = "foto.jpg") {
+                const arr = base64String.split(",");
+                const mime = arr[0].match(/:(.*?);/)[1]; // ex: image/jpeg
+                const bstr = atob(arr[1]); // decodifica base64
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+
+                return new File([u8arr], fileName, { type: mime });
+            }
+
+
+            captureBtn.addEventListener('click', () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0);
+                
+                fotoBase64 = canvas.toDataURL('image/jpeg');
+                fotoBase64Input.value = fotoBase64;
+                imagePreview.src = fotoBase64;
+
+                imagePreview.style.display = 'block'
+                video.style.display = 'none';
+                captureBtn.style.display = 'none';
+
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                
+                openCameraBtn.textContent = '📸 Capturar Foto';
+                submitBtn.disabled = false;
+                showAlert('Foto capturada com sucesso!', 'success');
+            });
+
+            uploadBtn.addEventListener('click', () => {
+                fileInput.type = "file";
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = (event) => {
+                        fotoBase64 = reader.result;
+                        imagePreview.src = fotoBase64;
+                        imagePreview.style.display = 'block';
+                        video.style.display = 'none';
+                        captureBtn.style.display = 'none';
+                        submitBtn.disabled = false;
+                        showAlert('Imagem carregada com sucesso!', 'success');
+                    };
+                }
+            });
+
+            
         </script>
     </body>
     </html>

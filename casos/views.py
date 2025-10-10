@@ -19,6 +19,10 @@ from .forms import *
 from django.core import serializers
 import json
 from django.views.decorators.http import require_http_methods
+import tempfile
+import os
+from django.core.files import File
+from django.core.files.base import ContentFile
 
 def caso(request):
     
@@ -772,13 +776,80 @@ def detail_individual_invalid(request, pessoa_id):
 def create_indiidual_involved(request, caso_id):
 
     caso = Caso.objects.get(id=caso_id)
-
+    
     if request.method == 'POST':
         form = PessoaEnvolvidaForm(request.POST)
         if form.is_valid():
             pessoa, envolvimentoCaso = form.save(caso=caso)
             pessoa.criado_por = request.user
             pessoa.save()
+
+            foto_data = None
+            foto_base64 = None
+            try:
+                foto_data = request.FILES['foto_data']
+            except Exception as e:
+                pass
+            try:
+                foto_base64 = request.POST.get('foto_base64')
+            except Exception as e:
+                pass
+
+            temp_path = None
+
+
+            if foto_data:
+                _, ext = os.path.splitext(foto_data.name)
+
+                with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_file:
+                    for chunk in foto_data.chunks():
+                        temp_file.write(chunk)
+                    temp_path = temp_file.name 
+
+                
+
+            elif foto_base64:
+                format, imgstr = foto_base64.split(';base64,')
+                ext = format.split('/')[-1]
+                image_content = ContentFile(base64.b64decode(imgstr), name=f"{pessoa.nome_completo}.{ext}")
+
+                with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as temp_file:
+                    temp_file.write(image_content.read())
+                    temp_path = temp_file.name
+
+
+            with open(temp_path, 'rb') as f:
+                pessoaReconhecimento = PessoaReconhecimento.objects.create(
+                    pessoa=pessoa,
+                    nome=pessoa.nome_completo,
+                    foto=File(f, name=f"{pessoa.nome_completo}.{ext}")
+                )
+
+            try:
+                faces = DeepFace.extract_faces(img_path=pessoaReconhecimento.foto.path, detector_backend='opencv',enforce_detection=False)
+            
+                if len(faces) == 0:
+                    pessoaReconhecimento.delete()
+                    return JsonResponse({'success': False, 'message': 'Nenhum rosto detectado na imagem'})
+                
+                
+                backends = ['opencv', 'ssd', 'dlib', 'mtcnn', 'fastmtcnn',
+                    'retinaface', 'mediapipe', 'yolov8n', 'yolov8m', 'yolov8l', 'yolov11n',
+                    'yolov11s', 'yolov11m', 'yolov11l', 'yolov12n', 'yolov12s',
+                    'yolov12m', 'yolov12l', 'yunet', 'centerface'
+                ]
+                embedding_obj = DeepFace.represent(
+                    img_path=pessoaReconhecimento.foto.path,
+                    detector_backend=backends[3],
+                    model_name='ArcFace',
+                    enforce_detection=False
+                )
+
+                pessoaReconhecimento.embedding = embedding_obj[0]['embedding']
+                pessoaReconhecimento.save()
+                
+            except Exception as e:
+                pessoaReconhecimento.delete()
 
             LogAuditoria.objects.create(
                 usuario=request.user,
@@ -789,9 +860,8 @@ def create_indiidual_involved(request, caso_id):
                 ip_origem=request.META.get('REMOTE_ADDR'),
                 user_agent=request.META.get('HTTP_USER_AGENT', '')
             )
-            
             return render(request, 'pessoas_envolvida/create_indiidual_involved.html', 
-                {'form': form, 'caso': caso, 'sucesso': 'Pessoa criada com sucesso'})
+                {'form': form, 'caso': caso, 'sucesso': f'{pessoa.nome_completo} Criado com sucesso!'})
         else:
             return render(request, 'pessoas_envolvida/create_indiidual_involved.html', 
                 {'form': form, 'caso': caso, 'erro': 'Erro ao salva dados da pessoa'})
@@ -800,9 +870,8 @@ def create_indiidual_involved(request, caso_id):
         form = PessoaEnvolvidaForm()
     
     return render(request, 'pessoas_envolvida/create_indiidual_involved.html', 
-    {'form': form, 'caso': caso})
+    {'form': form, 'caso': caso, 'erro':  f'Erro ao criar essa pessoa!'})
 
-# @login_required
 # def pessoa_editar(request, pessoa_id):
 #     """Editar pessoa existente"""
 #     pessoa = get_object_or_404(Pessoa, id=pessoa_id, ativo=True)

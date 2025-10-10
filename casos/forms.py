@@ -8,6 +8,14 @@ from django.utils import timezone
 from evidencias.models import Evidencia
 from decimal import Decimal
 import re
+from django.http import JsonResponse
+from django.core.files.base import ContentFile
+from deepface import DeepFace
+import base64
+import json
+import numpy as np
+import tempfile
+import os
 
 class PessoaEnvolvidaForm(forms.Form):
 
@@ -189,25 +197,25 @@ class PessoaEnvolvidaForm(forms.Form):
         telefone_principal = telefone_principal.replace(" ","")
         telefone_secundario = telefone_secundario.replace(" ","")
 
-        if not re.fullmatch(r'9\d{8}', telefone_principal):
+        if telefone_principal and not re.fullmatch(r'9\d{8}', telefone_principal):
 
             self.add_error('telefone_principal', 'Número de telefone inválido')
 
-        if not re.fullmatch(r'9\d{8}', telefone_secundario):
+        if telefone_secundario and not re.fullmatch(r'9\d{8}', telefone_secundario):
 
             self.add_error('telefone_secundario', 'Número de telefone inválido')
 
         return cleaned_data
 
     def save(self,caso, pessoa=None):
-
+        
         telefone_principal=self.cleaned_data['telefone_principal']
         telefone_secundario=self.cleaned_data['telefone_secundario']
-
         telefone_principal = telefone_principal.replace(" ","")
         telefone_secundario = telefone_secundario.replace(" ","")
 
         if pessoa is None:
+            
             altura = self.cleaned_data['altura']
             peso = self.cleaned_data['peso']
 
@@ -248,6 +256,8 @@ class PessoaEnvolvidaForm(forms.Form):
 
             pessoa.save()
 
+            
+
             envolvimentoCaso = EnvolvimentoCaso(
                 descricao=self.cleaned_data['descricao'],
                 caso=caso,
@@ -283,6 +293,7 @@ class PessoaEnvolvidaForm(forms.Form):
                 alias.save()
 
             return pessoa, envolvimentoCaso
+            
 
         # else:
         #     self.instance.titulo=self.cleaned_data['titulo']

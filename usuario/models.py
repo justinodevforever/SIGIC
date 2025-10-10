@@ -283,13 +283,15 @@ from django.core.files.storage import FileSystemStorage
 import os
 
 class PessoaReconhecimento(models.Model):
-    nome = models.CharField(max_length=100)
+    nome = models.CharField(max_length=400)
     foto = models.ImageField(upload_to='faces/')
     embedding = models.JSONField(null=True, blank=True)
     data_cadastro = models.DateTimeField(auto_now_add=True)
+
+    pessoa = models.ForeignKey(Pessoa, on_delete=models.CASCADE, related_name='envolvimento')
     
     def __str__(self):
-        return self.nome
+        return f'{self.pessoa.nome_completo}-{self.nome}'
     
     class Meta:
         verbose_name_plural = "Reconhecimentos"
