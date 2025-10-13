@@ -14,6 +14,7 @@ urlpatterns = [
     path('create_indiidual_involved/<str:caso_id>/', create_indiidual_involved, name='create_indiidual_involved'),
     path('list_indiidual_involved/', list_indiidual_involved, name='list_indiidual_involved'),
     path('detail_individual_invalid/<str:pessoa_id>/', detail_individual_invalid, name='detail_individual_invalid'),
+    path('delete_individual_involved/<str:id>/', delete_individual_involved, name='delete_individual_involved'),
     
     path('create_event/<str:caso_id>/', create_event, name='create_event'),
     path('list_event/', list_event, name='list_event'),

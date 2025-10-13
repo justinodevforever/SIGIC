@@ -116,12 +116,11 @@ def create_user(request):
 
             	return render(request, 'usuario/criar_usuario.html', {'form': form,
                 'erro': 'Erro ao criar Usuario!'})
+        
+    else:
+        form = UserForm()
 
-
-
-    form = UserForm()
-
-    return render(request, 'usuario/criar_usuario.html', {'form': form})
+        return render(request, 'usuario/criar_usuario.html', {'form': form})
 
 @login_required
 def edit_user(request, id):
@@ -129,7 +128,7 @@ def edit_user(request, id):
     user = Usuario.objects.get(id=id)
     
     if request.method == 'POST':
-        form = EditUserForm(request.POST)
+        form = EditUserForm(request.POST, instance=user)
 
         if form.is_valid():
             anterior ={
@@ -142,6 +141,7 @@ def edit_user(request, id):
                 'telefone': user.telefone,
                 'ativo': user.ativo,
                 'matricula': user.matricula,
+                'Ativo': user.is_active,
             }
          
             user.username = form.cleaned_data['username']
@@ -153,6 +153,8 @@ def edit_user(request, id):
             user.email = form.cleaned_data['email']
             user.matricula = form.cleaned_data['matricula']
             user.telefone = form.cleaned_data['telefone']
+            user.is_active = form.cleaned_data['is_active']
+            user.ativo = form.cleaned_data['is_active']
 
             userExist = Usuario.objects.get(username=form.cleaned_data['username'])
             if user.id != userExist.id:
@@ -224,20 +226,31 @@ def view_user(request, id):
     return render(request, 'usuario/view_user.html', {'user': user})
 
 @login_required
-@require_http_methods(["post"])
+@require_http_methods(["POST"])
 def delete_user(request, id):
 
     user = Usuario.objects.get(id=id)
+    dados = json.loads(request.body)
+    password = dados.get('password')
+    userLogin = request.user
+
+    if not userLogin.check_password(password.strip()):
+
+        return JsonResponse({'erro': 'Credinciais inválidas'}, status=403)
+    
+    user.is_active = False
+    user.ativo = False
+    user.save()
+    
     LogAuditoria.objects.create(
         usuario=request.user,
         acao='delete',
         modelo='Usuaurio',
         objeto_id=str(user.id),
-        descricao=f'Usuário Eliminado: {user.get_full_name}',
+        descricao=f'Usuário Desativado do sistema: {user.get_full_name}',
         ip_origem=request.META.get('REMOTE_ADDR'),
         user_agent=request.META.get('HTTP_USER_AGENT', '')
     )
-    user.delete()
 
     return redirect('list_user')
 def exe(request):

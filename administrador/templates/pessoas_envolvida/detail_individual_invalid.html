@@ -20,6 +20,30 @@
 
             <div class="card-body">
 
+                <h4>Dados do caso</h4>
+                <hr>
+
+                {% for en in envolvimentos %}
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Número de caso:</strong></div>
+                        <div class="col-sm-9">{{ en.caso.numero_caso}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Tipo de caso:</strong></div>
+                        <div class="col-sm-9">{{ en.caso.tipo_crime.nome}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Tipo de envolvimento</strong></div>
+                        <div class="col-sm-9">{{ en.get_tipo_envolvimento_display}}</div>
+                    </div>
+
+                {% endfor %}
+
+                <hr>
+
+                <h4>Dados Pessoais</h4>
+                <hr>
+
                 <div>
                     
                     <div class="row mb-3">
@@ -115,9 +139,6 @@
                         </div>
                     </div>
                 </div>
-
-                <h4>Dados do endereço</h4>
-                <hr>
 
                 {% for endereco in enderecos %}
                     <div class="row mb-3">

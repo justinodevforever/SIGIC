@@ -2,11 +2,17 @@
 from pathlib import Path
 import os
 from datetime import timedelta
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-l1-mhla&!@3#s4v)yo$83e69lb7t@6qi*@0iza)3c@zo)r#+k1'
+load_dotenv(BASE_DIR / '.env')
 
-DEBUG = True
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+DEBUG = os.getenv('DEBUG')
+BASE_URL = os.getenv('BASE_URL', default='http://localhost:8000')
+
 
 ALLOWED_HOSTS = []
 
@@ -22,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'axes',
     'usuario',
     'evidencias',
     'casos',
@@ -30,11 +37,17 @@ INSTALLED_APPS = [
     'administrador',
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',  # ✅ Novo backend do django-axes
+    'django.contrib.auth.backends.ModelBackend',  # Backend padrão do Django
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'axes.middleware.AxesMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -84,6 +97,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
+
 LANGUAGE_CODE = 'pt-pt'
 
 TIME_ZONE = 'Africa/Luanda'
@@ -112,6 +127,33 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
 }
+
+AXES_FAILURE_LIMIT = 3
+AXES_COOLOFF_TIME = timedelta(minutes=20) 
+AXES_LOCK_OUT_AT_FAILURE = True 
+AXES_RESET_ON_SUCCESS = True  
+AXES_USE_CACHE = True
+AXES_VERBOSE = True
+AXES_LOCKOUT_TEMPLATE = 'axes/lockout.html'
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',  # memória local
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST')        
+EMAIL_PORT = int(os.getenv('EMAIL_PORT'))  
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER') 
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)

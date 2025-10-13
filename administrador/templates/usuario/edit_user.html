@@ -10,6 +10,51 @@
             input{
                 height: 40px;
             }
+            .switch {
+  position: relative;
+  display: inline-block;
+  width: 55px;
+  height: 28px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
         </style>
     </head>
     <body style="background-color: #ddd;">
@@ -226,6 +271,20 @@
                     {% if form.departamento.errors %}
                         <div class="text-danger" style="margin-bottom: -30px; ">
                             {{form.departamento.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+                
+                <label for="id_is_active" style="display: flex; justify-content: center; align-items: center;
+                flex-direction: column; width: 100%;">
+                    Ativo?
+                    <label class="switch">
+                        <input type="checkbox" name="is_active" id="id_is_active" {% if user.is_active %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                    {% if form.is_active.errors %}
+                        <div class="text-danger" style="margin-bottom: -30px; ">
+                            {{form.is_active.errors}}
                         </div>
                     {% endif %}
                 </label>

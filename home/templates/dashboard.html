@@ -6,6 +6,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>SIGIC</title>
 
     <style>
@@ -13,7 +14,8 @@
         padding: 30px;
         width: 99%;
       }
-
+      
+      canvas { max-width: 100%; }
       .stat-card {
           background: white;
           border-radius: 12px;
@@ -192,37 +194,63 @@
                     </div>
                     <div class="stat-value">{{casos_urgentes}}</div>
                     <div class="stat-label">Casos urgente</div>
+                    <div style="font-size: 10pt; color: red;">Só para caso em andamento ou aberto</div>
                 </div>
             </div>
         </div>
 
         <div class="row g-4">
-            <div class="col-lg-8">
+
+            <div class="col-lg-8 w-100">
                 <div class="chart-container">
                     <div class="chart-header">
                         <h5 class="chart-title">Casos por Mês</h5>
-                        <button class="btn-custom">
-                            <i class="bi bi-download me-2"></i>Exportar
-                        </button>
+                        
                     </div>
                     <div style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                        <div class="text-center text-muted">
-                            <i class="bi bi-bar-chart-line" style="font-size: 3rem;"></i>
-                            <p class="mt-2">Gráfico de Casos por Mês</p>
+                        <div class="text-center text-muted w-100 h-100">
+                                <canvas id="graficoMes"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="col-lg-8 w-100">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h5 class="chart-title">Casos por tipo de crime</h5>
+                       
+                    </div>
+
+                     <div style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center text-muted w-100 h-100">
+                                <canvas id="graficoTipo"></canvas>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
             
-            <div class="col-lg-4">
+            <div class="col-lg-4 w-50">
                 <div class="chart-container">
                     <div class="chart-header">
                         <h5 class="chart-title">Status dos Casos</h5>
                     </div>
                     <div style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
                         <div class="text-center text-muted">
-                            <i class="bi bi-pie-chart" style="font-size: 3rem;"></i>
-                            <p class="mt-2">Gráfico de Pizza</p>
+                            <canvas id="graficoStatus"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 w-50">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h5 class="chart-title">Casos por Prioridade</h5>
+                    </div>
+                    <div style="height: 300px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <div class="text-center text-muted">
+                            <canvas id="graficoPrioridade"></canvas>
                         </div>
                     </div>
                 </div>
@@ -404,6 +432,96 @@
             </div>
         </div>
     </div>
+
+    <script>
+    // Gráfico 1 - Status
+    new Chart(document.getElementById('graficoStatus'), {
+      type: 'pie',
+      data: {
+        labels: {{ labels_status|safe }},
+        datasets: [{
+          label: 'Total de Casos',
+          data: {{ dados_status|safe }},
+           backgroundColor: [
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(255, 205, 86, 0.6)',
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+            'rgba(201, 203, 207, 0.6)'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    // Gráfico 2 - Prioridade
+    new Chart(document.getElementById('graficoPrioridade'), {
+      type: 'pie',
+      data: {
+        labels: {{ labels_prioridade|safe }},
+        datasets: [{
+          data: {{ dados_prioridade|safe }},
+          backgroundColor: [
+            'rgba(75, 192, 192, 0.6)',
+            'rgba(255, 205, 86, 0.6)',
+            'rgba(255, 99, 132, 0.6)',
+            'rgba(153, 102, 255, 0.6)',
+            'rgba(201, 203, 207, 0.6)'
+          ]
+        }]
+      },
+       options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    // Gráfico 3 - Tipo de Crime
+    new Chart(document.getElementById('graficoTipo'), {
+      type: 'line',
+      data: {
+        labels: {{ labels_tipo|safe }},
+        datasets: [{
+          label: 'Casos por Tipo de Crime',
+          data: {{ dados_tipo|safe }},
+          fill: false,
+          borderColor: 'rgba(255, 159, 64, 1)',
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    // --- Gráfico 4: Casos por Mês ---
+    new Chart(document.getElementById('graficoMes'), {
+      type: 'bar',
+      data: {
+        labels: {{ labels_mes|safe }},
+        datasets: [{
+          label: 'Casos por Mês',
+          data: {{ dados_mes|safe }},
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true } },
+        plugins: {
+          legend: { display: false },
+          title: { display: true, text: 'Casos registrados por mês' }
+        }
+      }
+    });
+  </script>
+
   </body>
   </html>
 {% endblock  %}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .mensage{
+            background-color: blue;
+  
+            width: 500px;
+            height: 150px;
+            padding: 10px;
+            gap: 10px;
+        }
+        .mensage span{
+            color: #fff;
+            font-size: 14pt;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <h1>Olá {{nome}} foi criada uma conta para ti no sistema de investigação criminal.</h1>
+    <h2>Para acessar o Sistema aceda ao link: {{link}} </h2>
+
+    <h2>Credenciais de acesso:</h2>
+    <div class="mensage">
+        <h1>Senha: {{password}} </h1>
+        <h1>Nome do usuário: {{username}} </h1>
+    </div>
+
+</body>
+</html>

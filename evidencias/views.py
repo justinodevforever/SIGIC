@@ -16,6 +16,7 @@ from casos.models import *
 from usuario.models import *
 from .forms import *
 from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 @login_required
@@ -38,7 +39,9 @@ def create_evidence(request, caso_id):
             'form': form,
             'tipos': tipos,
             'users': users,
-            'caso': caso
+            'caso': caso,
+            'sucesso': '',
+            'erro': ''
         }
         if form.is_valid():
 
@@ -54,9 +57,10 @@ def create_evidence(request, caso_id):
                 user_agent=request.META.get('HTTP_USER_AGENT', '')
             )
 
-
+            context['sucesso'] = 'Evidência criada com sucesso!'
             return render(request, 'evidencia/create_evidence.html',context)
         else:
+            context['erro'] = 'Erro ao criar evidência!'
             return render(request, 'evidencia/create_evidence.html',context)
 
     else:
@@ -193,6 +197,15 @@ def delete_evidence(request, id):
 
     ev = Evidencia.objects.get(id=id)
 
+    dados = json.loads(request.body)
+    password = dados.get('password')
+    user = request.user
+
+    if not user.check_password(password.strip()):
+
+        return JsonResponse({'erro': 'Credinciais inválidas'}, status=403)
+    
+    ev.delete()
     LogAuditoria.objects.create(
         usuario=request.user,
         acao='delete',
@@ -202,7 +215,6 @@ def delete_evidence(request, id):
         ip_origem=request.META.get('REMOTE_ADDR'),
         user_agent=request.META.get('HTTP_USER_AGENT', '')
     )
-    ev.delete()
 
     return redirect('list_evidence')
 

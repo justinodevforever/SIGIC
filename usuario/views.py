@@ -15,51 +15,6 @@ from casos.models import *
 from usuario.models import *
 from .forms import *
 
-class pessoaListView(LoginRequiredMixin, ListView):
-    
-    model = Pessoa
-    template_name = 'investigation/pessoa_list.html'
-    context_object_name = 'pessoas'
-    paginate_by = 25
-    
-    def get_queryset(self):
-        queryset = Pessoa.objects.filter(ativo=True).prefetch_related(
-            'aliases', 'enderecos', 'envolvimentos__caso'
-        )
-        
-        # busca
-        search = self.request.get.get('search')
-        if search:
-            queryset = queryset.filter(
-                Q(nome_completo__icontains=search) |
-                Q(nome_social__icontains=search) |
-                Q(cpf__icontains=search) |
-                Q(aliases__nome_alias__icontains=search)
-            ).distinct()
-        
-        return queryset.order_by('nome_completo')
-
-class pessoaDetailView(LoginRequiredMixin, DetailView):
-    
-    model = Pessoa
-    template_name = 'investigation/pessoa_detail.html'
-    context_object_name = 'pessoa'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        pessoa = self.object
-        
-        # envolvimentos em casos
-        context['envolvimentos'] = pessoa.envolvimentos.filter(ativo=True).select_related('caso')
-        
-        # endereços
-        context['enderecos'] = pessoa.enderecos.filter(ativo=True).order_by('-data_criacao')
-        
-        # aliases
-        context['aliases'] = pessoa.aliases.all().order_by('-data_criacao')
-        
-        return context
-    
 
 @require_http_methods(["get"])
 def buscar_pessoas(request):

@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from evidencias.models import *
 from casos.models import *
 from usuario.models import *
+from django.db.models.functions import ExtractMonth
 
 
 def home(request):
@@ -22,6 +23,13 @@ def home(request):
 
 @login_required
 def dashboard(request):
+
+     # --- Lista de meses em português ---
+    meses_pt = [
+        '',  # índice 0 não usado (meses começam em 1)
+        'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+        'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ]
     
     total_casos = Caso.objects.filter(ativo=True).count()
     casos_abertos = Caso.objects.filter(status__in=['aberto', 'em_andamento']).count()
@@ -52,8 +60,55 @@ def dashboard(request):
         caso__in=meus_casos
     ).order_by('-data_criacao')[:10]
     
-    
+
+    casos_status = (
+        Caso.objects.values('status')
+        .annotate(total=Count('id'))
+        .order_by('status')
+    )
+    labels_status = [c['status'].capitalize() for c in casos_status]
+    dados_status = [c['total'] for c in casos_status]
+
+    # Contagem de casos por prioridade
+    casos_prioridade = (
+        Caso.objects.values('prioridade')
+        .annotate(total=Count('id'))
+        .order_by('prioridade')
+    )
+    labels_prioridade = [
+        dict(Caso.PRIORIDADE_CHOICES).get(c['prioridade'])
+        for c in casos_prioridade
+    ]
+    dados_prioridade = [c['total'] for c in casos_prioridade]
+
+    # Contagem de casos por tipo de crime
+    casos_tipo = (
+        Caso.objects.values('tipo_crime__nome')  # supondo que TipoCrime tem campo 'nome'
+        .annotate(total=Count('id'))
+        .order_by('tipo_crime__nome')
+    )
+    labels_tipo = [c['tipo_crime__nome'] for c in casos_tipo]
+    dados_tipo = [c['total'] for c in casos_tipo]
+
+    # --- Gráfico 4: Casos por Mês ---
+    casos_mes = (
+        Caso.objects.annotate(mes=ExtractMonth('data_abertura'))
+        .values('mes')
+        .annotate(total=Count('id'))
+        .order_by('mes')
+    )
+    labels_mes = [meses_pt[c['mes']] for c in casos_mes if c['mes']]
+    dados_mes = [c['total'] for c in casos_mes]
+
     context = {
+       'labels_mes': labels_mes,
+        'dados_mes': dados_mes,
+       'labels_status': labels_status,
+        'dados_status': dados_status,
+        'labels_prioridade': labels_prioridade,
+        'dados_prioridade': dados_prioridade,
+        'labels_tipo': labels_tipo,
+        'dados_tipo': dados_tipo,
         'total_casos': total_casos,
         'casos_concluido': casos_concluido,
         'casos_abertos': casos_abertos,

@@ -621,9 +621,12 @@ def edit_case(request, caso_id):
     
     caso = get_object_or_404(Caso, id=caso_id, ativo=True)
 
-    caso.data_ocorrencia = caso.data_ocorrencia.strftime('%Y-%m-%dT%H:%M')
-    caso.prazo_conclusao = caso.prazo_conclusao.strftime('%Y-%m-%dT%H:%M')
-    caso.data_conclusao = caso.data_conclusao.strftime('%Y-%m-%dT%H:%M')
+    if caso.data_ocorrencia:
+        caso.data_ocorrencia = caso.data_ocorrencia.strftime('%Y-%m-%dT%H:%M')
+    if caso.prazo_conclusao:
+        caso.prazo_conclusao = caso.prazo_conclusao.strftime('%Y-%m-%dT%H:%M')
+    if caso.data_conclusao:
+        caso.data_conclusao = caso.data_conclusao.strftime('%Y-%m-%dT%H:%M')
     
     if request.method == 'POST':
         form = CasoForm(request.POST, instance=caso)
@@ -641,9 +644,12 @@ def edit_case(request, caso_id):
                 user_agent=request.META.get('HTTP_USER_AGENT', '')
             )
             
-            caso.data_ocorrencia = caso.data_ocorrencia.strftime('%Y-%m-%dT%H:%M')
-            caso.prazo_conclusao = caso.prazo_conclusao.strftime('%Y-%m-%dT%H:%M')
-            caso.data_conclusao = caso.data_conclusao.strftime('%Y-%m-%dT%H:%M')
+            if caso.data_ocorrencia:
+                caso.data_ocorrencia = caso.data_ocorrencia.strftime('%Y-%m-%dT%H:%M')
+            if caso.prazo_conclusao:
+                caso.prazo_conclusao = caso.prazo_conclusao.strftime('%Y-%m-%dT%H:%M')
+            if caso.data_conclusao:
+                caso.data_conclusao = caso.data_conclusao.strftime('%Y-%m-%dT%H:%M')
            
             return render(request, 'caso/edit_case.html', 
             {'form': form, 'caso': caso, 'sucesso': 'Sucesso'})
@@ -659,16 +665,25 @@ def delete_case(request, caso_id):
         
         caso = Caso.objects.get(id=caso_id)
 
+        dados = json.loads(request.body)
+        user = request.user
+        password = dados.get('password')
+    
+        if not user.check_password(password.strip()):
+
+            return JsonResponse({'error': 'Credenciais inválidas'}, status=403)
+
+        caso.delete()
+        
         LogAuditoria.objects.create(
             usuario=request.user,
             acao='delete',
-            modelo='EventoTimeline',
+            modelo='Caso',
             objeto_id=str(caso.id),
             descricao=f'Caso eliminado: {caso.numero_caso}',
             ip_origem=request.META.get('REMOTE_ADDR'),
             user_agent=request.META.get('HTTP_USER_AGENT', '')
         )
-        caso.delete()
 
         return redirect('list_case')
 
@@ -700,9 +715,6 @@ def criminal_record(request):
         'pessoas': pessoas,
         'envolvimentos': envolvimentos
     }
-
-    print(pessoas, search_bi)
-
 
     return render(request, 'caso/criminal_record.html', context)
 
@@ -759,8 +771,6 @@ def detail_individual_invalid(request, pessoa_id):
     ).select_related('caso').order_by('-data_envolvimento')
     
     casos_envolvidos = [env.caso for env in envolvimentos]
-
-    print(enderecos)
     
     context = {
         'pessoa': pessoa,
@@ -871,6 +881,35 @@ def create_indiidual_involved(request, caso_id):
     
     return render(request, 'pessoas_envolvida/create_indiidual_involved.html', 
     {'form': form, 'caso': caso, 'erro':  f'Erro ao criar essa pessoa!'})
+
+@login_required
+@require_http_methods(["POST"])
+def delete_individual_involved(request, id):
+    if request.method == 'POST':
+        
+        pessoa = Pessoa.objects.get(id=id)
+
+        dados = json.loads(request.body)
+        user = request.user
+        password = dados.get('password')
+    
+        if not user.check_password(password.strip()):
+
+            return JsonResponse({'error': 'Credenciais inválidas'}, status=403)
+
+        pessoa.delete()
+        
+        LogAuditoria.objects.create(
+            usuario=request.user,
+            acao='delete',
+            modelo='Pessoa',
+            objeto_id=str(pessoa.id),
+            descricao=f'Envolvimento eliminado',
+            ip_origem=request.META.get('REMOTE_ADDR'),
+            user_agent=request.META.get('HTTP_USER_AGENT', '')
+        )
+
+        return redirect('list_indiidual_involved')
 
 # def pessoa_editar(request, pessoa_id):
 #     """Editar pessoa existente"""

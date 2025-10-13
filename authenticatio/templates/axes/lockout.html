@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Bloqueado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.9;
+            }
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .alert-box {
+            background-color: #fef2f2;
+            border-left: 4px solid #dc2626;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+
+        .alert-box strong {
+            color: #7f1d1d;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .alert-box p {
+            color: #991b1b;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message {
+            color: #374151;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .message strong {
+            color: #1f2937;
+        }
+
+        .info-list {
+            background-color: #fef8f3;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+
+        .info-list p {
+            color: #92400e;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .info-list p:last-child {
+            margin-bottom: 0;
+        }
+
+        .timer {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff5eb 0%, #fef3c7 100%);
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+
+        .timer-label {
+            color: #b45309;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .timer-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #dc2626;
+            font-family: 'Courier New', monospace;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            background-color: #f9fafb;
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer p {
+            color: #6b7280;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .footer a {
+            color: #dc2626;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                padding: 30px 20px;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .icon {
+                font-size: 48px;
+            }
+
+            .timer-value {
+                font-size: 24px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🔐</div>
+            <h1>Acesso Bloqueado</h1>
+            <p>Segurança ativada</p>
+        </div>
+
+        <div class="content">
+            <div class="alert-box">
+                <strong>⚠️ Muitas tentativas de acesso</strong>
+                <p>Sua conta foi temporariamente bloqueada por razões de segurança.</p>
+            </div>
+
+            <div class="message">
+                <p>Detectamos <strong>múltiplas tentativas de login falhadas</strong> na sua conta. Para proteger sua segurança, o acesso foi bloqueado temporariamente.</p>
+            </div>
+
+            <div class="timer">
+                <div class="timer-label">Tempo até desbloqueio</div>
+                <div class="timer-value">20 min</div>
+            </div>
+
+            <div class="info-list">
+                <p><strong>📌 O que fazer:</strong></p>
+                <p>• Aguarde alguns minutos antes de tentar novamente</p>
+                <p>• Verifique se está usando a senha correta</p>
+                <p>• Se não consegue acessar, contate o suporte</p>
+                <p>• Não tente fazer login repetidamente</p>
+            </div>
+
+            <div class="actions">
+                <a href="/" class="btn btn-primary">Voltar ao Início</a>
+                <a href="javascript:location.reload();" class="btn btn-secondary">Recarregar</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Se você não fez essas tentativas de acesso, sua conta pode ter sido comprometida.</p>
+            <p><a href="/support/">Contate o suporte</a> para obter ajuda</p>
+        </div>
+    </div>
+</body>
+</html>

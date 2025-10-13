@@ -435,16 +435,6 @@ class CasoForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
-        titulo = cleaned_data.get('titulo')
-        tipo_crime = cleaned_data.get('tipo_crime')
-        local_ocorrencia = cleaned_data.get('local_ocorrencia')
-        delegacia_origem = cleaned_data.get('delegacia_origem')
-        investigador_principal = cleaned_data.get('investigador_principal')
-        delegado_responsavel = cleaned_data.get('delegado_responsavel')
-        prioridade = cleaned_data.get('prioridade')
-        status = cleaned_data.get('status')
-        prazo = cleaned_data.get('prazo_conclusao')
-        investigadores_apoio = cleaned_data.get('investigadores_apoio')
 
         return cleaned_data
 

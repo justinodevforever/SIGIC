@@ -1,6 +1,9 @@
 from django import forms
 from usuario.models import *
 import string, secrets
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
 
 def gerar_senha():
 
@@ -193,21 +196,18 @@ class UserForm(forms.Form):
         cleaned_data = super().clean()
 
         username = cleaned_data.get('username')
-        email = cleaned_data.get('email')
-        cargo = cleaned_data.get('cargo')
-        departamento = cleaned_data.get('departamento')
-        telefone = cleaned_data.get('telefone')
-        matricula = cleaned_data.get('matricula')
-        first_name = cleaned_data.get('first_name')
-        last_name = cleaned_data.get('last_name')
-        nivel_acesso = cleaned_data.get('nivel_acesso')
+
         
-        if username:
-            user = Usuario.objects.get(username=username)
+        try:
+            if username:
+                user = Usuario.objects.get(username=username)
 
             if user:
 
-                self.add_error('username', 'Esse nome do usuário já existe!')
+                return self.add_error('username', 'Esse nome do usuário já existe!')
+                
+        except Usuario.DoesNotExist:
+            pass
 
         return cleaned_data
 
@@ -228,7 +228,24 @@ class UserForm(forms.Form):
         )
         user.set_password(password)
 
+        assunto = "SISTEMA INTEGRAL DE GESTÃO DE INVESTIGAÇÃO CRIMINAL"
+        texto_simples = f"Olá {user.get_full_name} foi criada uma conta para ti no sistema de investigação criminal"
+        html_conteudo = render_to_string('emails/email_user.html', {'nome': user.get_full_name, 'password': password, 'link': settings.BASE_URL,
+                                                                    'username': user.username})
+
+        email_msg = EmailMultiAlternatives(
+            assunto,
+            texto_simples,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+        )
+        email_msg.attach_alternative(html_conteudo, "text/html")
+        email_msg.send()
+
         user.save()
+
+        return user
+
 
 class EditUserForm(forms.Form):
 
@@ -270,27 +287,31 @@ class EditUserForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
+    is_active = forms.BooleanField(
+        required=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-control'})
+    )
+
+    def __init__(self, *args, **kwargs):
+
+        self.instance = kwargs.pop('instance', None)
+        super().__init__(*args, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
 
         username = cleaned_data.get('username')
-        email = cleaned_data.get('email')
-        cargo = cleaned_data.get('cargo')
-        departamento = cleaned_data.get('departamento')
-        telefone = cleaned_data.get('telefone')
-        matricula = cleaned_data.get('matricula')
-        first_name = cleaned_data.get('first_name')
-        last_name = cleaned_data.get('last_name')
-        nivel_acesso = cleaned_data.get('nivel_acesso')
        
-        
-        # if username:
-        #     user = Usuario.objects.get(username=username)
+        try:
+            if username:
+                user = Usuario.objects.get(username=username)
 
-        #     if user:
+                if user and self.instance.id != user.id:
 
-        #         self.add_error('username', 'Esse nome do usuário já existe!')
+                    self.add_error('username', 'Esse nome do usuário já existe!')
+
+        except Usuario.DoesNotExist:
+            pass
 
         return cleaned_data
 
