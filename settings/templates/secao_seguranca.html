@@ -1,0 +1,68 @@
+{% extends 'configuracoes.html' %}
+
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações de segurança</title>
+</head>
+<body>
+    <div class="section" id="seguranca">
+        <h2 class="section-title"><i class="fas fa-lock"></i>Segurança</h2>
+        
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Recomendamos ativar a autenticação de dois fatores para maior segurança.</span>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Autenticação de Dois Fatores (2FA)</h3>
+                    <p class="setting-description">Adicionar camada extra de segurança no login</p>
+                </div>
+                <div class="toggle-switch"></div>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="input-group">
+                <label>Tempo de Sessão (minutos)</label>
+                <input type="number" value="30" min="5" max="120">
+            </div>
+            <div class="input-group">
+                <label>Tentativas de Login</label>
+                <input type="number" value="3" min="3" max="10">
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Registro de Auditoria</h3>
+                    <p class="setting-description">Registrar todas as ações dos usuários</p>
+                </div>
+                <div class="toggle-switch active"></div>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Criptografia de Dados</h3>
+                    <p class="setting-description">Criptografar dados sensíveis no banco de dados</p>
+                </div>
+                <div class="toggle-switch active"></div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary"><i class="fas fa-save"></i>Salvar Configurações</button>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock content %}

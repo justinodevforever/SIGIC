@@ -1,0 +1,62 @@
+{% extends 'configuracoes.html' %}
+
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações gerais</title>
+</head>
+<body>
+    <div class="section" id="geral">
+        <h2 class="section-title"><i class="fas fa-cog"></i>Configurações Gerais</h2>
+        
+        <div class="setting-card">
+            <div class="input-group">
+                <label>Nome da Instituição</label>
+                <input type="text" value="Departamento de Investigação Criminal" placeholder="Digite o nome da instituição">
+            </div>
+            <div class="input-group">
+                <label>Endereço</label>
+                <input type="text" value="Rua Principal, 123 - Luanda" placeholder="Digite o endereço">
+            </div>
+            <div class="input-group">
+                <label>Telefone de Contato</label>
+                <input type="tel" value="+244 923 456 789" placeholder="Digite o telefone">
+            </div>
+            <div class="input-group">
+                <label>Email Institucional</label>
+                <input type="email" value="contato@investigacao.gov.ao" placeholder="Digite o email">
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Modo Escuro</h3>
+                    <p class="setting-description">Ativar tema escuro para a interface</p>
+                </div>
+                <div class="toggle-switch active"></div>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Backup Automático</h3>
+                    <p class="setting-description">Realizar backup diário dos dados do sistema</p>
+                </div>
+                <div class="toggle-switch active"></div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary"><i class="fas fa-save"></i>Salvar Alterações</button>
+            <button class="btn btn-secondary"><i class="fas fa-undo"></i>Restaurar Padrões</button>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock content %}

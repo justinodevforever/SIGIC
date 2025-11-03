@@ -17,4 +17,8 @@ urlpatterns = [
     path('detail_expertise/<str:id>/', detail_expertise, name='detail_expertise'),
     path('edit_expertise/<str:id>/', edit_expertise, name='edit_expertise'),
     path('delete_expertise/<str:id>/', delete_expertise, name='delete_expertise'),
+
+    path('create_upload_file/<str:evidencia_id>/', create_upload_file, name='create_upload_file'),
+    path('list_upload_file/', list_upload_file, name='list_upload_file'),
+    path('edit_upload_file/<str:id>/', edit_upload_file, name='edit_upload_file'),
 ]

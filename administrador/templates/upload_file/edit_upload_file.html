@@ -1,0 +1,197 @@
+{% extends 'principal.html' %}
+
+{% block content %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% load static %}
+        <script src="{% static 'js/jquery.inputmask.min.js' %}"></script>
+        <style>
+            .form-control{
+                height: 40px;
+            }
+            .switch {
+            position: relative;
+            display: inline-block;
+            width: 55px;
+            height: 28px;
+            }
+
+            .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            }
+
+            .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+            }
+
+            .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+            }
+
+            input:checked + .slider {
+            background-color: #4caf50;
+            }
+
+            input:checked + .slider:before {
+            transform: translateX(26px);
+            }
+        </style>
+    </head>
+    <body style="background-color: #ddd;">
+        <form action="{% url 'edit_upload_file' arquivo.id %}" method="post" class="card" enctype="multipart/form-data"
+        style="display: flex; gap: 20px;  width: 80%; flex-direction: column;
+        background-color: #f8f9fa; padding: 10px; border-radius: 10px;
+         align-self: center; align-items: center;">
+
+            {% csrf_token %}
+            <div class="d-flex justify-content-between" style="width: 100%;">
+                <h3 class="text-warning">Cadastro de Arquivos de evidência</h3>
+                <a href="/list_upload_file/" class="btn btn-primary">Listar</a>
+            </div>
+
+            {% if message %}
+               
+                {% if type == 'success' %}
+                
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>{{message}}</strong>
+                        <button type="button" class="btn-close"
+                        data-bs-dismiss="alert" aria-label="close"
+                        ></button>
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>{{message}}</strong>
+                        <button type="button" class="btn-close"
+                        data-bs-dismiss="alert" aria-label="close"
+                        ></button>
+                    </div>
+                {% endif %}
+                
+                
+            {% endif %}
+          
+
+            <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+
+                <label for="nome_arquivo" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                    <span >
+                        Nome do arquivo 
+                        <span class="text-danger">*</span>
+                    </span>
+                    
+                    <input type="text" style=" width: 100%;" id="nome_arquivo" value="{{arquivo.nome_arquivo}}"
+                        class="form-control" name="nome_arquivo" autocomplete="off"
+                        aria-describedby="helpId">
+                    
+                    {% if form.nome_arquivo.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.nome_arquivo.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+
+                <label for="localizacao" 
+                style="display: flex; flex-direction: column;  width: 100%;">
+
+                    <span >
+                        Tipo de arquivo 
+                        <span class="text-danger">*</span>
+                    </span>
+                   
+                    <select name="tipo_arquivo" id="tipo_arquivo" class="form-control">
+                        <option value="{{arquivo.tipo_arquivo}}">{{arquivo.get_tipo_arquivo_display}}</option>
+                        <option value="documento">Documento</option>
+                        <option value="foto">Fotografia</option>
+                        <option value="video">Vídeo</option>
+                        <option value="audio">Áudio</option>
+                        <option value="relatorio">Relatório</option>
+                        <option value="laudo">Laudo</option>
+                        <option value="outro">Outro</option>
+                    </select>
+
+                    {% if form.tipo_arquivo.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.tipo_arquivo.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            </div>
+            
+            <div class="form-group" 
+            style="display: flex; gap: 20px;  width: 100%;">
+                <label for="descricao" 
+                style="display: flex; flex-direction: column;  width: 100%;">
+
+                    Descrição
+                    <textarea  style=" width: 100%;" id="descricao" 
+                        class="form-control" name="descricao" autocomplete="off"
+                        aria-describedby="helpId">{{arquivo.descricao}}</textarea>
+                        
+                        {% if form.descricao.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.descricao.errors}}
+                            </div>
+                        {% endif %}
+
+                </label>
+    
+                <label for="confidencial" style="display: flex;
+                 width: 100%; flex-direction: column;">
+
+                    {{form.confidencial.label_tag}}
+                    <label class="switch">
+                        <input type="checkbox" name="confidencial" id="confidencial" {% if arquivo.confidencial %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+
+
+                    {% if form.confidencial.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.confidencial.errors}}
+                        </div>
+                    {% endif %}
+
+                    {% if form.confidencial.help_text %}
+                        <small class="form-text text-danger">
+                        {{ form.confidencial.help_text }}
+                        </small>
+                    {% endif %}
+                </label>
+            </div>
+    
+            
+
+            <button type="submit" class="btn" 
+            style="width: 80%; background-color: #2c5aa0; color: #fff;">
+                Cadastrar
+            </button>
+        </form> 
+            
+    </body>
+    </html>
+{% endblock content %}

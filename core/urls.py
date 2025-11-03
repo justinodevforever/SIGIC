@@ -10,4 +10,5 @@ urlpatterns = [
     path('', include('authenticatio.urls')),
     path('', include('evidencias.urls')),
     path('', include('administrador.urls')),
+    path('', include('settings.urls')),
 ]

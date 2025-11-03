@@ -28,16 +28,36 @@
                     <div class="col-sm-9">{{ user.matricula }}</div>
                 </div>
                 <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Data Nascimento:</strong></div>
+                    <div class="col-sm-9">{{ user.data_nascimento }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Idade:</strong></div>
+                    <div class="col-sm-9">{{ user.idade }} Anos</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Bi:</strong></div>
+                    <div class="col-sm-9">{{ user.bi }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Gênero:</strong></div>
+                    <div class="col-sm-9">{{ user.get_genero_display}}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Estado civil:</strong></div>
+                    <div class="col-sm-9">{{ user.get_estado_civil_display }}</div>
+                </div>
+                <div class="row mb-3">
                     <div class="col-sm-3"><strong>Telefone:</strong></div>
                     <div class="col-sm-9">{{ user.telefone }}</div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-sm-3"><strong>Cargo:</strong></div>
-                    <div class="col-sm-9">{{ user.cargo }}</div>
+                    <div class="col-sm-9">{{ user.get_cargo_display }}</div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-sm-3"><strong>Nível de acesso:</strong></div>
-                    <div class="col-sm-9">{{ user.nivel_acesso }}</div>
+                    <div class="col-sm-9">{{ user.get_nivel_acesso_display }}</div>
                 </div>
                 <div class="row mb-3">
                     <div class="col-sm-3"><strong>E-mail:</strong></div>
@@ -50,11 +70,11 @@
                 <div class="row mb-3">
                     <div class="col-sm-3"><strong>Estado:</strong></div>
                     <div class="col-sm-9">
-                         {% if user.ativo == True %}
+                         {% if user.is_active == True %}
                                 
                             <span class="badge bg-success">Ativo</span>
 
-                            {% elif user.ativo == False  %}
+                            {% elif user.is_active == False  %}
                                 <span class="badge bg-danger">Inativo</span>
 
                         {% endif %}

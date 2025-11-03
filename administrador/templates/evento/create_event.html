@@ -230,7 +230,7 @@
                     <span class="text-danger">*</span>
                     </span>
                     <textarea  name="descricao" class="form-control" 
-                    style="height: 70px; resize: none;"
+                    style="height: 70px; resize: none; "
                     ></textarea>
 
                     {% if form.descricao1.errors %}
@@ -266,9 +266,9 @@
 
                     Pessoas envolvidas
                     <select  name="pessoas_envolvidas" multiple 
-                    class="form-control" style="height: 100px;">
+                    class="form-control" style="height: 110px;display: flex; gap: 8px;">
                         {% for pessoa in pessoas %}
-                            <option value="{{pessoa.pessoa.id}}">
+                            <option value="{{pessoa.pessoa.id}}" style="margin-bottom: 5px;">
                                 {{pessoa.pessoa.nome_completo}}
                             </option>
                         {% endfor %}            
@@ -291,9 +291,9 @@
 
                     Evidências
                     <select  name="evidencias_relacionadas" multiple 
-                    class="form-control" style="height: 100px;">
+                    class="form-control" style="height: 110px;display: flex; gap: 8px;">
                         {% for ev in evidencias %}
-                            <option value="{{ev.id}}">
+                            <option value="{{ev.id}}" style="margin-bottom: 5px;">
                                 {{ev.numero_evidencia}}-{{ev.tipo.nome}}
                             </option>
                         {% endfor %}            

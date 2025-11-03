@@ -7,7 +7,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        
+        a{
+            text-decoration: none;
+            borderra
+        }
     </style>
 </head>
 <body>
@@ -22,6 +25,21 @@
             
         </div>
         <div class="card" style="display:flex; width: 97%; align-self: center;">
+
+            <form method="get" class="form-inline mb-3" style="padding: 12px; height: 7px;">
+                <input style='border: 1px solid orange; width: 70px;'
+                    type="number" 
+                    id="per_page" 
+                    name="per_page" 
+                    class="form-control form-control-sm" 
+                    min="1" 
+                    max="200" 
+                    value="{{ per_page|default:20 }}" 
+                    onchange="this.form.submit()"
+                    
+                >
+            </form>
+
             <div class="card-body" style="border-radius: 4px;">
                 <div class="table-responsive">
                     <table class="table table-hover">
@@ -117,7 +135,7 @@
                         {% if casos.has_previous %}
                             <li class="page-item">
                                 
-                                <a class="page-link" href="?page={{ casos.previous_page_number }}" aria-label="Previous">
+                                <a class="page-link" href="?page={{ casos.previous_page_number }}&per_page={{per_page}}" aria-label="Previous">
                                     <span aria-hidden="true">&laquo;</span>
                                     <span class="sr-only">Anterior</span>
                                 </a>
@@ -131,14 +149,14 @@
                                 </li>
                             {% else %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    <a class="page-link" href="?page={{ num }}&per_page={{per_page}}">{{ num }}</a>
                                 </li>
                             {% endif %}
                         {% endfor %}
                     {% if casos.has_next %}
                         
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ casos.next_page_number }}" aria-label="Próximo">
+                            <a class="page-link" href="?page={{ casos.next_page_number }}&per_page={{per_page}}" aria-label="Próximo">
                                 <span aria-hidden="true">&raquo;</span>
                                 <span class="sr-only">Próximo</span>
                             </a>
@@ -156,7 +174,7 @@
             <p id="mensagemconfirmacao">Tem certeza que deseja deletar este caso?</p>
 
             <input type="password" class="form-control" autocomplete="new-password"
-                id="password" placeholder="Confirme sa senha" name="password" required>
+                id="password" placeholder="Confirme sua senha" name="password" required>
                 
             <div id="sms" style="color: red;"></div>
 

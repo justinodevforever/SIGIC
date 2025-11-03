@@ -1,0 +1,399 @@
+{% extends 'configuracoes.html' %}
+
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs de Auditoria</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-orange: #FF6B35;
+            --secondary-orange: #FF8C61;
+            --dark-blue: #0A1929;
+            --medium-blue: #1E3A5F;
+            --light-blue: #2C5F8D;
+            --bg-dark: #0D1B2A;
+            --bg-card: #1B2838;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0B8C1;
+            --border-color: #2C3E50;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        
+
+        .table-header {
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+            padding: 25px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h2 {
+            font-size: 1.6em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .table-header i {
+            font-size: 1.8em;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            width: 220px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 35px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.7;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--dark-blue);
+            border-bottom: 2px solid var(--primary-orange);
+        }
+
+        th {
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary-orange);
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 107, 53, 0.05);
+            border-left: 3px solid var(--primary-orange);
+        }
+
+        td {
+            padding: 18px 20px;
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+        }
+
+        .status-closed {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .priority-badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .priority-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .priority-low {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60A5FA;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .btn-view {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+        }
+
+        .btn-view:hover {
+            background: rgba(52, 152, 219, 0.3);
+            transform: scale(1.1);
+        }
+
+        .btn-edit {
+            background: rgba(255, 107, 53, 0.2);
+            color: var(--primary-orange);
+        }
+
+        .btn-edit:hover {
+            background: rgba(255, 107, 53, 0.3);
+            transform: scale(1.1);
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: scale(1.1);
+        }
+
+        .table-footer {
+            padding: 20px 30px;
+            background: var(--dark-blue);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        
+
+        .table-info {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .table-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .table-controls {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .table-footer {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            th, td {
+                padding: 12px 15px;
+                font-size: 0.85em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="table-card">
+            <div class="table-header">
+                <h2>
+                    <i class="fas fa-file-invoice"></i>
+                    Logs de Auditoria
+                </h2>
+
+                <form action="/logs_auditorio/" method="post" 
+                    class="btn-group btn-group-sm">
+                    {% csrf_token %}
+                    <select type="search" name="tipo" style="border-radius: 4px 0px 0px 4px; height: 40px;"
+                        class="form-control" placeholder="tipo de acção">
+
+                        <option value="create">Criação</option>
+                        <option value="update">Atualização</option>
+                        <option value="delete">Exclusão</option>
+                        <option value="login">Login</option>
+                        <option value="logout">Terminar sessão</option>
+                        <option value="access">Acesso</option>
+                        <option value="export">Exportação</option>
+                        <option value="print">Impressão</option>
+                    </select>
+                    <button class="btn btn-warning" type="submit" style="height: 40px; width: 20px;"><i class="bi bi-search"></i></button>
+                </form>
+
+            </div>
+            <form method="get" class="form-inline " style="padding: 12px; height: 7px; margin-bottom: 20px;">
+                <input style='border: 1px solid orange; width: 70px;'
+                    type="number" 
+                    id="per_page" 
+                    name="per_page" 
+                    class="form-control form-control-sm" 
+                    min="1" 
+                    max="200" 
+                    value="{{ per_page|default:20 }}" 
+                    onchange="this.form.submit()"
+                    
+                >
+            </form>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        
+                        <tr>
+                            <th>Tipo de ação</th>
+                            <th>Modelo afectado</th>
+                            <th>Data da oporação</th>
+                            <th>Responsável</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for auditoria in auditorias %}
+                            <tr>
+                                <td>{{auditoria.acao}}</td>
+                                <td>{{auditoria.modelo}}</td>
+                                <td>{{auditoria.data_acao}}</td>
+                                <td>{{auditoria.usuario.get_full_name}}</td>
+                                 <td>
+                                  <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'detail_aditorio' auditoria.id %}" 
+                                            class="btn btn-outline-primary" title="Ver detalhes">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </div> 
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4 text-white" >
+                                    <i class="fas fa-inbox fa-2x mb-2"></i>
+                                    <br>Nenhum registro encontrado.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-footer w-100" >
+                {% if auditorias.has_other_pages %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if auditorias.has_previous %}
+                                <li class="page-item">
+                                    
+                                    <a class="page-link" href="?page={{ auditorias.previous_page_number }}&per_page={{per_page}}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only">Anterior</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in auditorias.paginator.page_range %}
+                                {% if auditorias.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}&per_page={{per_page}}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if auditorias.has_next %}
+                                
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ auditorias.next_page_number }}&per_page={{per_page}}" aria-label="Próximo">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only">Próximo</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+       
+    </script>
+</body>
+</html>
+{% endblock content %}

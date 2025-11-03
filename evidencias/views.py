@@ -17,6 +17,7 @@ from usuario.models import *
 from .forms import *
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.core import serializers
 
 
 @login_required
@@ -54,7 +55,8 @@ def create_evidence(request, caso_id):
                 objeto_id=str(ev.id),
                 descricao=f'Evidência criada: {ev.numero_evidencia}',
                 ip_origem=request.META.get('REMOTE_ADDR'),
-                user_agent=request.META.get('HTTP_USER_AGENT', '')
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+
             )
 
             context['sucesso'] = 'Evidência criada com sucesso!'
@@ -82,13 +84,15 @@ def list_evidence(request):
         numero_evidencia = request.POST['numero_evidencia']
         evidencias = Evidencia.objects.filter(numero_evidencia__icontains=numero_evidencia)
 
-        paginator = Paginator(evidencias, 20)
+        per_page = request.GET.get('per_page', 20)
+        paginator = Paginator(evidencias, per_page)
         page = request.GET.get('page', 1)
 
         objs = paginator.page(page)
 
         context={
-            'evidencias': objs
+            'evidencias': objs,
+            'per_page': per_page,
         }
 
         return render(request, 'evidencia/list_evidence.html', context)
@@ -97,13 +101,16 @@ def list_evidence(request):
 
         evidencias = Evidencia.objects.all()
 
-        paginator = Paginator(evidencias, 20)
         page = request.GET.get('page', 1)
+        per_page = request.GET.get('per_page', 20)
+
+        paginator = Paginator(evidencias, per_page)
 
         objs = paginator.page(page)
 
         context={
-            'evidencias': objs
+            'evidencias': objs,
+            'per_page': per_page,
         }
 
         return render(request, 'evidencia/list_evidence.html', context)
@@ -150,17 +157,23 @@ def get_evidence(request):
 def edit_evidence(request, id):
 
     evidencia = Evidencia.objects.get(id=id)
+    evidencia.status = evidencia.get_status_display()
+
     users = Usuario.objects.filter(
         cargo__in=['investigador','delegado', 'perito']
     )
-    evidencia.data_coleta = evidencia.data_coleta.strftime('%Y-%m-%dT%H:%M')
 
     if request.method == 'POST':
+        
         form = EvidenciaForm(request.POST)
+        anterior = serializers.serialize('json', [evidencia])
+        
+        
 
         if form.is_valid():
 
             ev = form.save(evidencia)
+            ev.status = evidencia.get_status_display()
 
             LogAuditoria.objects.create(
                 usuario=request.user,
@@ -169,18 +182,24 @@ def edit_evidence(request, id):
                 objeto_id=str(ev.id),
                 descricao=f'Evidência atualizada: {ev.numero_evidencia}',
                 ip_origem=request.META.get('REMOTE_ADDR'),
-                user_agent=request.META.get('HTTP_USER_AGENT', '')
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                dados_anteriores = anterior,
+                dados_novos = serializers.serialize('json', [ev])
             )
+
+            evidencia.data_coleta = evidencia.data_coleta.strftime('%Y-%m-%dT%H:%M')
             messages.success(request, 'Evidência atualizada com sucesso')
             return render(request, 'evidencia/edit_evidence.html', 
             {'form': form, 'evidencia':evidencia, 'users': users})
         else:
 
+            evidencia.data_coleta = evidencia.data_coleta.strftime('%Y-%m-%dT%H:%M')
             messages.error(request, 'Erro ao atualizar a evidência!')
 
             return render(request, 'evidencia/edit_evidence.html', 
             {'form': form, 'evidencia':evidencia, 'users': users})
     else:
+        evidencia.data_coleta = evidencia.data_coleta.strftime('%Y-%m-%dT%H:%M')
         form = EvidenciaForm(
             initial={
             'peso': evidencia.peso,
@@ -234,6 +253,16 @@ def create_expertise(request):
 
             pericia.save()
 
+            LogAuditoria.objects.create(
+                usuario=request.user,
+                acao='create',
+                modelo='Pericia',
+                objeto_id=str(pericia.id),
+                descricao=f'Pericia Criada: {pericia.tipo}',
+                ip_origem=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT', '')
+            )
+
             messages.success(request, 'Dados da perícia criado com sucesso')
 
             return render(request, 'pericia/create_expertise.html', {'form': form})
@@ -266,12 +295,27 @@ def edit_expertise(request, id):
             'pericia_id': id,
             'pericia': pericia
         }
+        pericia.tipo = pericia.get_tipo_display()
+        dados_anteriores = serializers.serialize('json', [pericia])
 
         if form.is_valid():
 
-            pericia = form.save(pericia=pericia)
+            per = form.save(pericia=pericia)
 
-            pericia.save()
+
+            per.tipo = pericia.get_tipo_display()
+
+            LogAuditoria.objects.create(
+                usuario=request.user,
+                acao='update',
+                modelo='Pericia',
+                objeto_id=str(per.id),
+                descricao=f'Pericia Atualizada: {per.tipo}',
+                ip_origem=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                dados_anteriores = dados_anteriores,
+                dados_novos = serializers.serialize('json', [per])
+            )
 
             return render(request, 'pericia/edit_expertise.html', context)
         else:
@@ -285,12 +329,14 @@ def edit_expertise(request, id):
 def list_evidence_expertise(request):
 
     tipo = request.GET.get('tipo')
+   
+
     numero_evidencia = request.GET.get('numero_evidencia')
     pericas = Pericia.objects.all().order_by('-data_criacao')
 
     if numero_evidencia:
 
-        pericas = Pericia.objects.filter(evindecia__numero_evidencia__icontains=numero_evidencia)
+        pericas = Pericia.objects.filter(evidencia__numero_evidencia__icontains=numero_evidencia)
 
     if tipo:
         pericas = Pericia.objects.filter(tipo__icontains=tipo)
@@ -302,13 +348,16 @@ def list_evidence_expertise(request):
         if len(p.resultado) > 20:
             p.resultado = f'{p.resultado[:20]}...'
 
-    paginator = Paginator(pericas, 20)
     page = request.GET.get('page', 1)
+    per_page = request.GET.get('per_page', 20)
+
+    paginator = Paginator(pericas, per_page)
 
     objs = paginator.page(page)
 
     context={
-        'pericias': objs
+        'pericias': objs,
+        'per_page': per_page,
     }
 
     return render(request, 'pericia/list_evidence_expertise.html', context)
@@ -319,7 +368,25 @@ def delete_expertise(request, id):
 
     pericia = Pericia.objects.get(id=id)
 
+    dados = json.loads(request.body)
+    password = dados.get('password')
+    user = request.user
+
+    if not user.check_password(password.strip()):
+
+        return JsonResponse({'erro': 'Credinciais inválidas'}, status=403)
+
     pericia.delete()
+
+    LogAuditoria.objects.create(
+        usuario=request.user,
+        acao='delete',
+        modelo='Pericia',
+        objeto_id=str(pericia.id),
+        descricao=f'Pericia eliminada: {pericia.tipo}',
+        ip_origem=request.META.get('REMOTE_ADDR'),
+        user_agent=request.META.get('HTTP_USER_AGENT', '')
+    )
 
     return redirect('list_evidence_expertise')
 
@@ -349,22 +416,7 @@ def moviment_evidence(request, id):
         if form.is_valid():
 
             mov = form.save()
-            anterior = {
-                'evidencia': {
-                    'numero_evidencia': mov.evidencia.numero_evidencia
-                },
-                'tipo_movimentacao':mov.tipo_movimentacao,
-                'local_destino':mov.local_destino,
-                'local_origem':mov.local_origem,
-                'responsavel_anterior':{
-                    'ultimo_nome':mov.responsavel_anterior.last_name
-                    },
-                'responsavel_atual':{
-                    'ultimo_nome': mov.responsavel_atual.last_name
-                    },
-                'motivo':mov.motivo,
-                'observacoes':mov.observacoes,
-            }
+           
             LogAuditoria.objects.create(
                 usuario=request.user,
                 acao='create',
@@ -373,9 +425,8 @@ def moviment_evidence(request, id):
                 descricao=f'Cadeia custódia criada ou movimentação feita: {mov.get_tipo_movimentacao_display}',
                 ip_origem=request.META.get('REMOTE_ADDR'),
                 user_agent=request.META.get('HTTP_USER_AGENT', ''),
-                dados_anteriores = anterior,
-                dados_novos = anterior
             )
+
             messages.success(request, 'Movimentação de evidência feita com sucesso!')
             return render(request, 'evidencia/moviment.html', context)
         else:
@@ -442,26 +493,121 @@ class evidenciaDetailView(LoginRequiredMixin, DetailView):
         return context
 
 @login_required
-def upload_arquivo(request, caso_id):
+def create_upload_file(request, evidencia_id):
     
-    caso = get_object_or_404(Caso, pk=caso_id)
+    evidencia = get_object_or_404(Evidencia, pk=evidencia_id)
     
-    if request.method == 'post':
-        form = ArquivoForm(request.post, request.files)
+    if request.method == 'POST':
+
+        form = ArquivoForm(request.POST, request.FILES)
+
         if form.is_valid():
-            arquivo = form.save(commit=False)
-            arquivo.caso = caso
+
+            arquivo = form.save()
+            arquivo.evidencia = evidencia
             arquivo.uploadado_por = request.user
             arquivo.save()
+
+            LogAuditoria.objects.create(
+                usuario=request.user,
+                acao='create',
+                modelo='Arquivo',
+                objeto_id=str(arquivo.id),
+                descricao=f'Arquivo criado com sucesso: {arquivo.nome_arquivo}',
+                ip_origem=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+            )
             
             messages.success(request, 'arquivo enviado com sucesso!')
-            return redirect('caso_detail', pk=caso.pk)
+            return render(request, 'upload_file/create_upload_file.html', {
+                'form': form,
+                'evidencia': evidencia
+            })
+        else:
+            messages.error(request, 'Erro ao enviar o arquivo!')
+            return render(request, 'upload_file/create_upload_file.html', {
+                'form': form,
+                'evidencia': evidencia
+            })  
     else:
         form = ArquivoForm()
     
-    return render(request, 'investigation/upload_arquivo.html', {
+    return render(request, 'upload_file/create_upload_file.html', {
         'form': form,
-        'caso': caso
+        'evidencia': evidencia
     })
 
+def list_upload_file(request):
+
+    arquivos = Arquivo.objects.all()
+
+    per_page = request.GET.get('per_page', 10)
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(arquivos, per_page)
+
+    obj = paginator.page(page)
+
+    context = {
+        'arquivos': obj,
+        'per_page': per_page
+    }
+
+    return render(request, 'upload_file/list_upload_file.html', context)
+
+
+def edit_upload_file(request, id):
+
+    arquivo = Arquivo.objects.get(id=id)
+
+
+    if request.method == 'POST':
+
+        form = EditArquivoFrom(request.POST, request.FILES)
+
+        dados_anteriores = serializers.serialize('json', [arquivo])
+
+        if form.is_valid():
+
+            arq = form.save(arquivo)
+
+            LogAuditoria.objects.create(
+                usuario=request.user,
+                acao='edit',
+                modelo='Arquivo',
+                objeto_id=str(arquivo.id),
+                descricao=f'Atualização de Arquivo feita com sucesso: {arquivo.nome_arquivo}',
+                ip_origem=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                dados_anteriores = dados_anteriores,
+                dados_novos = serializers.serialize('json', [arquivo])
+            )
+
+            context = {
+                'message': 'Atualização feita com sucesso',
+                'type': 'success',
+                'form': form,
+                'arquivo': arquivo
+            }
+
+            return render(request, 'upload_file/edit_upload_file.html', context)
+        
+        else:
+            context = {
+                'message': 'Erro ao Atualização feita com sucesso',
+                'form': form,
+                'type': 'error',
+                'arquivo': arquivo
+            }
+
+            return render(request, 'upload_file/edit_upload_file.html', context)
+
+    else:
+        form = EditArquivoFrom()
+        context = {
+            'form': form,
+            'arquivo': arquivo
+        }
+
+        return render(request, 'upload_file/edit_upload_file.html', context)
 

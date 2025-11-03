@@ -153,8 +153,9 @@ class CadeiaCustomia(models.Model):
         return f"{self.evidencia.numero_evidencia} - {self.tipo_movimentacao} - {self.data_movimentacao}"
 
 def upload_arquivo_path(instance, filename):
+    print(instance)
     
-    return f"casos/{instance.caso.numero_caso}/arquivos/{filename}"
+    return f"casos/{instance.evidencia.numero_evidencia}/arquivos/{filename}"
 
 class Arquivo(models.Model):
     id = models.UUIDField(
@@ -173,11 +174,10 @@ class Arquivo(models.Model):
         ('outro', 'Outro'),
     ]
     
-    caso = models.ForeignKey(Caso, on_delete=models.CASCADE, related_name='arquivos')
     evidencia = models.ForeignKey(Evidencia, on_delete=models.CASCADE, related_name='arquivos', null=True, blank=True)
     nome_arquivo = models.CharField(max_length=255)
     tipo_arquivo = models.CharField(max_length=20, choices=TIPO_ARQUIVO_CHOICES)
-    arquivo = models.FileField(upload_to=upload_arquivo_path)
+    arquivo = models.FileField(upload_to='evidence/')
     tamanho_arquivo = models.BigIntegerField()
     mime_type = models.CharField(max_length=100)
     descricao = models.TextField(blank=True)
@@ -192,4 +192,4 @@ class Arquivo(models.Model):
         ordering = ['-data_upload']
     
     def __str__(self):
-        return f"{self.nome_arquivo} - {self.caso.numero_caso}"
+        return f"{self.nome_arquivo} - {self.evidencia.numero_evidencia}"

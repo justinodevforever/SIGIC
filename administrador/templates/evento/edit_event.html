@@ -22,7 +22,7 @@
 
             {% csrf_token %}
             <div class="d-flex justify-content-between" style="width: 100%;">
-                <h3 class="text-warning">Cadastro de Eventos Timeline</h3>
+                <h3 class="text-warning">Atualização de Eventos Timeline</h3>
                 <a href="/list_event/" class="btn btn-primary">Listar</a>
             </div>
             {% if messages %}
@@ -225,9 +225,7 @@
                     </span>
                     <textarea  name="descricao" class="form-control" 
                     style="height: 70px; resize: none;"
-                    >
-                    {{evento.descricao}}
-                    </textarea>
+                    >{{evento.descricao}}</textarea>
 
                     {% if form.descricao.errors %}
                         <div class="text-danger" style="margin-bottom: -40px; ">

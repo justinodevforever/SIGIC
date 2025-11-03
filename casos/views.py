@@ -4,25 +4,44 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.http import require_http_methods
-from django.urls import reverse_lazy
-from datetime import datetime, timedelta
+from datetime import datetime
 from .models import *
 from casos.models import *
 from usuario.models import *
 from .forms import *
-from django.core import serializers
 import json
 from django.views.decorators.http import require_http_methods
 import tempfile
 import os
 from django.core.files import File
 from django.core.files.base import ContentFile
+from django.core import serializers
+
+def list_suspect(request):
+
+    suspeitos = EnvolvimentoCaso.objects.filter(tipo_envolvimento='suspeito').order_by('caso__numero_caso')
+
+    page = request.GET.get('page')
+    per_page = request.GET.get('per_page', 20)
+
+    paginator = Paginator(suspeitos, per_page)
+    objec = paginator.get_page(page)
+
+    return render(request, 'caso/suspect.html', {'suspeitos': objec, 'per_page': per_page})
+    
+def detail_suspect(request, id):
+
+    suspeito = EnvolvimentoCaso.objects.get(tipo_envolvimento='suspeito', id=id)
+    enderecos = Endereco.objects.filter(pessoa=suspeito.pessoa)
+    print(suspeito.pessoa)
+
+    return render(request, 'caso/detail_suspect.html', {'suspeito': suspeito, 'enderecos': enderecos})
 
 def caso(request):
     
@@ -300,59 +319,11 @@ def processar_busca_avancada(dados):
 #     ComentarioForm, EnvolvimentoCasoForm
 # )
 
-# # =============================================================================
-# # VIEWS DE CASOS
-# # =============================================================================
 
-# @login_required
-# def caso_dashboard(request):
-#     """Dashboard principal de casos"""
-#     user = request.user
-    
-#     # Estatísticas gerais
-#     total_casos = Caso.objects.filter(ativo=True).count()
-#     casos_abertos = Caso.objects.filter(status__in=['aberto', 'em_andamento'], ativo=True).count()
-#     casos_usuario = Caso.objects.filter(investigador_principal=user, ativo=True).count()
-#     casos_urgentes = Caso.objects.filter(prioridade__gte=4, status__in=['aberto', 'em_andamento'], ativo=True).count()
-    
-#     # Casos recentes do usuário
-#     casos_recentes = Caso.objects.filter(
-#         investigador_principal=user, 
-#         ativo=True
-#     ).order_by('-data_abertura')[:5]
-    
-#     # Casos por status
-#     casos_por_status = Caso.objects.filter(ativo=True).values('status').annotate(
-#         count=Count('id')
-#     ).order_by('status')
-    
-#     # Casos por tipo de crime
-#     casos_por_tipo = Caso.objects.filter(ativo=True).values(
-#         'tipo_crime__nome'
-#     ).annotate(count=Count('id')).order_by('-count')[:5]
-    
-#     # Notificações não lidas
-#     notificacoes = Notificacao.objects.filter(
-#         usuario=user, 
-#         lida=False
-#     ).order_by('-data_criacao')[:10]
-    
-#     context = {
-#         'total_casos': total_casos,
-#         'casos_abertos': casos_abertos,
-#         'casos_usuario': casos_usuario,
-#         'casos_urgentes': casos_urgentes,
-#         'casos_recentes': casos_recentes,
-#         'casos_por_status': casos_por_status,
-#         'casos_por_tipo': casos_por_tipo,
-#         'notificacoes': notificacoes,
-#     }
-    
-#     return render(request, 'casos/dashboard.html', context)
 
 @login_required
 def list_case(request):
-    """Lista de casos com filtros"""
+   
     casos = Caso.objects.filter(ativo=True).select_related(
         'tipo_crime', 'investigador_principal', 'delegado_responsavel'
     )
@@ -362,6 +333,7 @@ def list_case(request):
     prioridade_filter = request.GET.get('prioridade')
     investigador_filter = request.GET.get('investigador')
     search = request.GET.get('search')
+    per_page = request.GET.get('per_page', 20)
     
     if status_filter:
         casos = casos.filter(status=status_filter)
@@ -385,7 +357,7 @@ def list_case(request):
     order_by = request.GET.get('order_by', '-data_abertura')
     casos = casos.order_by(order_by)
     
-    paginator = Paginator(casos, 20)
+    paginator = Paginator(casos, per_page)
     page = request.GET.get('page')
     casos = paginator.get_page(page)
     
@@ -399,6 +371,7 @@ def list_case(request):
         'investigadores': investigadores,
         'status_choices': Caso.STATUS_CHOICES,
         'prioridade_choices': Caso.PRIORIDADE_CHOICES,
+        'per_page': per_page,
         'current_filters': {
             'status': status_filter,
             'tipo_crime': tipo_filter,
@@ -620,28 +593,28 @@ def create_case(request):
 def edit_case(request, caso_id):
     
     caso = get_object_or_404(Caso, id=caso_id, ativo=True)
+    tipos_crime = TipoCrime.objects.filter(ativo=True)
 
-    if caso.data_ocorrencia:
-        caso.data_ocorrencia = caso.data_ocorrencia.strftime('%Y-%m-%dT%H:%M')
-    if caso.prazo_conclusao:
-        caso.prazo_conclusao = caso.prazo_conclusao.strftime('%Y-%m-%dT%H:%M')
-    if caso.data_conclusao:
-        caso.data_conclusao = caso.data_conclusao.strftime('%Y-%m-%dT%H:%M')
     
     if request.method == 'POST':
+
         form = CasoForm(request.POST, instance=caso)
+
+        dados_anteriores = serializers.serialize('json', [caso])
+
         if form.is_valid():
-            caso = form.save(caso)
-            caso.save()
-            
+            case = form.save(caso)
+
             LogAuditoria.objects.create(
                 usuario=request.user,
                 acao='update',
                 modelo='Caso',
-                objeto_id=str(caso.id),
-                descricao=f'Caso atualizado: {caso.numero_caso}',
+                objeto_id=str(case.id),
+                descricao=f'Caso atualizado: {case.numero_caso}',
                 ip_origem=request.META.get('REMOTE_ADDR'),
-                user_agent=request.META.get('HTTP_USER_AGENT', '')
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                dados_anteriores = dados_anteriores,
+                dados_novos = serializers.serialize('json', [case])
             )
             
             if caso.data_ocorrencia:
@@ -652,11 +625,30 @@ def edit_case(request, caso_id):
                 caso.data_conclusao = caso.data_conclusao.strftime('%Y-%m-%dT%H:%M')
            
             return render(request, 'caso/edit_case.html', 
-            {'form': form, 'caso': caso, 'sucesso': 'Sucesso'})
+            {'form': form, 'caso': case, 'tipos_crime': tipos_crime, 'sucesso': 'Caso atualizado com sucesso'})
+        
+        else:
+            if caso.data_ocorrencia:
+                caso.data_ocorrencia = caso.data_ocorrencia.strftime('%Y-%m-%dT%H:%M')
+            if caso.prazo_conclusao:
+                caso.prazo_conclusao = caso.prazo_conclusao.strftime('%Y-%m-%dT%H:%M')
+            if caso.data_conclusao:
+                caso.data_conclusao = caso.data_conclusao.strftime('%Y-%m-%dT%H:%M')
+           
+            return render(request, 'caso/edit_case.html', 
+            {'form': form, 'caso': caso, 'tipos_crime': tipos_crime, 'erro': 'Erro, ao atualizar caso!'})
     else:
+
+        if caso.data_ocorrencia:
+            caso.data_ocorrencia = caso.data_ocorrencia.strftime('%Y-%m-%dT%H:%M')
+        if caso.prazo_conclusao:
+            caso.prazo_conclusao = caso.prazo_conclusao.strftime('%Y-%m-%dT%H:%M')
+        if caso.data_conclusao:
+            caso.data_conclusao = caso.data_conclusao.strftime('%Y-%m-%dT%H:%M')
+
         form = CasoForm()
     
-    return render(request, 'caso/edit_case.html', {'form': form, 'caso': caso})
+        return render(request, 'caso/edit_case.html', {'form': form, 'tipos_crime': tipos_crime, 'caso': caso})
 
 @login_required
 @require_http_methods(["POST"])
@@ -722,31 +714,33 @@ def criminal_record(request):
 @login_required
 def list_indiidual_involved(request):
     
-    pessoas = Pessoa.objects.filter(ativo=True)
+    envolvimentos = EnvolvimentoCaso.objects.filter(pessoa__ativo=True)
     
     nome_filter = request.GET.get('nome')
     bi_filter = request.GET.get('bi')
     tipo_filter = request.GET.get('tipo_pessoa')
+    per_page = request.GET.get('per_page', 20)
     
     if nome_filter:
-        pessoas = pessoas.filter(nome_completo__icontains=nome_filter)
+        envolvimentos = envolvimentos.filter(pessoa_pessoanome_completo__icontains=nome_filter)
     
     if bi_filter:
-        pessoas = pessoas.filter(bi=bi_filter)
+        envolvimentos = envolvimentos.filter(pessoa__bi=bi_filter)
     
     if tipo_filter:
-        pessoas = pessoas.filter(
-            envolvimentos__tipo_envolvimento=tipo_filter
+        envolvimentos = envolvimentos.filter(
+            tipo_envolvimento=tipo_filter
         ).distinct()
     
-    pessoas = pessoas.order_by('nome_completo')
+    envolvimentos = envolvimentos.order_by('pessoa__nome_completo')
     
-    paginator = Paginator(pessoas, 20)
+    paginator = Paginator(envolvimentos, per_page)
     page = request.GET.get('page')
-    pessoas = paginator.get_page(page)
+    obj = paginator.get_page(page)
     
     context = {
-        'pessoas': pessoas,
+        'envolvimentos': obj,
+        'per_page': per_page,
         'tipo_choices': EnvolvimentoCaso.TIPO_ENVOLVIMENTO_CHOICES,
         'current_filters': {
             'nome': nome_filter,
@@ -850,7 +844,7 @@ def create_indiidual_involved(request, caso_id):
                 ]
                 embedding_obj = DeepFace.represent(
                     img_path=pessoaReconhecimento.foto.path,
-                    detector_backend=backends[3],
+                    detector_backend=backends[4],
                     model_name='ArcFace',
                     enforce_detection=False
                 )
@@ -871,8 +865,9 @@ def create_indiidual_involved(request, caso_id):
                 user_agent=request.META.get('HTTP_USER_AGENT', '')
             )
             return render(request, 'pessoas_envolvida/create_indiidual_involved.html', 
-                {'form': form, 'caso': caso, 'sucesso': f'{pessoa.nome_completo} Criado com sucesso!'})
+                {'form': form, 'caso': caso, 'sucesso': f'{pessoa.nome_completo} Criado(a) com sucesso!'})
         else:
+           
             return render(request, 'pessoas_envolvida/create_indiidual_involved.html', 
                 {'form': form, 'caso': caso, 'erro': 'Erro ao salva dados da pessoa'})
 
@@ -880,7 +875,14 @@ def create_indiidual_involved(request, caso_id):
         form = PessoaEnvolvidaForm()
     
     return render(request, 'pessoas_envolvida/create_indiidual_involved.html', 
-    {'form': form, 'caso': caso, 'erro':  f'Erro ao criar essa pessoa!'})
+    {'form': form, 'caso': caso})
+
+def edit_indiidual_involved(request, id):
+
+    envolvimento = EnvolvimentoCaso.objects.get(pessoa_id=id)
+    print(envolvimento)
+
+    return render(request, 'pessoas_envolvida/edit_indiidual_involved.html', {'envolvimento': envolvimento})
 
 @login_required
 @require_http_methods(["POST"])
@@ -1152,14 +1154,17 @@ def list_event(request):
 
         eventos = EventoTimeline.objects.filter(
             caso__numero_caso__icontains=numero_caso
-            ).order_by('data_hora')
+            ).order_by('-data_hora')
         
-        paginator = Paginator(eventos, 20)
         page = request.GET.get('page')
+        per_page = request.GET.get('per_page', 20)
+
+        paginator = Paginator(eventos, per_page)
         objs = paginator.get_page(page)
         
         context = {
             'eventos': objs,
+            'per_page':per_page
         }
 
         return render(request, 'evento/list_event.html', context)
@@ -1179,13 +1184,16 @@ def list_event(request):
                 'importance': evento.importancia
             })
         
-        paginator = Paginator(eventos, 20)
         page = request.GET.get('page')
+        per_page = request.GET.get('per_page', 20)
+
+        paginator = Paginator(eventos, per_page)
         objs = paginator.get_page(page)
         
         context = {
             'eventos': objs,
             'eventos_json': json.dumps(eventos_json),
+            'per_page':per_page,
         }
 
 
@@ -1193,6 +1201,7 @@ def list_event(request):
         return render(request, 'evento/list_event.html', context)
 
 def edit_event(request, id):
+
     evento = EventoTimeline.objects.get(id=id)
     caso = Caso.objects.get(eventos_timeline=id)
     pessoas = EnvolvimentoCaso.objects.filter(caso=caso)
@@ -1201,15 +1210,20 @@ def edit_event(request, id):
         cargo='investigador'
     )
 
-    evento.data_hora = evento.data_hora.strftime('%Y-%m-%dT%H:%M')
+    
 
     if request.method == 'POST':
 
         form = EventoTimelineForm(request.POST)
+        evento.tipo_evento = evento.get_tipo_evento_display()
+        evento.importancia = evento.get_importancia_display()
+        dados_anteriores = serializers.serialize('json', [evento])
 
         if form.is_valid():
 
             event = form.save(evento=evento)
+            event.tipo_evento = event.get_tipo_evento_display()
+            event.importancia = event.get_importancia_display()
 
             LogAuditoria.objects.create(
                 usuario=request.user,
@@ -1218,7 +1232,9 @@ def edit_event(request, id):
                 objeto_id=str(event.id),
                 descricao=f'Evento timeline atualizado: {event.titulo}',
                 ip_origem=request.META.get('REMOTE_ADDR'),
-                user_agent=request.META.get('HTTP_USER_AGENT', '')
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                dados_anteriores = dados_anteriores,
+                dados_novos = serializers.serialize('json', [event])
             )
 
             evento.data_hora = evento.data_hora.strftime('%Y-%m-%dT%H:%M')
@@ -1230,6 +1246,7 @@ def edit_event(request, id):
                 'investigadores': investigadores,
             }
 
+            evento.data_hora = evento.data_hora.strftime('%Y-%m-%dT%H:%M')
             messages.success(request, 'Atualização do evento feita com sucesso')
             return render(request, 'evento/edit_event.html', context)
         else:
@@ -1249,6 +1266,7 @@ def edit_event(request, id):
             'coordenadas_lat':evento.coordenadas_lat,
             'coordenadas_lng':evento.coordenadas_lng,
         })
+        evento.data_hora = evento.data_hora.strftime('%Y-%m-%dT%H:%M')
         context = {
             'form': form,
             'evento': evento,
@@ -1270,6 +1288,13 @@ def delete_event(request, id):
 
     ev = EventoTimeline.objects.get(id=id)
 
+    dados = json.loads(request.body)
+    password = dados.get('password')
+    user = request.user
+
+    if not user.check_password(password.strip()):
+        return JsonResponse({'erro': 'Credinciais inválidas'}, status=403)
+
     LogAuditoria.objects.create(
         usuario=request.user,
         acao='delete',
@@ -1283,6 +1308,119 @@ def delete_event(request, id):
 
     return redirect('/list_event')
 
+def create_type_crime(request):
+
+    form = TipoCrimeForm()
+
+    if request.method == 'POST':
+
+
+        form = TipoCrimeForm(request.POST)
+        
+
+        if form.is_valid():
+
+            tipo = form.save()
+
+            messages.success(request, 'Tipo de crime criado com sucesso!')
+
+            return render(request, 'tipo_crime/create_type_crime.html', {'form': form})
+        
+        else:
+            messages.error(request, 'Erro, ao criar tipo de crime!')
+            return render(request, 'tipo_crime/create_type_crime.html', {'form': form})
+
+
+    return render(request, 'tipo_crime/create_type_crime.html', {'form': form})
+
+
+def edit_type_crime(request, id):
+
+    tipo_crime = TipoCrime.objects.get(id=id)
+    form = TipoCrimeForm()
+
+    if request.method == 'POST':
+
+        form = TipoCrimeForm(request.POST)
+        dados_anteriores = serializers.serialize('json', [tipo_crime])
+
+        if form.is_valid():
+
+            tipo = form.save(tipo_crime)
+
+            LogAuditoria.objects.create(
+                usuario=request.user,
+                acao='update',
+                modelo='tipoCrime',
+                objeto_id=str(tipo.id),
+                descricao=f'Tipo de crime atualizado: {tipo.nome}',
+                ip_origem=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                dados_anteriores = dados_anteriores,
+                dados_novos = serializers.serialize('json', [tipo])
+            )
+            messages.success(request, 'Dados do tipo de crime atualizado com sucesso!')
+
+            return render(request, 'tipo_crime/edit_type_crime.html', {'form': form, 'tipo_crime':tipo})
+        
+        else:
+            messages.error(request, 'Erro, ao atuliazar dados do tipo de crime!')
+            return render(request, 'tipo_crime/edit_type_crime.html', {'form': form, 'tipo_crime': tipo_crime})
+
+    return render(request, 'tipo_crime/edit_type_crime.html', {'form': form, 'tipo_crime': tipo_crime})
+
+def datail_type_crime(request, id):
+
+    tipo_crime = TipoCrime.objects.get(id=id)
+
+
+    return render(request, 'tipo_crime/detail_type_crime.html', {'tipo_crime': tipo_crime})
+
+def list_type_crime(request):
+
+    tipos_crime = TipoCrime.objects.all()
+
+
+    per_page = request.GET.get('per_page', 20)
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(tipos_crime, per_page)
+    obj = paginator.get_page(page)
+
+    context = {
+        'tipos_crimes': obj,
+        'per_page':per_page
+    }
+    return render(request, 'tipo_crime/list_type_crime.html', context)
+
+
+
+
+def delete_typr_crime(request, id):
+
+    crime = TipoCrime.objects.get(id=id)
+
+    dados = json.loads(request.body)
+
+    password = dados.get('password')
+    user = request.user
+
+    if not user.check_password(password):
+        return JsonResponse({'erro': 'Credinciais inválidas'}, status=403)
+
+    LogAuditoria.objects.create(
+        usuario=request.user,
+        acao='delete',
+        modelo='TipoCrime',
+        objeto_id=str(crime.id),
+        descricao=f'tipo de crime Eliminado: {crime.nome}',
+        ip_origem=request.META.get('REMOTE_ADDR'),
+        user_agent=request.META.get('HTTP_USER_AGENT', '')
+    )
+
+    crime.delete()
+
+    return redirect('list_type_crime')
 # # =============================================================================
 # # VIEWS DE API (AJAX)
 # # =============================================================================

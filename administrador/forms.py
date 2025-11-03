@@ -175,10 +175,14 @@ class UserForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     telefone = forms.CharField(
-        required=True,
+        required=False,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     email = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    bi = forms.CharField(
         required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
@@ -188,6 +192,20 @@ class UserForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     nivel_acesso = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    estado_civil = forms.ChoiceField(
+        choices=Usuario.ESTADO_CIVIL_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    genero = forms.ChoiceField(
+        choices=Usuario.GENERO_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    data_nascimento = forms.CharField(
         required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
@@ -202,9 +220,9 @@ class UserForm(forms.Form):
             if username:
                 user = Usuario.objects.get(username=username)
 
-            if user:
+                if user:
 
-                return self.add_error('username', 'Esse nome do usuário já existe!')
+                    return self.add_error('username', 'Esse nome do usuário já existe!')
                 
         except Usuario.DoesNotExist:
             pass
@@ -225,6 +243,10 @@ class UserForm(forms.Form):
             matricula=self.cleaned_data['matricula'],
             telefone=self.cleaned_data['telefone'],
             cargo=self.cleaned_data['cargo'],
+            data_nascimento=self.cleaned_data['data_nascimento'],
+            estado_civil=self.cleaned_data['estado_civil'],
+            genero=self.cleaned_data['genero'],
+            bi=self.cleaned_data['bi'],
         )
         user.set_password(password)
 
@@ -248,6 +270,7 @@ class UserForm(forms.Form):
 
 
 class EditUserForm(forms.Form):
+    
 
     username = forms.CharField(
         required=True,
@@ -271,7 +294,7 @@ class EditUserForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     telefone = forms.CharField(
-        required=True,
+        required=False,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     email = forms.CharField(
@@ -283,13 +306,37 @@ class EditUserForm(forms.Form):
         required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
-    nivel_acesso = forms.CharField(
+    is_active = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-control'})
+    )
+    nivel_acesso = forms.ChoiceField(
+        choices=Usuario.NIVEL_ACESSO_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    cargo = forms.ChoiceField(
+        choices=Usuario.CARGO_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    bi = forms.CharField(
         required=True,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
-    is_active = forms.BooleanField(
+    data_nascimento = forms.CharField(
         required=True,
-        widget=forms.CheckboxInput(attrs={'class': 'form-control'})
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    estado_civil = forms.ChoiceField(
+        choices=Usuario.ESTADO_CIVIL_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    genero = forms.ChoiceField(
+        choices=Usuario.GENERO_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
 
     def __init__(self, *args, **kwargs):
@@ -314,5 +361,26 @@ class EditUserForm(forms.Form):
             pass
 
         return cleaned_data
+    
+    def save(self):
+
+        self.instance.username = self.cleaned_data['username']
+        self.instance.last_name = self.cleaned_data['last_name']
+        self.instance.first_name = self.cleaned_data['first_name']
+        self.instance.departamento = self.cleaned_data['departamento']
+        self.instance.cargo = self.cleaned_data['cargo']
+        self.instance.nivel_acesso = self.cleaned_data['nivel_acesso']
+        self.instance.email = self.cleaned_data['email']
+        self.instance.matricula = self.cleaned_data['matricula']
+        self.instance.estado_civil = self.cleaned_data['estado_civil']
+        self.instance.genero = self.cleaned_data['genero']
+        self.instance.bi = self.cleaned_data['bi']
+        self.instance.telefone = self.cleaned_data['telefone']
+        self.instance.is_active = self.cleaned_data['is_active']
+        self.instance.ativo = self.cleaned_data['is_active']
+
+        self.instance.save()
+
+        return self.instance
 
  

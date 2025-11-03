@@ -9,5 +9,8 @@ urlpatterns = [
     path('verificar/', views.verificar_face, name='verificar_face'),
     path('listar/', views.listar_pessoas, name='listar_pessoas'),
     path('deletar/<int:pessoa_id>/', views.deletar_pessoa, name='deletar_pessoa'),
+
+    path('list_researcher/', views.list_researcher, name='list_researcher'),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

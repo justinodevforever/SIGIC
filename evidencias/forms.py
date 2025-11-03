@@ -6,6 +6,13 @@ from django.utils import timezone
 from .models import *
 from decimal import Decimal
 
+from django.core.validators import FileExtensionValidator
+import hashlib
+import mimetypes
+from PIL import Image
+import os
+
+
 class EvidenciaForm(forms.Form):
 
     STATUS_CHOICES = [
@@ -78,12 +85,9 @@ class EvidenciaForm(forms.Form):
         widget= forms.NumberInput( attrs={'class': 'form-control',
         "step":"0.001"},
     ))
-    valor_estimado = forms.DecimalField(
+    valor_estimado = forms.CharField(
         required=False,
-        max_digits=10,
-        decimal_places=2,
-        initial=Decimal("0.00"),
-        widget= forms.NumberInput( attrs={'class': 'form-control',
+        widget= forms.TextInput( attrs={'class': 'form-control',
         "step":"0.001"},
     ))
 
@@ -162,7 +166,7 @@ class EvidenciaForm(forms.Form):
                 peso=self.cleaned_data['peso'],
                 status=self.cleaned_data['status'],
                 tipo=self.cleaned_data['tipo'],
-                valor_estimado=self.cleaned_data['valor_estimado'],
+                valor_estimado=Decimal(self.cleaned_data['valor_estimado']),
             )
 
             ev.save()
@@ -341,47 +345,206 @@ class CadeiaCustodiaForm(forms.Form):
 
         return cust
 
-# class ArquivoForm(forms.ModelForm):
-    
-#     class Meta:
-#         model = Arquivo
-#         fields = ['nome_arquivo', 'descricao', 'tipo_arquivo', 'arquivo', 'tags']
-#         widgets = {
-#             'nome_arquivo': forms.TextInput(attrs={
-#                 'class': 'form-control',
-#                 'placeholder': 'Nome do arquivo'
-#             }),
-#             'descricao': forms.Textarea(attrs={
-#                 'class': 'form-control',
-#                 'rows': 3,
-#                 'placeholder': 'Descrição do arquivo'
-#             }),
-#             'tipo_arquivo': forms.Select(attrs={
-#                 'class': 'form-control'
-#             }),
-#             'arquivo': forms.FileInput(attrs={
-#                 'class': 'form-control-file'
-#             }),
-#             'tags': forms.TextInput(attrs={
-#                 'class': 'form-control',
-#                 'placeholder': 'Tags separadas por vírgula'
-#             })
-#         }
-    
-#     def clean_arquivo(self):
-#         arquivo = self.cleaned_data.get('arquivo')
-#         if arquivo:
-#             # Verificar tamanho do arquivo (limite de 50MB)
-#             if arquivo.size > 50 * 1024 * 1024:
-#                 raise ValidationError('O arquivo não pode ser maior que 50MB.')
-            
-#             # Verificar extensões permitidas
-#             extensoes_permitidas = [
-#                 '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
-#                 '.txt', '.rtf', '.jpg', '.jpeg', '.png', '.gif', '.bmp',
-#                 '.mp3', '.mp4', '.avi', '.mov', '.wmv', '.zip', '.rar'
-#             ]
-            
-#             # Nome_arquivo = arquivo.name.lower()
-#             # if not any(nome_arquivo.endswith(ext) for ext in exit
 
+class ArquivoForm(forms.Form):
+
+    tipo_arquivo = forms.ChoiceField(
+        choices=Arquivo.TIPO_ARQUIVO_CHOICES,
+        label='Tipo de Arquivo',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'required': True
+        }),
+        error_messages={
+            'required': 'Por favor, selecione o tipo de arquivo.'
+        }
+    )
+    
+    arquivo = forms.FileField(
+        label='Arquivo',
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'required': True,
+            'accept': '*/*'
+        }),
+
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=[
+                    'pdf', 'doc', 'docx', 'txt', 'odt', 'rtf',
+                    'jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp',
+                    'mp4', 'avi', 'mov', 'wmv', 'flv', 'mkv', 'webm',
+                    'mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a',
+                    'zip', 'rar', '7z', 'csv', 'xls', 'xlsx'
+                ]
+            )
+        ],
+
+        error_messages={
+            'required': 'Por favor, selecione um arquivo.',
+            'invalid': 'Arquivo inválido.'
+        }
+    )
+    
+    nome_arquivo = forms.CharField(
+        label='Nome de arquivo',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Digite o nome de arquivo...'
+        })
+    )
+
+    descricao = forms.CharField(
+        label='Descrição',
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 4,
+            'placeholder': 'Descreva o conteúdo do arquivo...'
+        })
+    )
+    
+    confidencial = forms.BooleanField(
+        label='Arquivo Confidencial',
+        required=False,
+        initial=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text='Marque se este arquivo contém informações sensíveis.'
+    )
+    
+    def clean_arquivo(self):
+        arquivo = self.cleaned_data.get('arquivo')
+        
+        if not arquivo:
+            return self.add_error('arquivo','Nenhum arquivo foi enviado.')
+        
+        
+        max_size = 100 * 1024 * 1024
+
+        if arquivo.size > max_size:
+            return self.add_error('arquivo',
+                f'O arquivo é muito grande. Tamanho máximo permitido: 100MB. '
+                f'Tamanho do arquivo: {arquivo.size / (1024 * 1024):.2f}MB'
+            )
+        
+       
+        if arquivo.size < 1:
+            return self.add_error('arquivo','O arquivo está vazio.')
+        
+        return arquivo
+    
+  
+    
+    def _calcular_hash(self, arquivo):
+       
+        sha256 = hashlib.sha256()
+        for chunk in arquivo.chunks():
+            sha256.update(chunk)
+        return sha256.hexdigest()
+    
+    def _obter_mime_type(self, arquivo):
+       
+        mime_type, _ = mimetypes.guess_type(arquivo.name)
+
+        return mime_type or 'application/octet-stream'
+    
+    def _obter_resolucao(self, arquivo):
+       
+        try:
+            arquivo.seek(0)
+            image = Image.open(arquivo)
+            return f"{image.width}x{image.height}"
+        except Exception:
+            return ''
+    
+    def _obter_duracao(self, arquivo, mime_type):
+       
+   
+        return None
+    
+    def save(self):
+   
+        if not self.is_valid():
+            return self.add_error('arquivo','O formulário contém erros e não pode ser salvo.')
+        
+        arquivo_file = self.cleaned_data['arquivo']
+        mime_type = self._obter_mime_type(arquivo_file)
+
+        arquivo = Arquivo(
+            tipo_arquivo=self.cleaned_data['tipo_arquivo'],
+            nome_arquivo=self.cleaned_data['nome_arquivo'],
+            arquivo=arquivo_file,
+            tamanho_arquivo=arquivo_file.size,
+            mime_type=mime_type,
+            descricao=self.cleaned_data.get('descricao'),
+            confidencial=self.cleaned_data.get('confidencial', False),
+            hash_arquivo=self._calcular_hash(arquivo_file)
+        )
+        
+        if mime_type.startswith('image/'):
+            arquivo.resolucao = self._obter_resolucao(arquivo_file)
+        
+        if mime_type.startswith(('video/', 'audio/')):
+            arquivo.duracao = self._obter_duracao(arquivo_file, mime_type)
+        
+        arquivo.save()
+        
+        return arquivo
+        
+        
+
+class EditArquivoFrom(forms.Form):
+
+    tipo_arquivo = forms.ChoiceField(
+        choices=Arquivo.TIPO_ARQUIVO_CHOICES,
+        label='Tipo de Arquivo',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'required': True
+        }),
+        error_messages={
+            'required': 'Por favor, selecione o tipo de arquivo.'
+        }
+    )
+    
+    nome_arquivo = forms.CharField(
+        label='Nome de arquivo',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Digite o nome de arquivo...'
+        }),
+        error_messages={
+            'required': 'Por favor, selecione o tipo de arquivo.'
+        }
+    )
+
+    descricao = forms.CharField(
+        label='Descrição',
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'rows': 4,
+            'placeholder': 'Descreva o conteúdo do arquivo...'
+        })
+    )
+    
+    confidencial = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-control'}),
+        help_text='Marque se este arquivo contém informações sensíveis.'
+    )
+    
+    def save(self,arquivo):
+        
+        arquivo.tipo_arquivo=self.cleaned_data['tipo_arquivo']
+        arquivo.nome_arquivo=self.cleaned_data['nome_arquivo']
+        arquivo.descricao=self.cleaned_data.get('descricao')
+        arquivo.confidencial=self.cleaned_data.get('confidencial', False)
+        
+        arquivo.save()
+
+        return arquivo

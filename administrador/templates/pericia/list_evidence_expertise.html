@@ -18,22 +18,39 @@
         </div>
         <div style="display: flex; width: 97%; justify-content: space-between; align-items: center;">
             
-            <form action="/list_evidence/" method="get" 
+            <form action="/list_evidence_expertise/" method="get" 
              class="btn-group btn-group-sm" style="margin-bottom: 10px;">
                 {% csrf_token %}
                 <input type="search" name="tipo" style="border-radius: 4px 0px 0px 4px;"
                 class="form-control" placeholder="tipo de perícia">
                 <button class="btn text-white"  style="background-color: #2c5aa0;"><i class="bi bi-search"></i></button>
             </form>
-            <form action="/list_evidence/" method="get" 
+
+            <form action="/list_evidence_expertise/" method="get" 
              class="btn-group btn-group-sm">
                 {% csrf_token %}
                 <input type="search" name="numero_evidencia" style="border-radius: 4px 0px 0px 4px;"
                 class="form-control" placeholder="Número da evidência">
                 <button class="btn btn-warning"><i class="bi bi-search"></i></button>
             </form>
+
         </div>
         <div class="card" style="display:flex; width: 97%; align-self: center;">
+
+            <form method="get" class="form-inline mb-3" style="padding: 12px; height: 7px;">
+                <input style='border: 1px solid orange; width: 70px;'
+                    type="number" 
+                    id="per_page" 
+                    name="per_page" 
+                    class="form-control form-control-sm" 
+                    min="1" 
+                    max="200" 
+                    value="{{ per_page|default:20 }}" 
+                    onchange="this.form.submit()"
+                    
+                >
+            </form>
+            
             <div class="card-body" style="border-radius: 4px;">
                 <div class="table-responsive">
                     <table class="table table-hover">
@@ -86,40 +103,41 @@
                     </table>
                 </div>
 
-                {% if eventos.has_other_pages %}
+                {% if pericias.has_other_pages %}
                     <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
-                        {% if eventos.has_previous %}
-                            <li class="page-item">
-                                
-                                <a class="page-link" href="?page={{ eventos.previous_page_number }}" aria-label="Previous">
-                                    <span aria-hidden="true">&laquo;</span>
-                                    <span class="sr-only">Anterior</span>
-                                </a>
-                            </li>
-                        {% endif %}
-
-                        {% for num in eventos.paginator.page_range %}
-                            {% if eventos.number == num %}
-                                <li class="page-item active">
-                                    <span class="page-link">{{ num }}</span>
-                                </li>
-                            {% else %}
+                        <ul class="pagination justify-content-center">
+                            {% if pericias.has_previous %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    
+                                    <a class="page-link" href="?page={{ pericias.previous_page_number }}&per_page={{per_page}}" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only">Anterior</span>
+                                    </a>
                                 </li>
                             {% endif %}
-                        {% endfor %}
-                    {% if eventos.has_next %}
-                        
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ eventos.next_page_number }}" aria-label="Próximo">
-                                <span aria-hidden="true">&raquo;</span>
-                                <span class="sr-only">Próximo</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
+
+                            {% for num in pericias.paginator.page_range %}
+                                {% if pericias.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}&per_page={{per_page}}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if pericias.has_next %}
+                                
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ pericias.next_page_number }}&per_page={{per_page}}" aria-label="Próximo">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only">Próximo</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
                 {% endif %}
             </div>
         </div>
@@ -129,11 +147,17 @@
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; min-width: 300px;">
             <h3>confirmar exclusão</h3>
             <p id="mensagemconfirmacao">Tem certeza que deseja deletar estes dados da perícia?</p>
+
+            <input type="password" class="form-control" autocomplete="new-password"
+                id="password" placeholder="Confirme sua senha" name="password" required>
+                
+            <div id="sms" style="color: red;"></div>
+
             <div style="text-align: right; margin-top: 20px;">
                 <button onclick="fecharmodal()" class="btn" style="background: #6c757d; color: white; margin-right: 10px;">
-                    cancelar
+                    sair
                 </button>
-                <button onclick="deletaritem()" class="btn btn-danger">
+                <button onclick="deletarItem()" class="btn btn-danger">
                     confirmar
                 </button>
             </div>
@@ -151,26 +175,56 @@
         function fecharmodal() {
             document.getElementById('modalconfirmacao').style.display = 'none';
             itemparadeletar = null;
+            location.reload()
         }
-        
-        function deletaritem() {
-            if (itemparadeletar) {
-                
-                const form = document.createElement('form');
-                form.method = 'post';
-                form.action = `/delete_expertise/${itemparadeletar}/`;
-                
-                const csrfinput = document.createElement('span');
 
-                csrfinput.type = 'hidden';
-                csrfinput.name = 'csrfmiddlewaretoken';
-                csrfinput.innerHTML = '{% csrf_token %}';
-                form.appendChild(csrfinput);
-                
-                document.body.appendChild(form);
-                form.submit();
+        async function deletarItem() {
+            const passwordInput = document.getElementById('password');
+            const sms = document.getElementById('sms');
+
+            if (!passwordInput || passwordInput.value.trim() === '') {
+            alert('O campo senha é obrigatório!');
+            return;
+            }
+
+            const password = passwordInput.value;
+
+            try {
+            const response = await fetch(`/delete_expertise/${itemparadeletar}/`, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                password: password
+                })
+            });
+
+            if (response.ok) {
+                sms.innerText = "Evidência eliminada com sucesso!";
+                sms.style.color = "green";
+              
+            } else {
+                const data = await response.json();
+                sms.innerText = data.error || "Erro ao deletar o item!";
+                sms.style.color = "red";
+            }
+
+            } catch (error) {
+            console.log(error);
+            sms.innerText = "Erro de conexão com o servidor.";
+            sms.style.color = "red";
             }
         }
+        
+        
+        document.getElementById('modalconfirmacao').onclick = (e)=>{
+            if (e.target === this) {
+                fecharmodal();
+            }
+        }
+        
         
         document.getElementById('modalconfirmacao').onclick = (e)=>{
             if (e.target === this) {

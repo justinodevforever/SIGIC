@@ -294,24 +294,50 @@ class PessoaEnvolvidaForm(forms.Form):
 
             return pessoa, envolvimentoCaso
             
-
-        # else:
-        #     self.instance.titulo=self.cleaned_data['titulo']
-        #     self.instance.prazo_conclusao=self.cleaned_data['prazo_conclusao']
-        #     self.instance.data_conclusao=self.cleaned_data['data_conclusao']
-        #     self.instance.data_ocorrencia=self.cleaned_data['data_ocorrencia']
-        #     self.instance.delegacia_origem=self.cleaned_data['delegacia_origem']
-        #     self.instance.delegado_responsavel=self.cleaned_data['delegado_responsavel']
-        #     self.instance.investigador_principal=self.cleaned_data['investigador_principal']
-        #     self.instance.observacoes_internas=self.cleaned_data['observacoes_internas']
-        #     self.instance.observacoes=self.cleaned_data['observacoes']
-        #     self.instance.prioridade=self.cleaned_data['prioridade']
-        #     self.instance.local_ocorrencia=self.cleaned_data['local_ocorrencia']
-        #     self.instance.status=self.cleaned_data['status']
+        else:
             
-        #     self.instance.save()
+            altura = self.cleaned_data['altura']
+            peso = self.cleaned_data['peso']
 
-        #     return caso
+            if altura in (None, ""):
+
+                altura = None
+            elif isinstance(altura, str):
+                altura = altura.replace(',','.')
+                altura = Decimal(altura)
+
+            if peso in (None, ""):
+
+                peso = None
+            elif isinstance(peso, str):
+                peso = peso.replace(',','.')
+                peso = Decimal(peso)
+
+            
+
+            pessao.nome_completo=self.cleaned_data['nome_completo'],
+            pessao.nome_social=self.cleaned_data['nome_social'],
+            pessao.bi=self.cleaned_data['bi'],
+            pessao.data_nascimento=self.cleaned_data['data_nascimento'],
+            pessao.genero=self.cleaned_data['genero'],
+            pessao.estado_civil=self.cleaned_data['estado_civil'],
+            pessao.cor_olhos=self.cleaned_data['cor_olhos'],
+            pessao.altura=altura,
+            pessao.peso=peso,
+            pessao.cor_cabelo=self.cleaned_data['cor_cabelo'],
+            pessao.profissao=self.cleaned_data['profissao'],
+            pessao.escolaridade=self.cleaned_data['escolaridade'],
+            pessao.nacionalidade=self.cleaned_data['nacionalidade'],
+            pessao.telefone_principal=telefone_principal,
+            pessao.telefone_secundario=telefone_secundario,
+            pessao.email=self.cleaned_data['email'],
+            pessao.observacoes=self.cleaned_data['observacoes'],
+            
+
+            pessoa.save()
+
+            return pessoa
+        
 
 class CasoForm(forms.Form):
     
@@ -375,12 +401,20 @@ class CasoForm(forms.Form):
     investigador_principal = forms.ModelChoiceField(
         queryset= Usuario.objects.filter(
         cargo='investigador'),
+        error_messages={
+            'required': 'Por favor, selecione um Investigador.',
+            'invalid_choice': 'O usuário selecionado não é válido, ele não é um Investigador!'
+        },
         required=True,
         widget= forms.Select(attrs={'class': 'form-control'}
     ))
     investigadores_apoio = forms.ModelMultipleChoiceField(
         queryset=  Usuario.objects.filter(
         cargo='investigador'),
+        error_messages={
+            'required': 'Por favor, selecione um Investigador.',
+            'invalid_choice': 'O usuário selecionado não é válido, ele não é um Investigador!'
+        },
         required=False,
         widget= forms.SelectMultiple( attrs={
             'class': 'form-control',
@@ -390,6 +424,10 @@ class CasoForm(forms.Form):
         queryset= Usuario.objects.filter(
         cargo='delegado'),
         required=True,
+        error_messages={
+            'required': 'Por favor, selecione um delegado responsável.',
+            'invalid_choice': 'O usuário selecionado não é válido, ele não é um delegado!'
+        },
         widget= forms.Select( attrs={'class': 'form-control'}
     ))
     prioridade = forms.ChoiceField(
@@ -407,29 +445,17 @@ class CasoForm(forms.Form):
         widget= forms.Textarea( attrs={'class': 'form-control'}
     ))
 
-    nome = forms.CharField(
-        required=True,
-        widget= forms.TextInput( attrs={'class': 'form-control'}
-    ))
-    gravidade = forms.ChoiceField(
-        choices=choices_gravidade,
+    tipo_crime = forms.ModelChoiceField(
+        queryset= TipoCrime.objects.filter(ativo=True),
         required=True,
         widget= forms.Select( attrs={'class': 'form-control'}
     ))
-    descricao = forms.CharField(
-        required=False,
-        widget= forms.Textarea( attrs={'class': 'form-control'}
-    ))
+    
 
     def __init__(self, *args, **kwargs):
 
         self.instance = kwargs.pop('instance', None)
         super().__init__(*args, **kwargs)
-
-        if self.instance:
-
-            self.fields['nome'].required = False
-            self.fields['gravidade'].required = False
 
     
     def clean(self):
@@ -457,17 +483,9 @@ class CasoForm(forms.Form):
                 numero = 1
 
             numero_caso = f'{ano_atual}-{numero}'
-                
-            tipo_crime = TipoCrime(
-                descricao=self.cleaned_data['descricao'],
-                nome=self.cleaned_data['nome'],
-                gravidade=self.cleaned_data['gravidade'],
-            )
-
-            tipo_crime.save()
 
             caso = Caso(
-                tipo_crime=tipo_crime,
+                tipo_crime=self.cleaned_data['tipo_crime'],
                 numero_caso=numero_caso,
                 titulo=self.cleaned_data['titulo'],
                 prazo_conclusao=self.cleaned_data['prazo_conclusao'],
@@ -649,4 +667,55 @@ class EventoTimelineForm(forms.Form):
 
             return evento
     
-    
+class TipoCrimeForm(forms.Form):
+
+    nome = forms.CharField(
+        required=True,
+        widget= forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    gravidade = forms.ChoiceField(
+        choices=[
+            (1, 'Leve'),
+            (2, 'Média'),
+            (3, 'Grave'),
+            (4, 'Gravíssima'),
+        ],
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    descricao = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'form': 'form-control'})
+    )
+    ativo = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'form': 'form-control'})
+    )
+
+
+    def save(self, tipo_crime=None):
+
+        if not tipo_crime:
+
+            tipo = TipoCrime(
+                nome=self.cleaned_data['nome'],
+                gravidade=self.cleaned_data['gravidade'],
+                descricao=self.cleaned_data['descricao'],
+            )
+
+            tipo.save()
+
+            return tipo
+        
+        else:
+
+            tipo_crime.nome = self.cleaned_data['nome']
+            tipo_crime.gravidade = self.cleaned_data['gravidade']
+            tipo_crime.descricao = self.cleaned_data['descricao']
+            tipo_crime.ativo = self.cleaned_data['ativo']
+
+            tipo_crime.save()
+
+            return tipo_crime

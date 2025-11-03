@@ -1,0 +1,72 @@
+{% extends 'configuracoes.html' %}
+
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações de notificações</title>
+</head>
+<body>
+    <div class="section" id="notificacoes">
+        <h2 class="section-title"><i class="fas fa-bell"></i>Notificações</h2>
+        
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Notificações por Email</h3>
+                    <p class="setting-description">Receber alertas importantes por email</p>
+                </div>
+                <div class="toggle-switch active"></div>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Novos Casos Atribuídos</h3>
+                    <p class="setting-description">Notificar quando um novo caso for atribuído</p>
+                </div>
+                <div class="toggle-switch active"></div>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Atualizações de Casos</h3>
+                    <p class="setting-description">Notificar sobre mudanças de status</p>
+                </div>
+                <div class="toggle-switch active"></div>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Prazos Próximos</h3>
+                    <p class="setting-description">Alertar sobre prazos que estão se aproximando</p>
+                </div>
+                <div class="toggle-switch active"></div>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Notificações do Sistema</h3>
+                    <p class="setting-description">Receber atualizações e manutenções programadas</p>
+                </div>
+                <div class="toggle-switch"></div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary"><i class="fas fa-save"></i>Salvar Preferências</button>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock content %}

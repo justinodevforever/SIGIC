@@ -37,6 +37,7 @@
             --light-gray: #f8f9fa;
             --border-color: #e0e6ed;
         }
+        
 
         body {
             font-family: "Oxanium", sans-serif;
@@ -325,7 +326,7 @@
             </div>
 
             <div class="nav-item">
-                <a href="#" class="nav-link" id="suspects" title="Suspeitos">
+                <a href="/list_suspect/" class="nav-link" id="suspect" title="Suspeitos">
                     <i class="bi bi-person-exclamation"></i>
                     <span>Suspeitos</span>
                 </a>
@@ -337,9 +338,16 @@
                     <span>Evidências</span>
                 </a>
             </div>
+
+            <div class="nav-item">
+                <a href="/list_upload_file/" class="nav-link" id="evidence" title="Arquivos de Evidência">
+                    <i class="bi bi-files"></i>
+                    <span>Arquivos de Evidências</span>
+                </a>
+            </div>
             
             <div class="nav-item">
-                <a href="#" class="nav-link" id="investigators" title="Investigadores">
+                <a href="/list_researcher/" class="nav-link" id="researcher" title="Investigadores">
                     <i class="bi bi-people"></i>
                     <span>Investigadores</span>
                 </a>
@@ -374,9 +382,16 @@
                     <span>Timeline</span>
                 </a>
             </div>
+
+            <div class="nav-item">
+                <a href="/list_type_crime/" class="nav-link" id="tipo_crime" title="Tipo de Crime">
+                    <i class="bi bi-shield-exclamation"></i>
+                    <span>Tipo de Crime</span>
+                </a>
+            </div>
             
             <div class="nav-item">
-                <a href="#" class="nav-link" id="settings" title="Configurações">
+                <a href="/tool_sistem/" class="nav-link" id="settings" title="Configurações">
                     <i class="bi bi-gear"></i>
                     <span>Configurações</span>
                 </a>
@@ -396,13 +411,14 @@
     <div class="main-content" id="main-content" style="overflow-y: hidden;">
        
         <nav class="top-navbar d-flex justify-content-between align-items-center"
-         style="width: 95%; display: flex; position: fixed; align-items: center;
-         top: 0px; right: 0px; z-index: 100;" id="navbar">
+            style="width: 95%; display: flex; position: fixed; align-items: center;
+            top: 0px; right: 0px; z-index: 100;" id="navbar">
             <div class="d-flex justify-content-between align-items-center w-100">
                 <button class="toggle-btn" id="toggleSidebar">
                     <i class="bi bi-list"></i>
                 </button>
                 
+
                 {% if user.is_authenticated  %}
                 <div class="user-info">
                     <span class="me-2">
@@ -416,8 +432,8 @@
                             <i class="bi bi-chevron-down text-secondary"></i>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i>Perfil</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Configurações</a></li>
+                            <li><a class="dropdown-item" href="/perfil/"><i class="bi bi-person me-2"></i>Perfil</a></li>
+                            <li><a class="dropdown-item" href="/tool_sistem/"><i class="bi bi-gear me-2"></i>Configurações</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/logout/"><i class="bi bi-box-arrow-right me-2"></i>Sair</a></li>
                         </ul>
@@ -559,6 +575,44 @@
         const ficha = document.getElementById('ficha')
         const percia = document.getElementById('percia')
         const facial = document.getElementById('facial')
+        const suspect = document.getElementById('suspect')
+        const researcher = document.getElementById('researcher')
+        const settings = document.getElementById('settings')
+        const tipo_crime = document.getElementById('tipo_crime')
+
+        if(
+         
+            window.location.pathname == '/create_type_crime/' ||
+            window.location.pathname == '/list_type_crime/' ||
+            window.location.pathname.split('/')[1] == 'datail_type_crime' ||
+            window.location.pathname.split('/')[1] == 'edit_type_crime' 
+
+        ){
+            tipo_crime.classList.add('active')
+        }
+        if(
+         
+            window.location.pathname == '/tool_sistem/'
+
+        ){
+            settings.classList.add('active')
+        }
+
+        if(
+         
+            window.location.pathname == '/list_researcher/'
+
+        ){
+            researcher.classList.add('active')
+        }
+
+        if(
+         
+            window.location.pathname == '/list_suspect/'
+
+        ){
+            suspect.classList.add('active')
+        }
 
         if(
             window.location.pathname.split('/')[1] == 'detail_expertise'||
@@ -638,8 +692,6 @@
         if(window.location.pathname == '/'){
             dashboard.classList.add('active')
         }
-
-
 
     </script>
     </body>

@@ -43,7 +43,7 @@
                         Nome do usuário
                         <span class="text-danger">*</span>
                     </span>
-                    <input type="text" style=" width: 100%;"
+                    <input type="text" style=" width: 100%;" oninput="this.value=this.value.toLowerCase().replace(' ', '-')"
                         class="form-control" name="username" 
                         aria-describedby="helpId" autocomplete="off">
                         
@@ -80,10 +80,10 @@
                 flex-direction: column; width: 100%;">
 
                     <span >
-                        Primeiro nome 
+                        Nome Completo 
                         <span class="text-danger">*</span>
                     </span>
-                    <input type="text" style=" width: 100%;"
+                    <input type="text" style=" width: 100%;" oninput="this.value=this.value.toUpperCase()"
                     class="form-control" name="first_name" autocomplete="off"
                     aria-describedby="helpId">
 
@@ -101,7 +101,7 @@
                         Último nome
                         <span class="text-danger">*</span>
                     </span>
-                    <input type="text" style=" width: 100%;"
+                    <input type="text" style=" width: 100%;"  oninput="this.value=this.value.toUpperCase()"
                     class="form-control" name="last_name" autocomplete="off"
                     aria-describedby="helpId">
 
@@ -114,6 +114,94 @@
     
                 
             </div>
+
+            <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+                <label for="data_nascimento" 
+                style="display: flex; flex-direction: column;  width: 100%;">
+
+                    <span >
+                        Data de nascimento
+                        <span class="text-danger">*</span>
+                    </span>
+                    <input type="date" style=" width: 100%;"
+                        class="form-control" name="data_nascimento" 
+                        aria-describedby="helpId" autocomplete="off">
+                        
+                        {% if form.data_nascimento.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.data_nascimento.errors}}
+                            </div>
+                        {% endif %}
+                </label>
+    
+                <label for="bi" style="display: flex;
+                 width: 100%; flex-direction: column;">
+
+                    <span >
+                        B.I 
+                        <span class="text-danger">*</span>
+                    </span>
+                    <input type="bi" style=" width: 100%;" 
+                    class="form-control" name="bi" autocomplete="off"
+                    aria-describedby="helpId">
+
+
+                    {% if form.bi.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.bi.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            </div>
+
+            <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                
+                <label for="genero" style="display: flex;
+                 flex-direction: column; width: 100%;">
+
+                    <span >
+                        Gênero 
+                        <span class="text-danger">*</span>
+                    </span>
+                    <select name="genero" class="form-control" >
+                        <option value="">Selecione Gênero</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Feminino</option>
+                        <option value="O">Outro</option>
+                    </select>
+
+                    {% if form.genero.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.genero.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+                
+                <label for="estado_civil" style="display: flex;
+                 flex-direction: column; width: 100%;">
+
+                    <span >
+                        Estado Civil
+                        <span class="text-danger">*</span>
+                    </span>
+                    <select name="estado_civil" class="form-control" >
+                        <option value="">Selecione</option>
+                        <option value="solteiro">Solteiro(a)</option>
+                        <option value="casado">Casado(a)</option>
+                        <option value="divorciado">Divorciado(a)</option>
+                        <option value="viuvo">Viúvo(a)</option>                
+                        <option value="uniao_estavel">União estável</option>                
+                    </select>
+
+                    {% if form.estado_civil.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.estado_civil.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+            </div>
     
             <div class="form-group" 
             style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
@@ -122,7 +210,6 @@
 
                     <span >
                         Telefone 
-                        <span class="text-danger">*</span>
                     </span>
 
                     <input type="number" style=" width: 100%;"
@@ -218,7 +305,7 @@
                         Departamento 
                         <span class="text-danger">*</span>
                     </span>
-                    <input type="text" style=" width: 100%;"
+                    <input type="text" style=" width: 100%;"  oninput="this.value=this.value.toUpperCase()"
                     class="form-control" name="departamento" autocomplete="off"
                     aria-describedby="helpId">
 

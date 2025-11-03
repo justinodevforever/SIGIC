@@ -1,0 +1,68 @@
+{% extends 'configuracoes.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>configurações do usuário</title>
+</head>
+<body>
+    <!-- Seção Usuários -->
+    <div class="section" id="usuarios">
+        <h2 class="section-title"><i class="fas fa-users"></i>Gestão de Usuários</h2>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <h4>47</h4>
+                <p>Usuários Ativos</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-user-shield"></i>
+                <h4>12</h4>
+                <p>Administradores</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-user-tie"></i>
+                <h4>35</h4>
+                <p>Investigadores</p>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Aprovação Manual de Novos Usuários</h3>
+                    <p class="setting-description">Requer aprovação de administrador para novos registros</p>
+                </div>
+                <div class="toggle-switch active"></div>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="setting-header">
+                <div>
+                    <h3>Requisitos de Senha Forte</h3>
+                    <p class="setting-description">Exigir senhas complexas (mínimo 8 caracteres, maiúsculas, números e símbolos)</p>
+                </div>
+                <div class="toggle-switch active"></div>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <div class="input-group">
+                <label>Validade da Senha (dias)</label>
+                <input type="number" value="90" min="30" max="365">
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary"><i class="fas fa-user-plus"></i>Adicionar Usuário</button>
+            <button class="btn btn-secondary"><i class="fas fa-file-export"></i>Exportar Lista</button>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock content %}

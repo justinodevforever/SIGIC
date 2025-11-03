@@ -21,6 +21,16 @@ def home(request):
 
   return render(request, 'home.html')
 
+def perfil(request):
+    user = Usuario.objects.get(id=request.user.id)
+
+    context = {
+        'user': user
+    }
+    print(user.data_nascimento)
+
+    return render(request, 'perfil.html', context)
+
 @login_required
 def dashboard(request):
 

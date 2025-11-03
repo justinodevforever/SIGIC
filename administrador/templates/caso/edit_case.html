@@ -44,7 +44,7 @@
                         Piquente de origem
                         <span class="text-danger">*</span>
                     </span>
-                    <input type="text" style=" width: 100%;" value="{{caso.delegacia_origem}}"
+                    <input type="text" style=" width: 100%;" value="{{caso.delegacia_origem}}" oninput="this.value=this.value.toUpperCase()"
                         class="form-control" name="delegacia_origem" 
                         aria-describedby="helpId" autocomplete="off">
                         
@@ -62,7 +62,7 @@
                         Título
                         <span class="text-danger">*</span>
                     </span>
-                    <input type="text" style=" width: 100%;" value="{{caso.titulo}}"
+                    <input type="text" style=" width: 100%;" value="{{caso.titulo}} " oninput="this.value=this.value.toUpperCase()"
                         class="form-control" name="titulo" 
                         aria-describedby="helpId" autocomplete="off">
                         
@@ -135,7 +135,7 @@
                         Local da corrênca
                         <span class="text-danger">*</span>
                     </span>
-                    <textarea  style=" width: 100%; resize: none;" 
+                    <textarea  style=" width: 100%; resize: none;" oninput="this.value=this.value.toUpperCase()"
                     class="form-control" name="local_ocorrencia" autocomplete="off"
                     aria-describedby="helpId"> {{caso.local_ocorrencia}}</textarea>
 
@@ -280,6 +280,32 @@
                         </div>
                     {% endif %}
                   
+                </label>
+            </div>
+
+            <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                
+                <label for="tipo_crime" style="display: flex;
+                 flex-direction: column; width: 100%;">
+
+                    <span >
+                        Tipo de crime 
+                        <span class="text-danger">*</span>
+                    </span>
+                    <select name="tipo_crime" class="form-control" >
+                        <option value="{{caso.tipo_crime.id}}">{{caso.tipo_crime.nome}}</option>
+                        {% for tipo in tipos_crime %}
+                            <option value="{{tipo.id}}">{{tipo.nome}}</option>
+                        {% endfor %}
+                        
+                    </select>
+
+                    {% if form.tipo_crime.errors %}
+                        <div class="text-danger" style="margin-bottom: -40px; ">
+                            {{form.tipo_crime.errors}}
+                        </div>
+                    {% endif %}
                 </label>
             </div>
 

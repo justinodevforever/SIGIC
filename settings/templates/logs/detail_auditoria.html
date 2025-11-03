@@ -1,0 +1,98 @@
+{% extends 'configuracoes.html' %}
+
+
+
+{% block content %}
+<style>
+    :root {
+            --primary-orange: #FF6B35;
+            --secondary-orange: #FF8C61;
+            --dark-blue: #0A1929;
+            --medium-blue: #1E3A5F;
+            --light-blue: #2C5F8D;
+            --bg-dark: #0D1B2A;
+            --bg-card: #1B2838;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0B8C1;
+            --border-color: #2C3E50;
+        }
+
+        
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            color: #fff;
+        }
+        .card-header{
+            background-color: var(--primary-orange);
+        }
+</style>
+
+<div class="column container" style="display: flex; gap: 10px; padding: 20px; width: 100%;
+     justify-content: center;">
+    <div class="col-md-8" style="width: 100%;">
+        <div class="card" style="width: 97%;">
+            <div class="d-flex justify-content-between card-header text-white" >
+                <h5 class="mb-0">
+                     Informações da Auditoria
+                </h5>
+                <a href="/logs_auditorio/" class="btn" 
+                style="background: #1e3a5f; color: #fff;">
+                    lista
+                </a>
+            </div>        
+
+            <div class="card-body">
+
+                <div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Tipo da auditoria:</strong></div>
+                        <div class="col-sm-9">{{ auditoria.acao }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Modelo afectado:</strong></div>
+                        <div class="col-sm-9">{{ auditoria.modelo }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>ID do modelo:</strong></div>
+                        <div class="col-sm-9">{{ auditoria.objeto_id}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Descrição:</strong></div>
+                        <div class="col-sm-9">{{ auditoria.descricao}} anos</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>IP de origem:</strong></div>
+                        <div class="col-sm-9">{{ auditoria.ip_origem }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Navegado em:</strong></div>
+                        <div class="col-sm-9">{{ auditoria.user_agent}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Dados Anteriores:</strong></div>
+                        <div class="col-sm-9">{{ auditoria.dados_anteriores|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Dados atuais:</strong></div>
+                        <div class="col-sm-9">{{ auditoria.dados_novos|default:"Sem Informações"}}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Data da Operação:</strong></div>
+                        <div class="col-sm-9">{{ auditoria.data_acao}}</div>
+                    </div>
+
+                    
+                </div>
+
+                
+            </div>
+        </div>   
+</div>
+{% endblock %}
+

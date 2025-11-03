@@ -17,6 +17,9 @@ from casos.models import *
 from usuario.models import *
 from .forms import *
 import json
+from django.core import serializers
+
+
 
 class pessoaListView(LoginRequiredMixin, ListView):
     
@@ -111,11 +114,11 @@ def create_user(request):
             )
 
             return render(request, 'usuario/criar_usuario.html', {'form': form,
-            'sucesso': 'Usuario criado com sucesso!'})
+            'sucesso': 'Usuário criado com sucesso!'})
         else:
 
-            	return render(request, 'usuario/criar_usuario.html', {'form': form,
-                'erro': 'Erro ao criar Usuario!'})
+            return render(request, 'usuario/criar_usuario.html', {'form': form,
+            'erro': 'Erro ao criar Usuário!'})
         
     else:
         form = UserForm()
@@ -126,35 +129,15 @@ def create_user(request):
 def edit_user(request, id):
 
     user = Usuario.objects.get(id=id)
-    
+
     if request.method == 'POST':
         form = EditUserForm(request.POST, instance=user)
 
+        
+        dados_anteriores = serializers.serialize('json', [user]),
+        
+
         if form.is_valid():
-            anterior ={
-                'primeiro_nome': user.first_name,
-                'ultimo_nome': user.last_name,
-                'username': user.username,
-                'departamento': user.departamento,
-                'cargo': user.cargo,
-                'nivel_acesso': user.nivel_acesso,
-                'telefone': user.telefone,
-                'ativo': user.ativo,
-                'matricula': user.matricula,
-                'Ativo': user.is_active,
-            }
-         
-            user.username = form.cleaned_data['username']
-            user.last_name = form.cleaned_data['last_name']
-            user.first_name = form.cleaned_data['first_name']
-            user.departamento = form.cleaned_data['departamento']
-            user.cargo = form.cleaned_data['cargo']
-            user.nivel_acesso = form.cleaned_data['nivel_acesso']
-            user.email = form.cleaned_data['email']
-            user.matricula = form.cleaned_data['matricula']
-            user.telefone = form.cleaned_data['telefone']
-            user.is_active = form.cleaned_data['is_active']
-            user.ativo = form.cleaned_data['is_active']
 
             userExist = Usuario.objects.get(username=form.cleaned_data['username'])
             if user.id != userExist.id:
@@ -165,38 +148,32 @@ def edit_user(request, id):
                 return render(request, 'usuario/edit_user.html', 
                 {'user': user, 'form': form})
 
-            user.save()
-            new_user ={
-                'primeiro_nome': user.first_name,
-                'ultimo_nome': user.last_name,
-                'username': user.username,
-                'departamento': user.departamento,
-                'cargo': user.cargo,
-                'nivel_acesso': user.nivel_acesso,
-                'telefone': user.telefone,
-                'ativo': user.ativo,
-                'matricula': user.matricula,
-            }
 
+            usuario = form.save()            
+            
             LogAuditoria.objects.create(
                 usuario=request.user,
                 acao='update',
                 modelo='Usuaurio',
-                objeto_id=str(user.id),
-                descricao=f'Usuário Atualizado: {user.get_full_name}',
+                objeto_id=str(usuario.id),
+                descricao=f'Usuário Atualizado: {usuario.get_full_name}',
                 ip_origem=request.META.get('REMOTE_ADDR'),
                 user_agent=request.META.get('HTTP_USER_AGENT', ''),
-                dados_anteriores = anterior,
-                dados_novos = new_user
+                dados_anteriores = dados_anteriores,
+                dados_novos = serializers.serialize('json', [usuario])
             )
-
+       
+            user.data_nascimento = user.data_nascimento.strftime('%Y-%m-%d')
             return render(request, 'usuario/edit_user.html', 
-            {'user': user, 'form': form})
-
+            {'user': user, 'form': form, 'sucesso': 'Dados do usuário atualizado com sucesso!'})
+        
         else:
+            user.data_nascimento = user.data_nascimento.strftime('%Y-%m-%d')
             return render(request, 'usuario/edit_user.html', 
-            {'user': user, 'form': form})
+            {'user': user, 'form': form, 'erro': 'Erro ao atualizar dados do usuário!'})
 
+    user.data_nascimento = user.data_nascimento.strftime('%Y-%m-%d')
+    
     return render(request, 'usuario/edit_user.html', {'user': user})
 
 @login_required
@@ -205,8 +182,10 @@ def list_user(request):
     try:
         users = Usuario.objects.all()
 
-        paginator = Paginator(users, 20)
         num_page = request.GET.get('page', 1)
+        per_page = request.GET.get('per_page', 20)
+
+        paginator = Paginator(users, per_page)
 
         objetos = paginator.page(num_page)
 
@@ -217,7 +196,7 @@ def list_user(request):
     except EmptyPage:
       objetos = paginator.page(paginator.num_pages)
 
-    return render(request, 'usuario/list_user.html', {'users': objetos})
+    return render(request, 'usuario/list_user.html', {'users': objetos,'per_page': per_page,})
 
 @login_required
 def view_user(request, id):

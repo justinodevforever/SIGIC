@@ -1,0 +1,72 @@
+{% extends 'configuracoes.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações do sistema</title>
+</head>
+<body>
+    <!-- Seção Sistema -->
+    <div class="section" id="sistema">
+        <h2 class="section-title"><i class="fas fa-server"></i>Sistema</h2>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <span>Versão do Sistema: 2.4.1 | Última atualização: 10 de Outubro de 2025</span>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-database"></i>
+                <h4>2.3 GB</h4>
+                <p>Espaço Utilizado</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-hdd"></i>
+                <h4>15.7 GB</h4>
+                <p>Espaço Disponível</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-folder"></i>
+                <h4>1,247</h4>
+                <p>Casos Registrados</p>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <h3>Manutenção do Sistema</h3>
+            <p class="setting-description">Ferramentas para manutenção e otimização</p>
+            <div class="button-group">
+                <button class="btn btn-secondary"><i class="fas fa-broom"></i>Limpar Cache</button>
+                <button class="btn btn-secondary"><i class="fas fa-database"></i>Otimizar BD</button>
+                <button class="btn btn-secondary"><i class="fas fa-download"></i>Backup Manual</button>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <h3>Logs do Sistema</h3>
+            <p class="setting-description">Visualizar e gerenciar registros de atividades</p>
+            <div class="button-group">
+                <button class="btn btn-secondary"><i class="fas fa-eye"></i>Ver Logs</button>
+                <a href="/logs_auditorio/" class="btn btn-secondary"><i class="fas fa-eye"></i>Logs de Auditório</a>
+                <button class="btn btn-secondary"><i class="fas fa-download"></i>Exportar Logs</button>
+                <button class="btn btn-danger"><i class="fas fa-trash"></i>Limpar Logs Antigos</button>
+            </div>
+        </div>
+
+        <div class="setting-card">
+            <h3>Zona de Perigo</h3>
+            <p class="setting-description">Ações críticas que afetam o sistema</p>
+            <div class="button-group">
+                <button class="btn btn-danger"><i class="fas fa-redo"></i>Resetar Configurações</button>
+                <button class="btn btn-danger"><i class="fas fa-exclamation-triangle"></i>Modo Manutenção</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+{% endblock content %}

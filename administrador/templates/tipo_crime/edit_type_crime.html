@@ -1,0 +1,225 @@
+{% extends 'principal.html' %}
+
+{% block content %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {% load static %}
+        <script src="{% static 'js/jquery.mask.min.js' %}"></script>
+        <style>
+            .form-control{
+                height: 40px;
+            }
+            .switch {
+            position: relative;
+            display: inline-block;
+            width: 55px;
+            height: 28px;
+            }
+
+            .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            }
+            .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+            }
+
+            .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+            }
+
+            input:checked + .slider {
+            background-color: #4caf50;
+            }
+
+            input:checked + .slider:before {
+            transform: translateX(26px);
+            }
+        </style>
+    </head>
+    <body >
+        <div class="card"
+        style="display: flex; gap: 20px;  width: 80%; flex-direction: column;
+        background-color: #f8f9fa; padding: 10px; border-radius: 10px;
+         align-self: center; align-items: center; margin-top: 20px;">
+
+            <div class="d-flex justify-content-between"
+             style="width: 100%;">
+                <h3 class="text-warning">Atualização de Tipo de crime</h3>
+                <a href="/list_type_crime/" class="btn btn-primary">Listar</a>
+            </div>
+
+            <form action="{% url 'edit_type_crime' tipo_crime.id%}" method="post" 
+            style="display: flex; gap: 20px;  width: 100%; flex-direction: column;
+            background-color: #f8f9fa; padding: 10px; border-radius: 10px;
+             align-self: center; align-items: center;">
+
+             {% csrf_token %}
+
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if message.tags == 'success' %}
+                        
+                            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                                <strong>{{message}}</strong>
+                                <button type="button" class="btn-close"
+                                data-bs-dismiss="alert" aria-label="close"
+                                ></button>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>{{message}}</strong>
+                                <button type="button" class="btn-close"
+                                data-bs-dismiss="alert" aria-label="close"
+                                ></button>
+                            </div>
+                        {% endif %}
+                    
+                    {% endfor %}
+                {% endif %}
+
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    
+                    <label for="nome" style="display: flex;
+                    flex-direction: column; width: 100%;">
+                
+                        <span >
+                            Tipo de crime
+                            <span class="text-danger">*</span>
+                        </span>
+            
+                        <input type="text" name="nome" id="nome" oninput="this.value=this.value.toUpperCase()"
+                            style="border-radius: 4px 0px 0px 4px;"
+                            class="form-control"
+                            placeholder="Número da evidência" value="{{tipo_crime.nome}}">
+
+                        {% if form.nome.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.nome.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                    <label for="gravidade" style="display: flex;
+                    flex-direction: column; width: 100%;">
+                
+                        <span >
+                            Tipo de gravidade
+                            <span class="text-danger">*</span>
+                        </span>
+            
+                        <select name="gravidade" class="form-control" id="gravidade">
+                            <option value="{{tipo_crime.gravidade}}">{{tipo_crime.get_gravidade_display}} </option>
+                            <option value="1">Leve </option>
+                            <option value="2">Média </option>
+                            <option value="3">Grave </option>
+                            <option value="4">Gravíssima</option>
+                
+                        
+                        </select>
+
+                        {% if form.gravidade.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.gravidade.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+
+                    <label for="descricao" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+                        
+                        <span >
+                            Descrição
+                        </span>
+                        <textarea  style=" width: 100%; height: 100px; resize: none;"
+                            class="form-control" name="descricao" 
+                            aria-describedby="helpId" autocomplete="off">{{tipo_crime.descricao}}</textarea>
+                            
+                        {% if form.descricao.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.descricao.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+
+                    <label for="ativo" style="display: flex; justify-content: center; align-items: center;
+                        flex-direction: column; width: 100%;">
+                    Ativo?
+                    <label class="switch">
+                        <input type="checkbox" name="ativo" id="ativo" {% if tipo_crime.ativo %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                    {% if form.ativo.errors %}
+                        <div class="text-danger" style="margin-bottom: -30px; ">
+                            {{form.ativo.errors}}
+                        </div>
+                    {% endif %}
+                </label>
+                    
+                </div>        
+
+                <button type="submit" class="btn" 
+                style="width: 80%; background-color: green; color: #fff;">
+                    Salvar
+                </button>
+            </form>
+        </div> 
+        <script>
+
+            $(document).ready(function(){
+                
+                $('#form').on('submit',function(e){
+                    e.preventDefault()
+                    let formData = new FormData(this)
+                    let nu = $('#numero_evidencia').val()
+                    console.log(nu)
+                    
+                   
+                    $.ajax(
+                        {
+                            type: 'POST',
+                            url: `/get_evidence/`,
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            dataType: 'json',
+                            success: function(res){
+                            
+                                console.log(res)
+                            }
+                        }
+                    )
+                })
+
+
+            })
+           
+        </script>
+            
+    </body>
+    </html>
+{% endblock content %}

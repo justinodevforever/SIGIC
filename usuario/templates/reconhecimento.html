@@ -37,7 +37,7 @@
             margin-bottom: 30px;
         }
 
-        .card {
+        .card:not(#fichaCriminal) {
             background: white;
             border-radius: 15px;
             min-height: 20px;
@@ -285,6 +285,278 @@
             width: 20px;
             height: 20px;
         }
+
+        #fichaCriminal{
+            display: none;
+        }
+
+
+        .loading-box {
+            display: flex;
+            position: fixed;
+            z-index: 1001;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 50%, #16213e 100%);
+            width: 100%;
+            height: 100%;
+            top: 0px;
+            left:0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            overflow-y: hidden;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+        }
+
+        .scanner-box {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 30px;
+        }
+
+        .face-outline {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(0, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .corner {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border: 3px solid #00ffff;
+        }
+
+        .corner-tl {
+            top: 20px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+            animation: scanCorner 2s ease-in-out infinite;
+        }
+
+        .corner-tr {
+            top: 20px;
+            right: 20px;
+            border-left: none;
+            border-bottom: none;
+            animation: scanCorner 2s ease-in-out infinite 0.5s;
+        }
+
+        .corner-bl {
+            bottom: 20px;
+            left: 20px;
+            border-right: none;
+            border-top: none;
+            animation: scanCorner 2s ease-in-out infinite 1s;
+        }
+
+        .corner-br {
+            bottom: 20px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+            animation: scanCorner 2s ease-in-out infinite 1.5s;
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            top: 0;
+            left: 0;
+            animation: scan 3s linear infinite;
+            box-shadow: 0 0 20px #00ffff;
+        }
+
+        .face-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+        }
+
+        .face-circle {
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(0, 255, 255, 0.5);
+            border-radius: 50%;
+            position: relative;
+            animation: rotate 3s linear infinite;
+        }
+
+        .face-circle::before,
+        .face-circle::after {
+            content: '';
+            position: absolute;
+            background: #00ffff;
+            border-radius: 50%;
+        }
+
+        .face-circle::before {
+            width: 12px;
+            height: 12px;
+            top: 35%;
+            left: 30%;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        .face-circle::after {
+            width: 12px;
+            height: 12px;
+            top: 35%;
+            right: 30%;
+            animation: blink 2s ease-in-out infinite 0.1s;
+        }
+
+        .face-mouth {
+            position: absolute;
+            bottom: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 20px;
+            border: 3px solid #00ffff;
+            border-top: none;
+            border-radius: 0 0 40px 40px;
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ffff;
+            border-radius: 50%;
+            animation: float 3s ease-in-out infinite;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        .particle:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; }
+        .particle:nth-child(2) { top: 20%; left: 80%; animation-delay: 0.5s; }
+        .particle:nth-child(3) { top: 80%; left: 10%; animation-delay: 1s; }
+        .particle:nth-child(4) { top: 70%; left: 90%; animation-delay: 1.5s; }
+        .particle:nth-child(5) { top: 40%; left: 5%; animation-delay: 2s; }
+        .particle:nth-child(6) { top: 60%; left: 95%; animation-delay: 2.5s; }
+
+        .status-text {
+            color: #00ffff;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            animation: fadeInOut 2s ease-in-out infinite;
+        }
+
+        .progress-container {
+            width: 300px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 0 auto 20px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00ffff, #00ff88, #00ffff);
+            border-radius: 10px;
+            animation: progress 3s ease-in-out infinite;
+            box-shadow: 0 0 20px #00ffff;
+        }
+
+        .info-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            animation: fadeInOut 2s ease-in-out infinite 1s;
+        }
+
+        .dots {
+            color: #00ffff;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        @keyframes scan {
+            0% { top: 0; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        @keyframes scanCorner {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; box-shadow: 0 0 20px #00ffff; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+            50% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .grid-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: gridMove 4s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(30px); }
+        }
+
+        #loading{
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -321,8 +593,11 @@
             </div>
             <div id="mensagemVerificacao"></div>
 
+            <div class="card" id="fichaCriminal" style="width: 99%; color: #fff;"></div>
         </div>
     </div>
+
+    <div class="loading-box" id="loading"></div>
     <script>
         let streamCadastro = null;
         let streamVerificacao = null;
@@ -331,6 +606,47 @@
         const imagePreview = document.getElementById('imagePreview');
         const video = document.getElementById('videoVerificacao');
         const openCameraBtn = document.getElementById('openCameraBtn');
+        const loading = document.getElementById('loading');
+        
+        const loadi = `
+            
+                <div class="container">
+        <div class="scanner-box">
+            <div class="grid-lines"></div>
+            <div class="face-outline"></div>
+            
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            
+            <div class="scan-line"></div>
+            
+            <div class="face-icon">
+                <div class="face-circle">
+                    <div class="face-mouth"></div>
+                </div>
+            </div>
+
+            <div class="particles">
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+            </div>
+        </div>
+
+        <div class="status-text" id="statusText">Escaneando rosto</div>
+        
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+        
+        <div class="info-text" id="infoText">Analisando características faciais<span class="dots">...</span></div>
+    </div>
+        `
         
         const video1 = document.getElementById('video');
         const parar = document.getElementById('parar');
@@ -413,6 +729,17 @@
             const video = document.getElementById('videoVerificacao');
             const canvas = document.getElementById('canvasVerificacao');
             const ctx = canvas.getContext('2d');
+            const elemento = document.getElementById('mensagemVerificacao')
+            const image = document.getElementById('image')
+             const fichaCriminal = document.getElementById('fichaCriminal')
+
+            fichaCriminal.innerHTML = ''
+            elemento.innerHTML = ''
+            image.innerHTML = '' 
+            loading.innerHTML = loadi
+
+            loading.style.display = 'flex'
+
 
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
@@ -438,16 +765,65 @@
                 const data = await response.json();
                 if (data.success) {
                     if (data.reconhecido) {
+
+
+                        fichaCriminal.style.display = 'flex'
+                        image.style.display = 'flex'
+                        image.innerHTML = `<img src=${data.image} id='recoImg'/>`
+
+                        
+
                         mostrarMensagem('verificacao', 
                             `✅ ${data.pessoa} - Confiança: ${data.confianca}%`, 
                             'success');
+                        
+                            
+                            fichaCriminal.innerHTML = `
+                                <div class='card-header bg-primary text-white'>
+                                    <h2 class="text-white">Ficha Criminal</h2>
+                                </div>
+                                ${data.envolvimento.length > 0 ? 
+                                    data.envolvimento.map(env => `
+                                    <div class="card-body text-black">
+                                        <div class="row mb-3">
+                                        <div class="col-sm-3"><strong>Envolvido no caso Nº:</strong></div>
+                                        <div class="col-sm-9">${env.numero_caso ?? "Não informado"}</div>
+                                        </div>
+                                        <div class="row mb-3">
+                                        <div class="col-sm-3"><strong>Título:</strong></div>
+                                        <div class="col-sm-9">${env.titulo_caso ?? "Não informado"}</div>
+                                        </div>
+                                        <div class="row mb-3">
+                                        <div class="col-sm-3"><strong>Tipo de crime:</strong></div>
+                                        <div class="col-sm-9">${env.tipo_crime ?? "Não informado"}</div>
+                                        </div>
+                                        <div class="row mb-3">
+                                        <div class="col-sm-3"><strong>Data de envolvimento:</strong></div>
+                                        <div class="col-sm-9">${env.data_envolvimento ?? "Não informada"}</div>
+                                        </div>
+                                        <div class="row mb-3">
+                                        <div class="col-sm-3"><strong>Estado do caso:</strong></div>
+                                        <div class="col-sm-9">${env.estado_caso ?? "Sem informações"}</div>
+                                        <a href="/detail_individual_invalid/${env.pessoa_id}">Ler mais</a>
+                                        </div>
+                                    </div>
+                                    `).join('') 
+                                    : 
+                                    `<h3 class="text-center text-muted mt-3">Sem Envolvimento</h3>`
+                                }
+                                `;
+
+                        loading.style.display = 'none'
                     } else {
+                        loading.style.display = 'none'
                         mostrarMensagem('verificacao', '❌ Pessoa não reconhecida', 'error');
                     }
                 } else {
+                    loading.style.display = 'none'
                     mostrarMensagem('verificacao', data.message, 'error');
                 }
             } catch (error) {
+                loading.style.display = 'none'
                 mostrarMensagem('verificacao', 'Erro ao verificar: ' + error.message, 'error');
             }
             
@@ -456,9 +832,18 @@
         async function VerificarFoto(){
             const elemento = document.getElementById('mensagemVerificacao')
             const image = document.getElementById('image')
+            const fichaCriminal = document.getElementById('fichaCriminal')
+
+            fichaCriminal.innerHTML = ''
             elemento.innerHTML = ''
 
-            image.innerHTML = '' 
+            image.innerHTML = ''
+
+            loading.innerHTML = loadi
+
+            loading.style.display = 'flex'
+
+
 
             const fileInput = document.getElementById('file');
             const file = fileInput.files[0];
@@ -468,7 +853,7 @@
 
             reader.onload = async function () {
                 const fotoBase64 = reader.result;
-                console.log(fotoBase64)
+                
 
                 try {
                     const response = await fetch('/verificar/', {
@@ -487,17 +872,58 @@
                     if (data.success) {
                         if (data.reconhecido) {
                             image.style.display = 'flex'
+                            fichaCriminal.style.display = 'flex'
+
                             image.innerHTML = `<img src=${data.image} id='recoImg'/>`
                             mostrarMensagem('verificacao', 
                                 `✅ ${data.pessoa} - Confiança: ${data.confianca}%`, 
                                 'success');
+
+                            fichaCriminal.innerHTML = `
+                                <div class='card-header bg-primary text-white'>
+                                    <h2 class="text-white">Ficha Criminal</h2>
+                                </div>
+                                ${data.envolvimento.length > 0 ? 
+                                    data.envolvimento.map(env => `
+                                    <div class="card-body text-black">
+                                        <div class="row mb-3">
+                                        <div class="col-sm-3"><strong>Envolvido no caso Nº:</strong></div>
+                                        <div class="col-sm-9">${env.numero_caso ?? "Não informado"}</div>
+                                        </div>
+                                        <div class="row mb-3">
+                                        <div class="col-sm-3"><strong>Título:</strong></div>
+                                        <div class="col-sm-9">${env.titulo_caso ?? "Não informado"}</div>
+                                        </div>
+                                        <div class="row mb-3">
+                                        <div class="col-sm-3"><strong>Tipo de crime:</strong></div>
+                                        <div class="col-sm-9">${env.tipo_crime ?? "Não informado"}</div>
+                                        </div>
+                                        <div class="row mb-3">
+                                        <div class="col-sm-3"><strong>Data de envolvimento:</strong></div>
+                                        <div class="col-sm-9">${env.data_envolvimento ?? "Não informada"}</div>
+                                        </div>
+                                        <div class="row mb-3">
+                                        <div class="col-sm-3"><strong>Estado do caso:</strong></div>
+                                        <div class="col-sm-9">${env.estado_caso ?? "Sem informações"}</div>
+                                        <a href="/detail_individual_invalid/${env.pessoa_id}">Ler mais</a>
+                                        </div>
+                                    </div>
+                                    `).join('') 
+                                    : 
+                                    `<h3 class="text-center text-muted mt-3">Sem Envolvimento</h3>`
+                                }
+                                `;
+                            loading.style.display = 'none'
                         } else {
+                            loading.style.display = 'none'
                             mostrarMensagem('verificacao', '❌ Pessoa não reconhecida', 'error');
                         }
                     } else {
+                        loading.style.display = 'none'
                         mostrarMensagem('verificacao', data.message, 'error');
                     }
                 } catch (error) {
+                    loading.style.display = 'none'
                     mostrarMensagem('cadastro', 'Erro ao cadastrar: ' + error.message, 'error');
                 }
             };
@@ -526,6 +952,30 @@
             }
             return cookieValue;
         }
+
+         const statusTexts = [
+            'Escaneando rosto',
+            'Detectando pontos faciais',
+            'Analisando características',
+            'Processando biometria',
+            'Verificando identidade'
+        ];
+
+        const infoTexts = [
+            'Analisando características faciais',
+            'Mapeando pontos de referência',
+            'Verificando padrões únicos',
+            'Comparando dados biométricos',
+            'Finalizando autenticação'
+        ];
+
+        let currentIndex = 0;
+
+        setInterval(() => {
+            currentIndex = (currentIndex + 1) % statusTexts.length;
+            document.getElementById('statusText').textContent = statusTexts[currentIndex];
+            document.getElementById('infoText').innerHTML = infoTexts[currentIndex] + '<span class="dots">...</span>';
+        }, 3000);
     </script>
 </body>
 </html>

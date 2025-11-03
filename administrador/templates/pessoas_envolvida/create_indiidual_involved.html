@@ -108,7 +108,6 @@
                 border-radius: 10px;
                 margin-bottom: 20px;
                 font-weight: 500;
-                display: none;
             }
 
             .alert-success {
@@ -158,17 +157,17 @@
 
             {% csrf_token %}
              
-            
             <div class="d-flex justify-content-between" style="width: 100%;">
                 <h3 class="text-warning">Envolvimento no caso Nº {{caso.numero_caso}}</h3>
                 <a href="/list_case/" class="btn btn-primary">Listar</a>
             </div>
+            
             {% if sucesso %}
             <div class="alert alert-success" role="alert">
                 <strong>{{sucesso}}</strong>
             </div>
             
-            {% elif erro%}
+            {% elif erro %}
             
             <div class="alert alert-danger" role="alert">
                 <strong>{{erro}}</strong>
@@ -404,7 +403,7 @@
             </div>
             
             <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%;">
+                style="display: flex; gap: 20px;  width: 100%;">
                 <label for="data_nascimento" 
                 style="display: flex; flex-direction: column;  width: 100%;">
 

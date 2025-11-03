@@ -111,6 +111,7 @@ class EnvolvimentoCaso(models.Model):
     descricao = models.TextField(blank=True)
     data_envolvimento = models.DateTimeField(auto_now_add=True)
     ativo = models.BooleanField(default=True)
+    criado_por = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
     
     class Meta:
         unique_together = ['caso', 'pessoa', 'tipo_envolvimento']

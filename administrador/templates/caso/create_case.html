@@ -44,7 +44,7 @@
                         Piquente de origem
                         <span class="text-danger">*</span>
                     </span>
-                    <input type="text" style=" width: 100%;"
+                    <input type="text" style=" width: 100%;" oninput="this.value=this.value.toUpperCase()"
                         class="form-control" name="delegacia_origem" 
                         aria-describedby="helpId" autocomplete="off">
                         
@@ -62,7 +62,7 @@
                         Título
                         <span class="text-danger">*</span>
                     </span>
-                    <input type="text" style=" width: 100%;"
+                    <input type="text" style=" width: 100%;" oninput="this.value=this.value.toUpperCase()"
                         class="form-control" name="titulo" 
                         aria-describedby="helpId" autocomplete="off">
                         
@@ -135,7 +135,7 @@
                         Local da corrênca
                         <span class="text-danger">*</span>
                     </span>
-                    <textarea  style=" width: 100%; resize: none;"
+                    <textarea  style=" width: 100%; resize: none;" oninput="this.value=this.value.toUpperCase()"
                     class="form-control" name="local_ocorrencia" autocomplete="off"
                     aria-describedby="helpId"> </textarea>
 
@@ -308,8 +308,7 @@
 
             </div>
 
-            <h4>Tipo de crime</h4>
-            <hr style="width: 98%; margin-top: -30px;">
+
 
             <div class="form-group" 
                 style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
@@ -318,66 +317,17 @@
                  flex-direction: column; width: 100%;">
 
                     <span >
-                        Nome
+                        Tipo de crime
                         <span class="text-danger">*</span>
                     </span>
-                    <input type="text" name="nome" class="form-control" />
+                    {{form.tipo_crime}}
 
-
-                    {% if form.nome.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.nome.errors}}
-                        </div>
-                    {% endif %}
                 </label>
 
-                <label for="gravidade" style="display: flex;
-                flex-direction: column; width: 100%;">
-            
-                    <span >
-                        Gravidade
-                    <span class="text-danger">*</span>
-                    </span>
-                    <select  name="gravidade" class="form-control" >
-                        <option value="">Selecione</option>
-                        <option value="1">Leve</option>               
-                        <option value="2">Média</option>               
-                        <option value="3">Grave</option>               
-                        <option value="4">Gravíssima</option>               
-                    </select>
-
-                    {% if form.gravidade.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.gravidade.errors}}
-                        </div>
-                    {% endif %}
-                  
-                </label>
+                
             </div>
 
-            <div class="form-group" 
-                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-
-                <label for="descricao" style="display: flex;
-                flex-direction: column; width: 100%;">
-            
-                    <span >
-                        Descrição
-                    <span class="text-danger">*</span>
-                    </span>
-                    <textarea  name="descricao" class="form-control" 
-                    style="height: 70px; resize: none;"
-                    >
-                    </textarea>
-
-                    {% if form.descricao1.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.descricao1.errors}}
-                        </div>
-                    {% endif %}
-                  
-                </label>
-            </div>
+           
 
             <button type="submit" class="btn" 
             style="width: 80%; background-color: #2c5aa0; color: #fff;">
