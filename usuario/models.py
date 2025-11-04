@@ -331,6 +331,11 @@ from django.core.files.storage import FileSystemStorage
 import os
 
 class PessoaReconhecimento(models.Model):
+    id = models.UUIDField(
+      primary_key = True,
+      default = uuid.uuid4,
+      editable= False
+    )
     nome = models.CharField(max_length=400)
     foto = models.ImageField(upload_to='faces/')
     embedding = models.JSONField(null=True, blank=True)
@@ -351,6 +356,11 @@ class PessoaReconhecimento(models.Model):
         ]
 
 class HistoricoReconhecimento(models.Model):
+    id = models.UUIDField(
+      primary_key = True,
+      default = uuid.uuid4,
+      editable= False
+    )
     pessoa = models.ForeignKey(PessoaReconhecimento, on_delete=models.CASCADE, null=True, blank=True)
     foto_verificacao = models.ImageField(upload_to='verificacoes/')
     confianca = models.FloatField(null=True, blank=True)

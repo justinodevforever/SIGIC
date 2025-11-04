@@ -408,6 +408,8 @@ def detail_case(request, caso_id):
         caso=caso
     ).select_related('autor').order_by('-data_comentario')
     
+    
+   
     # Arquivos
     # arquivos = Arquivo.objects.filter(
     #     caso=caso
@@ -418,19 +420,25 @@ def detail_case(request, caso_id):
     paginator = Paginator(envolvimentos, 1)
     page = request.GET.get('page')
     objs = paginator.get_page(page)
+    print(objs.has_next(), objs.number)
 
-    context = {
-            # 'caso': list(caso),
-            'envolvimentos': list(objs),
-            # 'evidencias': list(evidencias),
-            # 'eventos': list(eventos),
-        }
+        
+    print(page)
 
     dados = []
+
+    image = PessoaReconhecimento.objects.filter(pessoa=objs.object_list[0].pessoa)
+    print(image)
+    foto = None
+
+    for f in image:
+        print(f)
+        foto = f.foto.url
 
     for v in objs.object_list:
         dados.append(
             {
+            'image': foto,
             'tipo_envolvimento': v.tipo_envolvimento,
             'descricao': v.descricao,
             'ativo': v.ativo,
@@ -438,7 +446,8 @@ def detail_case(request, caso_id):
                 'id': v.caso.id,
                 'titulo': v.caso.titulo
             },
-            'pessoa':{
+            'pessoa': {
+                'id': v.pessoa.id,
                 'nome_completo':v.pessoa.nome_completo,
                 'nome_social':v.pessoa.nome_social,
                 'bi':v.pessoa.bi,
@@ -715,6 +724,7 @@ def criminal_record(request):
 def list_indiidual_involved(request):
     
     envolvimentos = EnvolvimentoCaso.objects.filter(pessoa__ativo=True)
+    print(envolvimentos)
     
     nome_filter = request.GET.get('nome')
     bi_filter = request.GET.get('bi')
@@ -772,6 +782,7 @@ def detail_individual_invalid(request, pessoa_id):
         'enderecos': enderecos,
         'envolvimentos': envolvimentos,
         'casos_envolvidos': casos_envolvidos,
+
     }
     
     return render(request, 'pessoas_envolvida/detail_individual_invalid.html', context)
@@ -815,7 +826,7 @@ def create_indiidual_involved(request, caso_id):
             elif foto_base64:
                 format, imgstr = foto_base64.split(';base64,')
                 ext = format.split('/')[-1]
-                image_content = ContentFile(base64.b64decode(imgstr), name=f"{pessoa.nome_completo}.{ext}")
+                image_content = ContentFile(base64.b64decode(imgstr), name=f"{datetime.now()}.{ext}")
 
                 with tempfile.NamedTemporaryFile(delete=False, suffix=f".{ext}") as temp_file:
                     temp_file.write(image_content.read())
@@ -826,7 +837,7 @@ def create_indiidual_involved(request, caso_id):
                 pessoaReconhecimento = PessoaReconhecimento.objects.create(
                     pessoa=pessoa,
                     nome=pessoa.nome_completo,
-                    foto=File(f, name=f"{pessoa.nome_completo}.{ext}")
+                    foto=File(f, name=f"{datetime.now()}.{ext}")
                 )
 
             try:

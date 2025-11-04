@@ -28,360 +28,362 @@
         </style>
     </head>
     <body >
-        <form action="{% url 'create_evidence' caso.id %}" method="post" class="card"
-        style="display: flex; gap: 20px;  width: 80%; flex-direction: column;
-        background-color: #fff; padding: 10px; border-radius: 10px;
-         align-self: center; align-items: center;">
+        <div style="width: 80%; height: 100%">
+            <form action="{% url 'create_evidence' caso.id %}" method="post" class="card"
+                style="display: flex; gap: 20px;  width: 100%; flex-direction: column;
+                background-color: #fff; padding: 10px; border-radius: 10px;
+                align-self: center; align-items: center;">
 
-            {% csrf_token %}
-            <div class="d-flex justify-content-between"
-             style="width: 100%;">
-                <h3 class="text-warning">Cadastro de Evidências</h3>
-                <a href="/list_evidence/" class="btn btn-primary">Listar</a>
-            </div>
-           
-                {% if sucesso %}
-                
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong>{{sucesso}}</strong>
-                        <button type="button" class="btn-close"
-                        data-bs-dismiss="alert" aria-label="close"
-                        ></button>
-                    </div>
-                {% elif erro %}
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>{{erro}}</strong>
-                        <button type="button" class="btn-close"
-                        data-bs-dismiss="alert" aria-label="close"
-                        ></button>
-                    </div>
-                {% endif %}
-                
-              
-          
-            <div class="stat-card blue" style="display: flex; gap: 20px;  width: 100%; margin-top: 10px; flex-direction: column;">
-
-                <h3>Coleta e Custódia</h3>
-
-                <div style="display: flex; gap: 20px;  width: 100%;">
-
-                    <label for="local_coleta" 
-                    style="display: flex; flex-direction: column;  width: 100%;">
-                        
-                        <span >
-                            Local da coleta
-                            <span class="text-danger">*</span>
-                        </span>
-                        <input type="text" style=" width: 100%;"
-                            class="form-control" name="local_coleta" 
-                            aria-describedby="helpId" autocomplete="off">
-                            
-                        {% if form.local_coleta.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.local_coleta.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
-                    
+                {% csrf_token %}
+                <div class="d-flex justify-content-between"
+                style="width: 100%;">
+                    <h3 class="text-warning">Cadastro de Evidências</h3>
+                    <a href="/list_evidence/" class="btn btn-primary">Listar</a>
                 </div>
-
-                <div class="form-group" 
-                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                    
-                    <label for="local_armazenamento" style="display: flex;
-                        flex-direction: column; width: 100%;">
-
-                        <span >
-                            Local de armazenamento: 
-                            <span class="text-danger">*</span>
-                        </span>
-                        <input type="text" class="form-control" 
-                        name="local_armazenamento" id="local_armazenamento">
-
-                        {% if form.local_armazenamento.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.local_armazenamento.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
-
-                    <label for="data_coleta" style="display: flex;
-                    flex-direction: column; width: 100%;">
-
-                        <span >
-                            Data da coleta
-                            <span class="text-danger">*</span>
-                        </span>
-                        <input type="datetime-local" style=" width: 100%;"
-                        class="form-control" name="data_coleta" autocomplete="off"
-                        aria-describedby="helpId">
-
-                        {% if form.data_coleta.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.data_coleta.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
-                </div>
-
-                <div class="form-group" 
-                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                    
-                    <label for="custodia_atual" style="display: flex;
-                    flex-direction: column; width: 100%;">
-
-                        <span >
-                            Custódia atual 
-                            <span class="text-danger">*</span>
-                        </span>
             
-                        <select name="custodia_atual" class="form-control" >
-                            <option value="">Selecione </option>
-                            {% for user in users %}
-                                <option value="{{user.id}}">{{user.get_full_name}}</option>
-                            {% endfor %}
-                        
-                        </select>
-
-                        {% if form.custodia_atual.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.custodia_atual.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
+                    {% if sucesso %}
                     
-                    <label for="coletado_por" style="display: flex;
-                    flex-direction: column; width: 100%;">
-
-                        <span >
-                            Coletado por: 
-                            <span class="text-danger">*</span>
-                        </span>
-                        <select name="coletado_por" class="form-control" >
-                            <option value="">Selecione</option>
-                            {% for user in users %}
-                                <option value="{{user.id}}">{{user.get_full_name}}</option>
-                            {% endfor %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <strong>{{sucesso}}</strong>
+                            <button type="button" class="btn-close"
+                            data-bs-dismiss="alert" aria-label="close"
+                            ></button>
+                        </div>
+                    {% elif erro %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>{{erro}}</strong>
+                            <button type="button" class="btn-close"
+                            data-bs-dismiss="alert" aria-label="close"
+                            ></button>
+                        </div>
+                    {% endif %}
                     
-                        </select>
-
-                        {% if form.coletado_por.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.coletado_por.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
-                </div>
-            </div>
-
-            <div class="stat-card blue" style="display: flex; gap: 20px;  width: 100%; margin-top: 10px; flex-direction: column;">
-                <h3>Características física</h3>
-                <div class="form-group" 
-                style="display: flex; gap: 20px;  width: 100%;">
-
-                    <label for="dimensoes" 
-                        style="display: flex; flex-direction: column;  width: 100%;">
-
-                        Dimensões
-                        <input type="text" style=" width: 100%;"
-                            class="form-control" name="dimensoes" 
-                            aria-describedby="helpId" autocomplete="off">
-                            
-                        {% if form.dimensoes.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.dimensoes.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
-
-                    <label for="material" 
-                    style="display: flex; flex-direction: column;  width: 100%;">
-
-                        Material
-                        <input type="text" style=" width: 100%;"
-                            class="form-control" name="material" 
-                            aria-describedby="helpId" autocomplete="off">
-                            
-                        {% if form.material.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.material.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
-                </div>
                 
-                <div class="form-group" 
-                    style="display: flex; gap: 20px;  width: 100%;">
+            
+                <div class="stat-card blue" style="display: flex; gap: 20px;  width: 100%; margin-top: 10px; flex-direction: column;">
 
-                    <label for="peso" style="display: flex; flex-direction: column;  width: 100%;">
+                    <h3>Coleta e Custódia</h3>
 
-                        Peso
-                        <input type="number" style=" width: 100%;" step="0.001" id="la"
-                            class="form-control" name="peso" 
-                            aria-describedby="helpId" autocomplete="off">
+                    <div style="display: flex; gap: 20px;  width: 100%;">
+
+                        <label for="local_coleta" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
                             
-                            {% if form.peso.errors %}
+                            <span >
+                                Local da coleta
+                                <span class="text-danger">*</span>
+                            </span>
+                            <input type="text" style=" width: 100%;"
+                                class="form-control" name="local_coleta" 
+                                aria-describedby="helpId" autocomplete="off">
+                                
+                            {% if form.local_coleta.errors %}
                                 <div class="text-danger" style="margin-bottom: -40px; ">
-                                    {{form.peso.errors}}
+                                    {{form.local_coleta.errors}}
                                 </div>
                             {% endif %}
-                    </label>
-        
-                    <label for="valor_estimado" style="display: flex;
-                    width: 100%; flex-direction: column;">
+                        </label>
+                        
+                    </div>
 
-                        Valor estimado
-                        <input type="text" style=" width: 100%;" step="0.01" id="valor"
-                        class="form-control" name="valor_estimado" autocomplete="off"
-                        aria-describedby="helpId">
+                    <div class="form-group" 
+                        style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                        
+                        <label for="local_armazenamento" style="display: flex;
+                            flex-direction: column; width: 100%;">
 
+                            <span >
+                                Local de armazenamento: 
+                                <span class="text-danger">*</span>
+                            </span>
+                            <input type="text" class="form-control" 
+                            name="local_armazenamento" id="local_armazenamento">
 
-                        {% if form.valor_estimado.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.valor_estimado.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
-                </div>
+                            {% if form.local_armazenamento.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.local_armazenamento.errors}}
+                                </div>
+                            {% endif %}
+                        </label>
 
-                <div class="form-group">
-                    <label for="estado_conservacao" style="display: flex;
+                        <label for="data_coleta" style="display: flex;
                         flex-direction: column; width: 100%;">
 
-                        Estado da conservação
-                        <input type="text"  name="estado_conservacao" 
-                        class="form-control" />
+                            <span >
+                                Data da coleta
+                                <span class="text-danger">*</span>
+                            </span>
+                            <input type="datetime-local" style=" width: 100%;"
+                            class="form-control" name="data_coleta" autocomplete="off"
+                            aria-describedby="helpId">
 
-                        {% if form.estado_conservacao.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.estado_conservacao.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
+                            {% if form.data_coleta.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.data_coleta.errors}}
+                                </div>
+                            {% endif %}
+                        </label>
+                    </div>
+
+                    <div class="form-group" 
+                        style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                        
+                        <label for="custodia_atual" style="display: flex;
+                        flex-direction: column; width: 100%;">
+
+                            <span >
+                                Custódia atual 
+                                <span class="text-danger">*</span>
+                            </span>
+                
+                            <select name="custodia_atual" class="form-control" >
+                                <option value="">Selecione </option>
+                                {% for user in users %}
+                                    <option value="{{user.id}}">{{user.get_full_name}}</option>
+                                {% endfor %}
+                            
+                            </select>
+
+                            {% if form.custodia_atual.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.custodia_atual.errors}}
+                                </div>
+                            {% endif %}
+                        </label>
+                        
+                        <label for="coletado_por" style="display: flex;
+                        flex-direction: column; width: 100%;">
+
+                            <span >
+                                Coletado por: 
+                                <span class="text-danger">*</span>
+                            </span>
+                            <select name="coletado_por" class="form-control" >
+                                <option value="">Selecione</option>
+                                {% for user in users %}
+                                    <option value="{{user.id}}">{{user.get_full_name}}</option>
+                                {% endfor %}
+                        
+                            </select>
+
+                            {% if form.coletado_por.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.coletado_por.errors}}
+                                </div>
+                            {% endif %}
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="stat-card blue" style="display: flex; gap: 20px;  width: 100%; margin-top: 10px; flex-direction: column;">
+                <div class="stat-card blue" style="display: flex; gap: 20px;  width: 100%; margin-top: 10px; flex-direction: column;">
+                    <h3>Características física</h3>
+                    <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%;">
 
-                <h3>outras informações</h3>
-    
-                <div class="form-group" 
+                        <label for="dimensoes" 
+                            style="display: flex; flex-direction: column;  width: 100%;">
+
+                            Dimensões
+                            <input type="text" style=" width: 100%;"
+                                class="form-control" name="dimensoes" 
+                                aria-describedby="helpId" autocomplete="off">
+                                
+                            {% if form.dimensoes.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.dimensoes.errors}}
+                                </div>
+                            {% endif %}
+                        </label>
+
+                        <label for="material" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
+
+                            Material
+                            <input type="text" style=" width: 100%;"
+                                class="form-control" name="material" 
+                                aria-describedby="helpId" autocomplete="off">
+                                
+                            {% if form.material.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.material.errors}}
+                                </div>
+                            {% endif %}
+                        </label>
+                    </div>
+                    
+                    <div class="form-group" 
+                        style="display: flex; gap: 20px;  width: 100%;">
+
+                        <label for="peso" style="display: flex; flex-direction: column;  width: 100%;">
+
+                            Peso
+                            <input type="number" style=" width: 100%;" step="0.001" id="la"
+                                class="form-control" name="peso" 
+                                aria-describedby="helpId" autocomplete="off">
+                                
+                                {% if form.peso.errors %}
+                                    <div class="text-danger" style="margin-bottom: -40px; ">
+                                        {{form.peso.errors}}
+                                    </div>
+                                {% endif %}
+                        </label>
+            
+                        <label for="valor_estimado" style="display: flex;
+                        width: 100%; flex-direction: column;">
+
+                            Valor estimado
+                            <input type="text" style=" width: 100%;" step="0.01" id="valor"
+                            class="form-control" name="valor_estimado" autocomplete="off"
+                            aria-describedby="helpId">
+
+
+                            {% if form.valor_estimado.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.valor_estimado.errors}}
+                                </div>
+                            {% endif %}
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estado_conservacao" style="display: flex;
+                            flex-direction: column; width: 100%;">
+
+                            Estado da conservação
+                            <input type="text"  name="estado_conservacao" 
+                            class="form-control" />
+
+                            {% if form.estado_conservacao.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.estado_conservacao.errors}}
+                                </div>
+                            {% endif %}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="stat-card blue" style="display: flex; gap: 20px;  width: 100%; margin-top: 10px; flex-direction: column;">
+
+                    <h3>outras informações</h3>
+        
+                    <div class="form-group" 
+                        style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                        
+                        <label for="tipo" style="display: flex;
+                        flex-direction: column; width: 100%;">
+
+                            <span >
+                                Tipo de evidência 
+                                <span class="text-danger">*</span>
+                            </span>
+                
+                            <select name="tipo" class="form-control" >
+                                <option value="">Selecione </option>
+                                {% for tipo in tipos %}
+                                <option value="{{tipo.id}}">{{tipo.nome}}</option>
+                                {% endfor %}
+                            
+                            </select>
+
+                            {% if form.tipo.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.tipo.errors}}
+                                </div>
+                            {% endif %}
+                        </label>
+                        
+                        <label for="status" style="display: flex;
+                        flex-direction: column; width: 100%;">
+
+                            <span >
+                                Status
+                                <span class="text-danger">*</span>
+                            </span>
+                            <select name="status" class="form-control" >
+                                <option value="">Selecione</option>
+                                <option value="coletada">Coletada</option>
+                                <option value="em_analise">Em análise</option>
+                                <option value="analisada">Analisada</option>
+                                <option value="devolvida">Devolvida</option>                
+                                <option value="destruida">Destruída</option>                
+                            </select>
+
+                            {% if form.status.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.status.errors}}
+                                </div>
+                            {% endif %}
+                        </label>
+                    </div>
+
+                    
+
+                    <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+
+                        <label for="descricao" style="display: flex;
+                        flex-direction: column; width: 100%;">
+                    
+                            <span >
+                                Descrição
+                            <span class="text-danger">*</span>
+                            </span>
+                            <textarea  name="descricao" class="form-control" 
+                            style="height: 70px; resize: none;"
+                            ></textarea>
+
+                            {% if form.descricao.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.descricao.errors}}
+                                </div>
+                            {% endif %}
+                        
+                        </label>
+
+                        <label for="observacoes" style="display: flex;
+                        flex-direction: column; width: 100%;">
+                    
+                            Observações
+                            <textarea  name="observacoes" class="form-control" 
+                            style="height: 70px; resize: none;"
+                            ></textarea>
+
+                            {% if form.observacoes.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.observacoes.errors}}
+                                </div>
+                            {% endif %}
+                        
+                        </label>
+                    </div>
+                    
+                    <div class="form-group" 
                     style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
                     
-                    <label for="tipo" style="display: flex;
-                    flex-direction: column; width: 100%;">
-
-                        <span >
-                            Tipo de evidência 
-                            <span class="text-danger">*</span>
-                        </span>
-            
-                        <select name="tipo" class="form-control" >
-                            <option value="">Selecione </option>
-                            {% for tipo in tipos %}
-                            <option value="{{tipo.id}}">{{tipo.nome}}</option>
-                            {% endfor %}
                         
-                        </select>
 
-                        {% if form.tipo.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.tipo.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
-                    
-                    <label for="status" style="display: flex;
-                    flex-direction: column; width: 100%;">
+                        <label for="numero_lacre" style="display: flex;
+                        flex-direction: column; width: 100%;">
 
-                        <span >
-                            Status
-                            <span class="text-danger">*</span>
-                        </span>
-                        <select name="status" class="form-control" >
-                            <option value="">Selecione</option>
-                            <option value="coletada">Coletada</option>
-                            <option value="em_analise">Em análise</option>
-                            <option value="analisada">Analisada</option>
-                            <option value="devolvida">Devolvida</option>                
-                            <option value="destruida">Destruída</option>                
-                        </select>
+                            Número de lacre
+                            <input type="text" name="numero_lacre" 
+                            class="form-control"/>
 
-                        {% if form.status.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.status.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
+                            {% if form.numero_lacre.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.evidencias_relacionadas.errors}}
+                                </div>
+                            {% endif %}
+                        </label>
+                    </div>
                 </div>
 
-                
-
-                <div class="form-group" 
-                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-
-                    <label for="descricao" style="display: flex;
-                    flex-direction: column; width: 100%;">
-                
-                        <span >
-                            Descrição
-                        <span class="text-danger">*</span>
-                        </span>
-                        <textarea  name="descricao" class="form-control" 
-                        style="height: 70px; resize: none;"
-                        ></textarea>
-
-                        {% if form.descricao.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.descricao.errors}}
-                            </div>
-                        {% endif %}
-                    
-                    </label>
-
-                    <label for="observacoes" style="display: flex;
-                    flex-direction: column; width: 100%;">
-                
-                        Observações
-                        <textarea  name="observacoes" class="form-control" 
-                        style="height: 70px; resize: none;"
-                        ></textarea>
-
-                        {% if form.observacoes.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.observacoes.errors}}
-                            </div>
-                        {% endif %}
-                    
-                    </label>
-                </div>
-                
-                <div class="form-group" 
-                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                
-                    
-
-                    <label for="numero_lacre" style="display: flex;
-                    flex-direction: column; width: 100%;">
-
-                        Número de lacre
-                        <input type="text" name="numero_lacre" 
-                        class="form-control"/>
-
-                        {% if form.numero_lacre.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.evidencias_relacionadas.errors}}
-                            </div>
-                        {% endif %}
-                    </label>
-                </div>
-            </div>
-
-            <button type="submit" class="btn" 
-            style="width: 80%; background-color: #2c5aa0; color: #fff;">
-                Cadastrar
-            </button>
-        </form> 
+                <button type="submit" class="btn" 
+                style="width: 80%; background-color: #2c5aa0; color: #fff;">
+                    Cadastrar
+                </button>
+            </form>
+        </div>
         <script>
             function formatCurrency(input, min, max) {
                 // Remove tudo que não for número ou vírgula/ponto

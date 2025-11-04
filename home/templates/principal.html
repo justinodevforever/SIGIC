@@ -37,16 +37,19 @@
             --light-gray: #f8f9fa;
             --border-color: #e0e6ed;
         }
+        textarea{
+            resize: none;
+        }
         
 
         body {
+            height: 100vh;
             font-family: "Oxanium", sans-serif;
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
             background-image: url('{% static 'image/logo1.png' %}');
             background-attachment: fixed;
-            
         }
 
         /* Sidebar Styles */
@@ -162,9 +165,12 @@
         .main-content {
             display: flex;
             flex-direction: column;
-            overflow: hidden;
             margin-left: 280px;
             transition: all 0.3s ease;
+            padding-top: 30px;
+            background-color: rgb(0,0,0, 0.4);
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .collapsed .main-content {
@@ -340,7 +346,7 @@
             </div>
 
             <div class="nav-item">
-                <a href="/list_upload_file/" class="nav-link" id="evidence" title="Arquivos de Evidência">
+                <a href="/list_upload_file/" class="nav-link" id="upload" title="Arquivos de Evidência">
                     <i class="bi bi-files"></i>
                     <span>Arquivos de Evidências</span>
                 </a>
@@ -444,8 +450,8 @@
         </nav>
        
         <div style="display: flex; justify-content: center; align-items: center;
-        width: 100%; padding-top: 80px;">
-            
+        width: 100%; padding-top: 80px; overflow-y: auto; flex-direction: column;">
+        
         {% block content %}{% endblock  %}
         </div>
 
@@ -579,7 +585,17 @@
         const researcher = document.getElementById('researcher')
         const settings = document.getElementById('settings')
         const tipo_crime = document.getElementById('tipo_crime')
+        const upload = document.getElementById('upload')
 
+        if(
+         
+            window.location.pathname == '/list_upload_file/' ||
+            window.location.pathname.split('/')[1] == 'edit_upload_file' ||
+            window.location.pathname.split('/')[1] == 'detail_upload_file' 
+
+        ){
+            upload.classList.add('active')
+        }
         if(
          
             window.location.pathname == '/create_type_crime/' ||
@@ -652,6 +668,7 @@
             window.location.pathname.split('/')[1] == 'edit_evidence'||
             window.location.pathname.split('/')[1] == 'detail_evidence'||
             window.location.pathname.split('/')[1] == 'moviment_evidence'||
+            window.location.pathname.split('/')[1] == 'create_upload_file'||
             window.location.pathname == '/list_evidence/'
 
         ){

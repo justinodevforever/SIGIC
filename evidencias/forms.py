@@ -436,15 +436,6 @@ class ArquivoForm(forms.Form):
         
         return arquivo
     
-  
-    
-    def _calcular_hash(self, arquivo):
-       
-        sha256 = hashlib.sha256()
-        for chunk in arquivo.chunks():
-            sha256.update(chunk)
-        return sha256.hexdigest()
-    
     def _obter_mime_type(self, arquivo):
        
         mime_type, _ = mimetypes.guess_type(arquivo.name)
@@ -481,7 +472,6 @@ class ArquivoForm(forms.Form):
             mime_type=mime_type,
             descricao=self.cleaned_data.get('descricao'),
             confidencial=self.cleaned_data.get('confidencial', False),
-            hash_arquivo=self._calcular_hash(arquivo_file)
         )
         
         if mime_type.startswith('image/'):
@@ -498,17 +488,6 @@ class ArquivoForm(forms.Form):
 
 class EditArquivoFrom(forms.Form):
 
-    tipo_arquivo = forms.ChoiceField(
-        choices=Arquivo.TIPO_ARQUIVO_CHOICES,
-        label='Tipo de Arquivo',
-        widget=forms.Select(attrs={
-            'class': 'form-control',
-            'required': True
-        }),
-        error_messages={
-            'required': 'Por favor, selecione o tipo de arquivo.'
-        }
-    )
     
     nome_arquivo = forms.CharField(
         label='Nome de arquivo',
@@ -540,7 +519,6 @@ class EditArquivoFrom(forms.Form):
     
     def save(self,arquivo):
         
-        arquivo.tipo_arquivo=self.cleaned_data['tipo_arquivo']
         arquivo.nome_arquivo=self.cleaned_data['nome_arquivo']
         arquivo.descricao=self.cleaned_data.get('descricao')
         arquivo.confidencial=self.cleaned_data.get('confidencial', False)

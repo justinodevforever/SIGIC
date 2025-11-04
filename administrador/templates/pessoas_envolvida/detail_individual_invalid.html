@@ -4,8 +4,8 @@
 
 {% block content %}
 
-<div class="column" style="display: flex; gap: 10px; padding: 20px; width: 100%;
-     justify-content: center;">
+<div class="column" style="display: flex; gap: 10px; padding: 20px; width: 80%;
+     justify-content: center; height: 100%;">
     <div class="col-md-8" style="width: 100%;">
         <div class="card" style="width: 97%;">
             <div class="d-flex justify-content-between card-header bg-primary text-white" >
@@ -107,10 +107,7 @@
                         <div class="col-sm-3"><strong>Telefone secundário:</strong></div>
                         <div class="col-sm-9">{{ pessoa.telefone_secundario|default:"Sem Informações"}}</div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-3"><strong>Escolaridade:</strong></div>
-                        <div class="col-sm-9">{{ pessoa.escolaridade|default:"Sem Informações"}}</div>
-                    </div>
+                    
                     <div class="row mb-3">
                         <div class="col-sm-3"><strong>E-mail:</strong></div>
                         <div class="col-sm-9">{{ pessoa.email|default:"Sem Informações"}}</div>
@@ -139,6 +136,10 @@
                         </div>
                     </div>
                 </div>
+
+                <hr>
+                <h4>Dados de endereço</h4>
+                <hr>
 
                 {% for endereco in enderecos %}
                     <div class="row mb-3">

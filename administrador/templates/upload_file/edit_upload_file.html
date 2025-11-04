@@ -66,7 +66,7 @@
 
             {% csrf_token %}
             <div class="d-flex justify-content-between" style="width: 100%;">
-                <h3 class="text-warning">Cadastro de Arquivos de evidência</h3>
+                <h3 class="text-warning">Atualização de Arquivos de evidência</h3>
                 <a href="/list_upload_file/" class="btn btn-primary">Listar</a>
             </div>
 
@@ -115,31 +115,7 @@
                     {% endif %}
                 </label>
 
-                <label for="localizacao" 
-                style="display: flex; flex-direction: column;  width: 100%;">
-
-                    <span >
-                        Tipo de arquivo 
-                        <span class="text-danger">*</span>
-                    </span>
-                   
-                    <select name="tipo_arquivo" id="tipo_arquivo" class="form-control">
-                        <option value="{{arquivo.tipo_arquivo}}">{{arquivo.get_tipo_arquivo_display}}</option>
-                        <option value="documento">Documento</option>
-                        <option value="foto">Fotografia</option>
-                        <option value="video">Vídeo</option>
-                        <option value="audio">Áudio</option>
-                        <option value="relatorio">Relatório</option>
-                        <option value="laudo">Laudo</option>
-                        <option value="outro">Outro</option>
-                    </select>
-
-                    {% if form.tipo_arquivo.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.tipo_arquivo.errors}}
-                        </div>
-                    {% endif %}
-                </label>
+                
             </div>
             
             <div class="form-group" 
@@ -148,9 +124,9 @@
                 style="display: flex; flex-direction: column;  width: 100%;">
 
                     Descrição
-                    <textarea  style=" width: 100%;" id="descricao" 
+                    <textarea  id="descricao" 
                         class="form-control" name="descricao" autocomplete="off"
-                        aria-describedby="helpId">{{arquivo.descricao}}</textarea>
+                         style="height: 70px; resize: none;">{{arquivo.descricao}}</textarea>
                         
                         {% if form.descricao.errors %}
                             <div class="text-danger" style="margin-bottom: -40px; ">

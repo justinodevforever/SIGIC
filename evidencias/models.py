@@ -186,7 +186,36 @@ class Arquivo(models.Model):
     resolucao = models.CharField(max_length=20, blank=True)
     duracao = models.IntegerField(null=True, blank=True)  # em segundos
     confidencial = models.BooleanField(default=False)
-    hash_arquivo = models.CharField(max_length=64, blank=True)  # SHA-256
+    hash_arquivo = models.CharField(max_length=64, blank=True)
+    
+    def gerar_hash(self):
+        sha256 = hashlib.sha256()
+        if self.arquivo and hasattr(self.arquivo, 'open'):
+            
+            self.arquivo.open('rb')
+            for chunk in iter(lambda: self.arquivo.read(8192), b''):
+                sha256.update(chunk)
+            
+            self.arquivo.seek(0) 
+        sha256.update(self.tipo_arquivo.encode('utf-8'))
+        return sha256.hexdigest()
+
+    def save(self, *args, **kwargs):
+
+        if not self.hash_arquivo:
+            self.hash_arquivo = self.gerar_hash()
+            
+        
+        super().save(*args, **kwargs)
+        
+    def verificar_autenticidade(self):
+
+        if self.hash_arquivo == self.gerar_hash():
+
+            return f'Assinatura íntegra e autenticada'
+        
+        else:
+            return f'Assinatura Adulterada ou Corrompida'
     
     class Meta:
         ordering = ['-data_upload']

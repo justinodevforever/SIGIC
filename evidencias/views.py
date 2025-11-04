@@ -611,3 +611,38 @@ def edit_upload_file(request, id):
 
         return render(request, 'upload_file/edit_upload_file.html', context)
 
+def detail_upload_file(request, id):
+
+    arquivo = Arquivo.objects.get(id=id)
+
+    return render(request, 'upload_file/detail_upload_file.html', {'arquivo': arquivo})
+
+
+
+@login_required
+@require_http_methods(['POST'])
+def delete_upload_file(request, id):
+
+    arquivo = Arquivo.objects.get(id=id)
+
+    dados = json.loads(request.body)
+    password = dados.get('password')
+    user = request.user
+
+    if not user.check_password(password.strip()):
+
+        return JsonResponse({'erro': 'Credinciais inválidas'}, status=403)
+
+    arquivo.delete()
+
+    LogAuditoria.objects.create(
+        usuario=request.user,
+        acao='delete',
+        modelo='Arquivo',
+        objeto_id=str(arquivo.id),
+        descricao=f'Arquivo eliminada: {arquivo.nome_arquivo}',
+        ip_origem=request.META.get('REMOTE_ADDR'),
+        user_agent=request.META.get('HTTP_USER_AGENT', '')
+    )
+
+    return redirect('list_upload_file')

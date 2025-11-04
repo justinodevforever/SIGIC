@@ -1,10 +1,10 @@
 {% extends 'principal.html' %}
 
 
-{% comment %} {% load static %} {% endcomment %}
+
 {% block content %}
 
-<div class="column" style="display: flex; gap: 10px; padding: 20px; width: 100%;
+<div class="column" style="display: flex; gap: 10px; padding: 20px; width: 100%; height: 100%;
      justify-content: center;">
     <div class="col-md-8" style="width: 100%;">
         <div class="card" style="width: 97%;">
@@ -44,7 +44,7 @@
 
             <div  id="modalconfirmacao" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
                 <div class="card"  style="position: absolute; top: 50% ; left: 50%; transform: translate(-50%, -50%); height: 630px;
-                 background: white; min-width: 70%;">
+                    background: white; min-width: 50%;">
 
                     <div id="previous">
 
@@ -56,9 +56,7 @@
 
 
                     <div class="d-flex justify-content-between card-header bg-primary text-white"
-                    style="width: 100%;"
-                  
-                    >
+                    style="width: 100%;">
 
                         <h3 >Pessoas envolvidas no caso nº {{caso.numero_caso}}</h3>
                         <button onclick="fecharmodal()" class="btn" style=" background-color: 
@@ -219,9 +217,9 @@
                         type: 'GET',
                         dataType: 'json',
                         success: function(res){
-                           
-                            pessaosDados(res.evidencia_obj[0].dados[0].pessoa, res.evidencia_obj[0].dados[0])
-                            proximo(res.evidencia_obj[0].paginacao)
+                            dados = res.evidencia_obj[0].dados[0].image
+                            pessaosDados(res.evidencia_obj[0].dados[0].pessoa, res.evidencia_obj[0].dados[0], dados)
+                            proximo(res.evidencia_obj[0].dados[0].paginacao)
                         }
                     }
                 )
@@ -233,25 +231,33 @@
                 const co = $('#li')
                 co.empty()
                 co1.empty()
+                console.log(paginacao.has_next)
                 if(paginacao.has_next){
-                    v= paginacao.page_atual + 1
+                     let v = 0
+                     console.log(v)
 
                     co.append(
-                        $('<button>').text('>').addClass('btn btn-primary').click(()=>loadPaginacao(v))
+                        $('<button>').text('>').addClass('btn btn-primary').click(()=>{
+                            loadPaginacao(paginacao.page_atual + 1)
+                        })
                     )
                 }
 
                 if (paginacao.has_previous){
 
-                    v= paginacao.page_atual - 1
+                    
 
                     co1.append(
-                        $('<button>').text('<').addClass('btn btn-primary').click(()=>loadPaginacao(v))
+                        $('<button>').text('<').addClass('btn btn-primary').click(()=>{
+                            let v= paginacao.page_atual - 1
+                            loadPaginacao(v)
+                        })
                     )
                 }
 
                 
             }
+
             function anterior(has_previous, previous_page_number){
                 $('#previous1').hide()
                 v= previous_page_number - 1
@@ -271,7 +277,7 @@
                 
             }
 
-            function pessaosDados(pessoa, envolvimento){
+            function pessaosDados(pessoa, envolvimento, image){
                 const p = $('#pessoa')
 
                 p.empty()
@@ -282,8 +288,8 @@
                             <h4 class="text-danger">PAPEL: ${envolvimento.tipo_envolvimento.toUpperCase()}</h4>
 
                             <div class="d-flex" style="margin-top: 10px; margin-left: 10px; gap: 10px;">
-                                <div style="padding: 20px; font-size: 20pt; border: 1px solid #ddd;">
-                                    <i class="bi bi-person-fill"></i>
+                                <div style=" font-size: 20pt; border: 1px solid #ddd; width: 150px; height: 200px;">
+                                   <img src='${image}' style='height: 100%; width: 100%;'/>
                                 </div> 
 
                                 <div style="display: flex; flex-direction: column;">
@@ -304,13 +310,9 @@
                                     }
                                 </span>
                                 ${
-
-                                pessoa.genero == 'F' ? '<span><strong>Gênego: </strong>Feminino</span>': ''
-                                || 'Sem Informação'}
-                                ${pessoa.genero == 'M'? '<span><strong>Gênego: </strong>Masculino</span>': ''
-                                || 'Sem Informação'}
-                                ${pessoa.genero == 'O' ? '<span><strong>Gênego: </strong>Outro</span>': ''
-                                || 'Sem Informação'}
+                                pessoa.genero == 'F' ? '<span><strong>Gênego: </strong>Feminino</span>': ''}
+                                ${pessoa.genero == 'M'? '<span><strong>Gênego: </strong>Masculino</span>': ''}
+                                ${pessoa.genero == 'O' ? '<span><strong>Gênego: </strong>Outro</span>': ''}
                                 
                                 <span><strong>Cor dos olhos: </strong>${pessoa.cor_olhos || 'Sem Informação'}</span>
                                 <span><strong>Cor de cabelo: </strong>${pessoa.cor_cabelo || 'Sem Informação'}</span>
@@ -323,6 +325,8 @@
                                 <span><strong>Telefone secundário: </strong>${pessoa.telefone_secundario || 'Sem Informação'}</span>
                                 <span><strong>E-mail: </strong>${pessoa.email || 'Sem Informação'}</span>
                                 <span><strong>Descrição: </strong>${envolvimento.descricao || "Sem informações"}</span>
+
+                                <a href='/detail_individual_invalid/${pessoa.id}'> Ver mais detalhes</a>
                             </div>
                         </div>
                 `)

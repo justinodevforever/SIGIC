@@ -21,4 +21,6 @@ urlpatterns = [
     path('create_upload_file/<str:evidencia_id>/', create_upload_file, name='create_upload_file'),
     path('list_upload_file/', list_upload_file, name='list_upload_file'),
     path('edit_upload_file/<str:id>/', edit_upload_file, name='edit_upload_file'),
+    path('detail_upload_file/<str:id>/', detail_upload_file, name='detail_upload_file'),
+    path('delete_upload_file/<str:id>/', delete_upload_file, name='delete_upload_file'),
 ]

@@ -149,633 +149,636 @@
             }
         </style>
     </head>
-    <body style="background-color: #ddd;"  >
-        <form action="{% url 'create_indiidual_involved' caso.id %}" method="post" class="card" enctype="multipart/form-data" 
-        style="display: flex; gap: 20px;  width: 80%; flex-direction: column;
-        background-color: #f8f9fa; padding: 10px; border-radius: 10px;
-         align-self: center; align-items: center;">
+    <body>
+        <div style=" height: 100%; width: 80%;" >
 
-            {% csrf_token %}
-             
-            <div class="d-flex justify-content-between" style="width: 100%;">
-                <h3 class="text-warning">Envolvimento no caso Nº {{caso.numero_caso}}</h3>
-                <a href="/list_case/" class="btn btn-primary">Listar</a>
-            </div>
-            
-            {% if sucesso %}
-            <div class="alert alert-success" role="alert">
-                <strong>{{sucesso}}</strong>
-            </div>
-            
-            {% elif erro %}
-            
-            <div class="alert alert-danger" role="alert">
-                <strong>{{erro}}</strong>
-            </div>
-            {% endif %}
+            <form action="{% url 'create_indiidual_involved' caso.id %}" method="post" class="card" enctype="multipart/form-data" 
+            style="display: flex; gap: 20px;  width: 100%; flex-direction: column;
+            background-color: #f8f9fa; padding: 10px; border-radius: 10px;
+            align-self: center; align-items: center; ">
 
-            <div class="container">
-
-                <div id="alertBox" class="alert"></div>
-
-                    <div class="button-group">
-                        <button type="button" class="btn btn-camera" id="openCameraBtn" style="width: 200px;">
-                            <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
-                            </svg>
-                            Capturar Foto
-                        </button>
-                        <button type="button" class="btn btn-upload" id="uploadBtn" style="width: 200px;">
-                            <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z"/>
-                            </svg>
-                            Carregar Imagem
-                        </button>
-                        <button type="button" 
-                        onclick="stopCamera()"
-                        class="btn btn-camera" id="stopCameraBtn" 
-                        style="display: none; margin-bottom: 15px; width: 200px; background: #ef4444;">
-                            <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z"/>
-                            </svg>
-                            Parar Câmera
-                        </button>
-                    </div>
-
-                    <input type="file" id="fileInput" name="foto_data" accept="image/*">
-                   
-                    <input type="hidden" id="fotoBase64Input" name="foto_base64">
-                    
-                    <div class="preview-container" id="video">
-                        <video id="videoElement" autoplay></video>
-                        <button type="button" class="btn btn-camera" id="captureBtn">Capturar Imagem</button>
-                        <canvas id="canvas"></canvas>
-                        <img id="imagePreview" alt="Preview da imagem">
-                    </div>
-
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p style="margin-top: 10px; color: #667eea; font-weight: 600;">Processando...</p>
-                    </div>
-
-                    
+                {% csrf_token %}
                 
-            </div>
+                <div class="d-flex justify-content-between" style="width: 100%;">
+                    <h3 class="text-warning">Envolvimento no caso Nº {{caso.numero_caso}}</h3>
+                    <a href="/list_case/" class="btn btn-primary">Listar</a>
+                </div>
+                
+                {% if sucesso %}
+                <div class="alert alert-success" role="alert">
+                    <strong>{{sucesso}}</strong>
+                </div>
+                
+                {% elif erro %}
+                
+                <div class="alert alert-danger" role="alert">
+                    <strong>{{erro}}</strong>
+                </div>
+                {% endif %}
 
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%;">
-                <label for="nome_completo" 
-                style="display: flex; flex-direction: column;  width: 100%;">
+                <div class="container">
 
-                    <span >
-                        Nome completo
-                        <span class="text-danger">*</span>
-                    </span>
-                    <input type="text" style=" width: 100%;"
-                        oninput="this.value=this.value.toUpperCase()"
-                        class="form-control" name="nome_completo" 
-                        aria-describedby="helpId" autocomplete="off">
-                        
-                        {% if form.nome_completo.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.nome_completo.errors}}
-                            </div>
-                        {% endif %}
-                </label>
+                    <div id="alertBox" class="alert"></div>
 
-                <label for="nome_social" 
-                    style="display: flex; flex-direction: column;  width: 100%;">
-
-                    Nome social
-                    <input type="text" style=" width: 100%;"
-                        class="form-control" name="nome_social" 
-                        oninput="this.value=this.value.toUpperCase()"
-                        aria-describedby="helpId" autocomplete="off">
-                        
-                    {% if form.nome_social.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.nome_social.errors}}
+                        <div class="button-group">
+                            <button type="button" class="btn btn-camera" id="openCameraBtn" style="width: 200px;">
+                                <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                                </svg>
+                                Capturar Foto
+                            </button>
+                            <button type="button" class="btn btn-upload" id="uploadBtn" style="width: 200px;">
+                                <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z"/>
+                                </svg>
+                                Carregar Imagem
+                            </button>
+                            <button type="button" 
+                            onclick="stopCamera()"
+                            class="btn btn-camera" id="stopCameraBtn" 
+                            style="display: none; margin-bottom: 15px; width: 200px; background: #ef4444;">
+                                <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z"/>
+                                </svg>
+                                Parar Câmera
+                            </button>
                         </div>
-                    {% endif %}
-                </label>
-            </div>
 
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%;">
-                <label for="cor_olhos" 
-                style="display: flex; flex-direction: column;  width: 100%;">
-
-                    Cor de olhos
-                    <input type="text" style=" width: 100%;"
-                         oninput="this.value=this.value.toUpperCase()"
-                        class="form-control" name="cor_olhos" 
-                        aria-describedby="helpId" autocomplete="off">
+                        <input type="file" id="fileInput" name="foto_data" accept="image/*">
+                    
+                        <input type="hidden" id="fotoBase64Input" name="foto_base64">
                         
-                        {% if form.cor_olhos.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.cor_olhos.errors}}
-                            </div>
-                        {% endif %}
-                </label>
-
-                <label for="cor_cabelo" 
-                    style="display: flex; flex-direction: column;  width: 100%;">
-
-                    Cor de cabelo
-                    <input type="text" style=" width: 100%;"
-                        class="form-control" name="cor_cabelo" 
-                         oninput="this.value=this.value.toUpperCase()"
-                        aria-describedby="helpId" autocomplete="off">
-                        
-                    {% if form.cor_cabelo.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.cor_cabelo.errors}}
+                        <div class="preview-container" id="video">
+                            <video id="videoElement" autoplay></video>
+                            <button type="button" class="btn btn-camera" id="captureBtn">Capturar Imagem</button>
+                            <canvas id="canvas"></canvas>
+                            <img id="imagePreview" alt="Preview da imagem">
                         </div>
-                    {% endif %}
-                </label>
-            </div>
 
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%;">
-                <label for="bi" 
-                style="display: flex; flex-direction: column;  width: 100%;">
-
-                    <span >
-                        BI/Passaporte
-                        <span class="text-danger">*</span>
-                    </span>
-                    <input type="text" style=" width: 100%;"
-                        class="form-control" name="bi" 
-                        aria-describedby="helpId" autocomplete="off">
-                        
-                        {% if form.bi.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.bi.errors}}
-                            </div>
-                        {% endif %}
-                </label>
-
-                <label for="nacionalidade" 
-                    style="display: flex; flex-direction: column;  width: 100%;">
-
-                    <span >
-                        Nacionalidade
-                        <span class="text-danger">*</span>
-                    </span>
-                    <input type="text" style=" width: 100%;"
-                    oninput="this.value=this.value.toUpperCase()"
-                        class="form-control" name="nacionalidade" 
-                        aria-describedby="helpId" autocomplete="off">
-                        
-                    {% if form.nacionalidade.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.nacionalidade.errors}}
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p style="margin-top: 10px; color: #667eea; font-weight: 600;">Processando...</p>
                         </div>
-                    {% endif %}
-                </label>
-            </div>
 
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%;">
-                <label for="profissao" 
-                style="display: flex; flex-direction: column;  width: 100%;">
-
-                    Profissão
-                    <input type="text" style=" width: 100%;"
-                        class="form-control" name="profissao" 
-                        oninput="this.value=this.value.toUpperCase()"
-                        aria-describedby="helpId" autocomplete="off">
                         
-                        {% if form.profissao.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.profissao.errors}}
-                            </div>
-                        {% endif %}
-                </label>
+                    
+                </div>
 
-                <label for="escolaridade" 
-                    style="display: flex; flex-direction: column;  width: 100%;">
-
-                    Nível acadêmico
-                    <input type="text" style=" width: 100%;"
-                        class="form-control" name="escolaridade" 
-                        aria-describedby="helpId" autocomplete="off">
-                        
-                    {% if form.escolaridade.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.escolaridade.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
-
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%;">
-                <label for="telefone_principal" 
-                style="display: flex; flex-direction: column;  width: 100%;">
-
-                    Telefone Principal
-                    <input type="text" style=" width: 100%;"
-                        class="form-control" name="telefone_principal" id="telefone_principal"
-                        aria-describedby="helpId" autocomplete="off">
-                        
-                        {% if form.telefone_principal.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.telefone_principal.errors}}
-                            </div>
-                        {% endif %}
-                </label>
-
-                <label for="telefone_secundario" 
-                    style="display: flex; flex-direction: column;  width: 100%;">
-
-                    Telefone segundário
-                    <input type="text" style=" width: 100%;"
-                        class="form-control" name="telefone_secundario" id="telefone_secundario"
-                        aria-describedby="helpId" autocomplete="off">
-                        
-                    {% if form.telefone_secundario.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.telefone_secundario.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
-            
-            <div class="form-group" 
+                <div class="form-group" 
                 style="display: flex; gap: 20px;  width: 100%;">
-                <label for="data_nascimento" 
-                style="display: flex; flex-direction: column;  width: 100%;">
+                    <label for="nome_completo" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
 
-                    <span >
-                        Data de nascimento
-                        <span class="text-danger">*</span>
-                    </span>
-                    <input type="date" style=" width: 100%;"
-                        class="form-control" name="data_nascimento" 
-                        aria-describedby="helpId" autocomplete="off">
-                        
-                        {% if form.data_nascimento.errors %}
+                        <span >
+                            Nome completo
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="text" style=" width: 100%;"
+                            oninput="this.value=this.value.toUpperCase()"
+                            class="form-control" name="nome_completo" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.nome_completo.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.nome_completo.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+
+                    <label for="nome_social" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Nome social
+                        <input type="text" style=" width: 100%;"
+                            class="form-control" name="nome_social" 
+                            oninput="this.value=this.value.toUpperCase()"
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                        {% if form.nome_social.errors %}
                             <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.data_nascimento.errors}}
+                                {{form.nome_social.errors}}
                             </div>
                         {% endif %}
-                </label>
-    
-                <label for="email" style="display: flex;
-                 width: 100%; flex-direction: column;">
+                    </label>
+                </div>
 
-                    E-mail
-                    <input type="email" style=" width: 100%;"
-                    class="form-control" name="email" autocomplete="off"
-                    aria-describedby="helpId">
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="cor_olhos" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
 
+                        Cor de olhos
+                        <input type="text" style=" width: 100%;"
+                            oninput="this.value=this.value.toUpperCase()"
+                            class="form-control" name="cor_olhos" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.cor_olhos.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.cor_olhos.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
 
-                    {% if form.email.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.email.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
-    
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                <label for="altura" style="display: flex;
-                flex-direction: column; width: 100%;">
+                    <label for="cor_cabelo" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
 
-                    Altura
-                    <input type="text" style=" width: 100%;" id="altura"
-                    class="form-control" name="altura" autocomplete="off"
-                    aria-describedby="helpId">
+                        Cor de cabelo
+                        <input type="text" style=" width: 100%;"
+                            class="form-control" name="cor_cabelo" 
+                            oninput="this.value=this.value.toUpperCase()"
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                        {% if form.cor_cabelo.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.cor_cabelo.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
 
-                    {% if form.altura.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.altura.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            
-                <label for="peso" style="display: flex; 
-                 flex-direction: column; width: 100%;">
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="bi" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
 
-                    Peso
-                    <input type="text" name="peso" style=" width: 100%;" id='peso'
-                    class="form-control" autocomplete="off"
-                    aria-describedby="helpId"> 
+                        <span >
+                            BI/Passaporte
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="text" style=" width: 100%;"
+                            class="form-control" name="bi" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.bi.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.bi.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
 
-                    {% if form.peso.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.peso.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-    
+                    <label for="nacionalidade" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
+
+                        <span >
+                            Nacionalidade
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="text" style=" width: 100%;"
+                        oninput="this.value=this.value.toUpperCase()"
+                            class="form-control" name="nacionalidade" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                        {% if form.nacionalidade.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.nacionalidade.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="profissao" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Profissão
+                        <input type="text" style=" width: 100%;"
+                            class="form-control" name="profissao" 
+                            oninput="this.value=this.value.toUpperCase()"
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.profissao.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.profissao.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+
+                    <label for="escolaridade" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Nível acadêmico
+                        <input type="text" style=" width: 100%;"
+                            class="form-control" name="escolaridade" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                        {% if form.escolaridade.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.escolaridade.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="telefone_principal" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Telefone Principal
+                        <input type="text" style=" width: 100%;"
+                            class="form-control" name="telefone_principal" id="telefone_principal"
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.telefone_principal.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.telefone_principal.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+
+                    <label for="telefone_secundario" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Telefone segundário
+                        <input type="text" style=" width: 100%;"
+                            class="form-control" name="telefone_secundario" id="telefone_secundario"
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                        {% if form.telefone_secundario.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.telefone_secundario.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
                 
-            </div>
-    
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                <label for="observacoes" style="display: flex;
-                 flex-direction: column;  width: 100%;">
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="data_nascimento" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
 
-                    observações 
-                    <textarea style=" width: 100%; height: 100px; resize: none;"
-                    class="form-control" name="observacoes" 
-                    aria-describedby="helpId" autocomplete="off"></textarea>
+                        <span >
+                            Data de nascimento
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="date" style=" width: 100%;"
+                            class="form-control" name="data_nascimento" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.data_nascimento.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.data_nascimento.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+        
+                    <label for="email" style="display: flex;
+                    width: 100%; flex-direction: column;">
 
-                    {% if form.observacoes.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.observacoes.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
-    
-            <div class="form-group" 
+                        E-mail
+                        <input type="email" style=" width: 100%;"
+                        class="form-control" name="email" autocomplete="off"
+                        aria-describedby="helpId">
+
+
+                        {% if form.email.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.email.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+        
+                <div class="form-group" 
                 style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="altura" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        Altura
+                        <input type="text" style=" width: 100%;" id="altura"
+                        class="form-control" name="altura" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.altura.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.altura.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
                 
-                <label for="genero" style="display: flex;
-                 flex-direction: column; width: 100%;">
+                    <label for="peso" style="display: flex; 
+                    flex-direction: column; width: 100%;">
 
-                    <span >
-                        Gênero 
-                        <span class="text-danger">*</span>
-                    </span>
-                    <select name="genero" class="form-control" >
-                        <option value="">Selecione Gênero</option>
-                        <option value="M">Masculino</option>
-                        <option value="F">Feminino</option>
-                        <option value="O">Outro</option>
-                    </select>
+                        Peso
+                        <input type="text" name="peso" style=" width: 100%;" id='peso'
+                        class="form-control" autocomplete="off"
+                        aria-describedby="helpId"> 
 
-                    {% if form.genero.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.genero.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-                
-                <label for="estado_civil" style="display: flex;
-                 flex-direction: column; width: 100%;">
-
-                    <span >
-                        Estado Civil
-                        <span class="text-danger">*</span>
-                    </span>
-                    <select name="estado_civil" class="form-control" >
-                        <option value="">Selecione</option>
-                        <option value="solteiro">Solteiro(a)</option>
-                        <option value="casado">Casado(a)</option>
-                        <option value="divorciado">Divorciado(a)</option>
-                        <option value="viuvo">Viúvo(a)</option>                
-                        <option value="uniao_estavel">União estável</option>                
-                    </select>
-
-                    {% if form.estado_civil.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.estado_civil.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
-
-            <h4>Alias</h4>
-            <hr style="width: 98%; margin-top: -30px;">
-
-            <div class="form-group" 
-                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                
-                <label for="tipo_alias" style="display: flex;
-                 flex-direction: column; width: 100%;">
-                    <span >
-                        Tipos de alias
-                    </span>
-                    <select name="tipo_alias" class="form-control" >
-                        <option value="">Selecione</option>
-                        <option value="apelido">Apelido</option>
-                        <option value="nome_guerra">Nome de guerra</option>
-                        <option value="nome_falso">Nome Falso</option>
-                        <option value="outro">Outro</option>                
-                    </select>
-
-                    {% if form.tipo_alias.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.tipo_alias.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-
-                <label for="nome_alias" style="display: flex;
-                 flex-direction: column; width: 100%;">
-
-                    <span >
-                       Nome alias
-                    </span>
-                    <input type="text" name="nome_alias"
-                    oninput="this.value=this.value.toUpperCase()"
-                    class="form-control" autocomplete="off"
-                    aria-describedby="helpId"
-                    >
-
-                    {% if form.nome_alias.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.nome_alias.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
-
-            <h4>Dados de envolvimento</h4>
-            <hr style="width: 98%; margin-top: -30px;">
-
-            <div class="form-group" 
-                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                
-                <label for="tipo_envolvimento" style="display: flex;
-                 flex-direction: column; width: 100%;">
-
-                    <span >
-                        Tipo de envolvimento
-                        <span class="text-danger">*</span>
-                    </span>
-                    <select name="tipo_envolvimento" class="form-control" >
-                        <option value="">Selecione</option>
-                        <option value="suspeito">Suspeito</option>
-                        <option value="vitima">Vítima</option>
-                        <option value="testemunha">Testemunha</option>
-                        <option value="informante">Informante</option>
-                        <option value="outro">Outro</option>
-                    </select>
-
-                    {% if form.tipo_envolvimento.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.tipo_envolvimento.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-
-                
-            </div>
-
-            <div class="form-group" 
-                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-
-                <label for="descricao" style="display: flex;
-                flex-direction: column; width: 100%;">
-            
-                    Descrição
-                    <textarea  name="descricao" class="form-control" 
-                    style="height: 70px; resize: none;" autocomplete="off"
-                    aria-describedby="helpId"
-                    ></textarea>
-
-                    {% if form.descricao1.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.descricao1.errors}}
-                        </div>
-                    {% endif %}
-                  
-                </label>
-            </div>
-
-            <h4>Dados de endereço</h4>
-            <hr style="width: 98%; margin-top: -30px;">
-
-            <div class="form-group" 
-                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                
-                <label for="tipo_endereco" style="display: flex;
-                 flex-direction: column; width: 100%;">
+                        {% if form.peso.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.peso.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+        
                     
-                    Tipo de endereço
-                   
-                    <select name="tipo_endereco" class="form-control" >
-                        <option value="">Selecione</option>
-                        <option value="residencial">Residencial</option>
-                        <option value="comercial">Comercial</option>
-                        <option value="temporario">Temporário</option>
-                        <option value="antigo">Antigo</option>
-                    </select>
+                </div>
+        
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="observacoes" style="display: flex;
+                    flex-direction: column;  width: 100%;">
 
-                    {% if form.tipo_endereco.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.tipo_endereco.errors}}
-                        </div>
-                    {% endif %}
-                </label>
+                        observações 
+                        <textarea style=" width: 100%; height: 100px; resize: none;"
+                        class="form-control" name="observacoes" 
+                        aria-describedby="helpId" autocomplete="off"></textarea>
 
-                <label for="logradouro" style="display: flex;
-                flex-direction: column; width: 100%;">
+                        {% if form.observacoes.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.observacoes.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+        
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    
+                    <label for="genero" style="display: flex;
+                    flex-direction: column; width: 100%;">
 
-                    Logradouro
-                    <input type="text" style=" width: 100%;"
-                    oninput="this.value=this.value.toUpperCase()"
-                    class="form-control" name="logradouro" autocomplete="off"
-                    aria-describedby="helpId">
+                        <span >
+                            Gênero 
+                            <span class="text-danger">*</span>
+                        </span>
+                        <select name="genero" class="form-control" >
+                            <option value="">Selecione Gênero</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Feminino</option>
+                            <option value="O">Outro</option>
+                        </select>
 
-                    {% if form.logradouro.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.logradouro.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
+                        {% if form.genero.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.genero.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                    
+                    <label for="estado_civil" style="display: flex;
+                    flex-direction: column; width: 100%;">
 
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                <label for="bairro" style="display: flex;
-                flex-direction: column; width: 100%;">
+                        <span >
+                            Estado Civil
+                            <span class="text-danger">*</span>
+                        </span>
+                        <select name="estado_civil" class="form-control" >
+                            <option value="">Selecione</option>
+                            <option value="solteiro">Solteiro(a)</option>
+                            <option value="casado">Casado(a)</option>
+                            <option value="divorciado">Divorciado(a)</option>
+                            <option value="viuvo">Viúvo(a)</option>                
+                            <option value="uniao_estavel">União estável</option>                
+                        </select>
 
-                    Bairro
-                    <input type="text" style=" width: 100%;"
-                    oninput="this.value=this.value.toUpperCase()"
-                    class="form-control" name="bairro" autocomplete="off"
-                    aria-describedby="helpId">
+                        {% if form.estado_civil.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.estado_civil.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
 
-                    {% if form.bairro.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.bairro.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            
-                <label for="cidade" style="display: flex; 
-                 flex-direction: column; width: 100%;">
+                <h4>Alias</h4>
+                <hr style="width: 98%; margin-top: -30px;">
 
-                    Cidade
-                    <input type="text" style=" width: 100%; resize: none;"
-                    oninput="this.value=this.value.toUpperCase()"
-                    class="form-control" name="cidade" autocomplete="off"
-                    aria-describedby="helpId"> 
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    
+                    <label for="tipo_alias" style="display: flex;
+                    flex-direction: column; width: 100%;">
+                        <span >
+                            Tipos de alias
+                        </span>
+                        <select name="tipo_alias" class="form-control" >
+                            <option value="">Selecione</option>
+                            <option value="apelido">Apelido</option>
+                            <option value="nome_guerra">Nome de guerra</option>
+                            <option value="nome_falso">Nome Falso</option>
+                            <option value="outro">Outro</option>                
+                        </select>
 
-                    {% if form.cidade.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.cidade.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
+                        {% if form.tipo_alias.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.tipo_alias.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
 
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                <label for="ponto_referencia" style="display: flex;
-                flex-direction: column; width: 100%;">
+                    <label for="nome_alias" style="display: flex;
+                    flex-direction: column; width: 100%;">
 
-                    Ponto de referência
-                    <input type="text" style=" width: 100%;"
-                    oninput="this.value=this.value.toUpperCase()"
-                    class="form-control" name="ponto_referencia" autocomplete="off"
-                    aria-describedby="helpId">
+                        <span >
+                        Nome alias
+                        </span>
+                        <input type="text" name="nome_alias"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" autocomplete="off"
+                        aria-describedby="helpId"
+                        >
 
-                    {% if form.ponto_referencia.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.ponto_referencia.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
+                        {% if form.nome_alias.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.nome_alias.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
 
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                <label for="numero" style="display: flex;
-                flex-direction: column; width: 100%;">
+                <h4>Dados de envolvimento</h4>
+                <hr style="width: 98%; margin-top: -30px;">
 
-                    Número
-                    <input type="text" style=" width: 100%;"
-                    class="form-control" name="numero" autocomplete="off"
-                    aria-describedby="helpId">
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    
+                    <label for="tipo_envolvimento" style="display: flex;
+                    flex-direction: column; width: 100%;">
 
-                    {% if form.numero.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.numero.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            
-                <label for="complemento" style="display: flex; 
-                 flex-direction: column; width: 100%;">
+                        <span >
+                            Tipo de envolvimento
+                            <span class="text-danger">*</span>
+                        </span>
+                        <select name="tipo_envolvimento" class="form-control" >
+                            <option value="">Selecione</option>
+                            <option value="suspeito">Suspeito</option>
+                            <option value="vitima">Vítima</option>
+                            <option value="testemunha">Testemunha</option>
+                            <option value="informante">Informante</option>
+                            <option value="outro">Outro</option>
+                        </select>
 
-                    Complemento
-                    <input type="text" style=" width: 100%; resize: none;"
-                    oninput="this.value=this.value.toUpperCase()"
-                    class="form-control" name="complemento" autocomplete="off"
-                    aria-describedby="helpId"> 
+                        {% if form.tipo_envolvimento.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.tipo_envolvimento.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
 
-                    {% if form.complemento.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.complemento.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
+                    
+                </div>
 
-            <button type="submit" class="btn btn-submit" >
-                <i class="bi bi-check"></i>
-                Cadastrar Pessoa
-            </button>
-            
-    </form> 
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+
+                    <label for="descricao" style="display: flex;
+                    flex-direction: column; width: 100%;">
+                
+                        Descrição
+                        <textarea  name="descricao" class="form-control" 
+                        style="height: 70px; resize: none;" autocomplete="off"
+                        aria-describedby="helpId"
+                        ></textarea>
+
+                        {% if form.descricao1.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.descricao1.errors}}
+                            </div>
+                        {% endif %}
+                    
+                    </label>
+                </div>
+
+                <h4>Dados de endereço</h4>
+                <hr style="width: 98%; margin-top: -30px;">
+
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    
+                    <label for="tipo_endereco" style="display: flex;
+                    flex-direction: column; width: 100%;">
+                        
+                        Tipo de endereço
+                    
+                        <select name="tipo_endereco" class="form-control" >
+                            <option value="">Selecione</option>
+                            <option value="residencial">Residencial</option>
+                            <option value="comercial">Comercial</option>
+                            <option value="temporario">Temporário</option>
+                            <option value="antigo">Antigo</option>
+                        </select>
+
+                        {% if form.tipo_endereco.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.tipo_endereco.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+
+                    <label for="logradouro" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        Logradouro
+                        <input type="text" style=" width: 100%;"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="logradouro" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.logradouro.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.logradouro.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="bairro" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        Bairro
+                        <input type="text" style=" width: 100%;"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="bairro" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.bairro.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.bairro.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                
+                    <label for="cidade" style="display: flex; 
+                    flex-direction: column; width: 100%;">
+
+                        Cidade
+                        <input type="text" style=" width: 100%; resize: none;"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="cidade" autocomplete="off"
+                        aria-describedby="helpId"> 
+
+                        {% if form.cidade.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.cidade.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="ponto_referencia" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        Ponto de referência
+                        <input type="text" style=" width: 100%;"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="ponto_referencia" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.ponto_referencia.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.ponto_referencia.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="numero" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        Número
+                        <input type="text" style=" width: 100%;"
+                        class="form-control" name="numero" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.numero.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.numero.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                
+                    <label for="complemento" style="display: flex; 
+                    flex-direction: column; width: 100%;">
+
+                        Complemento
+                        <input type="text" style=" width: 100%; resize: none;"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="complemento" autocomplete="off"
+                        aria-describedby="helpId"> 
+
+                        {% if form.complemento.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.complemento.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-submit" >
+                    <i class="bi bi-check"></i>
+                    Cadastrar Pessoa
+                </button>
+                
+        </form>
+    </div>
 
         <script>
             $(document).ready(function(){
