@@ -1,0 +1,89 @@
+{% extends 'principal.html' %}
+
+
+
+{% block content %}
+
+<div class="column" style="display: flex; gap: 10px; padding: 20px; width: 100%; height: 100%;
+     justify-content: center;">
+    <div class="col-md-8" style="width: 100%;">
+        <div class="card" style="width: 97%;">
+            <div class="d-flex justify-content-between card-header bg-primary text-white" >
+                <h5 class="mb-0">
+                    <i class="fas fa-user"></i> Informações do Investigador
+                </h5>
+                <a href="/list_researcher/" class="btn" 
+                style="background: #1e3a5f; color: #fff;">
+                    lista
+                </a>
+            </div>
+
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Nome Completo:</strong></div>
+                    <div class="col-sm-9">{{ user.get_full_name|default:"Não informado" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Nº de distintivo:</strong></div>
+                    <div class="col-sm-9">{{ user.matricula }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Data Nascimento:</strong></div>
+                    <div class="col-sm-9">{{ user.data_nascimento }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Idade:</strong></div>
+                    <div class="col-sm-9">{{ user.idade }} Anos</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Bi:</strong></div>
+                    <div class="col-sm-9">{{ user.bi }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Gênero:</strong></div>
+                    <div class="col-sm-9">{{ user.get_genero_display}}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Estado civil:</strong></div>
+                    <div class="col-sm-9">{{ user.get_estado_civil_display }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Telefone:</strong></div>
+                    <div class="col-sm-9">{{ user.telefone }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Cargo:</strong></div>
+                    <div class="col-sm-9">{{ user.get_cargo_display }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Nível de acesso:</strong></div>
+                    <div class="col-sm-9">{{ user.get_nivel_acesso_display }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>E-mail:</strong></div>
+                    <div class="col-sm-9">{{ user.email }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Departamento:</strong></div>
+                    <div class="col-sm-9">{{ user.departamento }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Estado:</strong></div>
+                    <div class="col-sm-9">
+                         {% if user.is_active == True %}
+                                
+                            <span class="badge bg-success">Ativo</span>
+
+                            {% elif user.is_active == False  %}
+                                <span class="badge bg-danger">Inativo</span>
+
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+</div>
+{% endblock %}
+

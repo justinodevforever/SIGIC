@@ -53,24 +53,25 @@
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
+                                <th>Código do caso</th>
                                 <th>Nome</th>
-                                <th>B.I</th>
-                                <th>Telefone</th>
+                                <th>Tipo de envolvimento</th>
+                                <th>Data de envolvimento</th>
                                 <th>Estado</th>
-                                <th>Gênero</th>
                                 <th>Opções</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for pessoa in pessoas %}
+                            {% for env in envolvimentos %}
                             <tr>
-                                <td>{{ pessoa.nome_completo }} {{pessoa.envolvimentos.id}}</td>
+                                <td>{{ env.caso.numero_caso }}</td>
+                                <td>{{ env.pessoa.nome_completo }}</td>
                                 <td>
-                                    <strong>{{ pessoa.bi}}</strong>
+                                    <strong>{{ env.get_tipo_envolvimento_display}}</strong>
                                 </td>
-                                <td>{{ pessoa.telefone_principal }}</td>
+                                <td>{{ env.data_envolvimento }}</td>
                                 <td>
-                                    {% if pessoa.ativo == True%}
+                                    {% if env.ativo == True%}
                                         <span class="badge bg-success">Ativo</span>
                                     {% else%}
                                         <span class="badge bg-danger">Inativo</span>
@@ -78,21 +79,19 @@
                                     {% endif %}
                                 </td>
                               
-                                <td>{{pessoa.get_genero_display}}</td>
-
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{% url 'detail_individual_invalid' pessoa.id %}" 
+                                        <a href="{% url 'detail_individual_invalid' env.id %}" 
                                             class="btn btn-outline-primary" title="Ver detalhes">
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         
-                                        <a href="{% url 'edit_indiidual_involved' pessoa.id %}" 
+                                        <a href="{% url 'edit_indiidual_involved' env.id %}" 
                                             class="btn btn-outline-warning" title="Editar">
                                             <i class="fas bi-pencil-square"></i>
                                         </a>
                                         
-                                        <button onclick="confirmardelecao('{{pessoa.id}}')"
+                                        <button onclick="confirmardelecao('{{env.id}}')"
                                         class="btn btn-outline-danger" title="Deletar">
                                             <i class="bi bi-trash"></i>
                                             

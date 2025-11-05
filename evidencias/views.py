@@ -537,6 +537,7 @@ def create_upload_file(request, evidencia_id):
         'evidencia': evidencia
     })
 
+@login_required
 def list_upload_file(request):
 
     arquivos = Arquivo.objects.all()
@@ -555,7 +556,7 @@ def list_upload_file(request):
 
     return render(request, 'upload_file/list_upload_file.html', context)
 
-
+@login_required
 def edit_upload_file(request, id):
 
     arquivo = Arquivo.objects.get(id=id)
@@ -610,7 +611,8 @@ def edit_upload_file(request, id):
         }
 
         return render(request, 'upload_file/edit_upload_file.html', context)
-
+        
+@login_required
 def detail_upload_file(request, id):
 
     arquivo = Arquivo.objects.get(id=id)

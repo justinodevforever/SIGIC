@@ -616,7 +616,8 @@
 
         if(
          
-            window.location.pathname == '/list_researcher/'
+            window.location.pathname == '/list_researcher/' ||
+            window.location.pathname.split('/')[1] == 'dateil_researcher' 
 
         ){
             researcher.classList.add('active')
@@ -650,6 +651,7 @@
 
         if(
             window.location.pathname.split('/')[1] == 'detail_individual_invalid'||
+            window.location.pathname.split('/')[1] == 'edit_indiidual_involved'||
             window.location.pathname == '/list_indiidual_involved/'
 
         ){

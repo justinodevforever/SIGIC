@@ -3,16 +3,19 @@
 
 {% block content %}
 
-<div style="width: 100%;">
+<div style=" height: 100%; width: 100%;">
 
     <form action="/criminal_record/" method="get" style="
-    width: 70%; background-color: #fff; margin-top: 30px; padding: 10px;" 
+    width: 100%; margin-top: 30px; padding: 10px; display: flex; align-items: center;"
         class="btn-group btn-group-sm">
         
-        <input type="search" name="bi" style="border-radius: 4px 0px 0px 4px;"
-            class="form-control" placeholder="Número de B.I">
-        <button class="btn btn-warning"><i class="bi bi-search"></i></button>
+        <div style="display: flex; width: 50%; align-items: center; justify-content: center;">
+            <input type="search" name="bi" style="border-radius: 4px 0px 0px 4px;"
+                class="form-control w-50" placeholder="Número de B.I">
+            <button class="btn btn-warning" style="width: 40px; border-radius: 0px 4px 4px 0px;"><i class="bi bi-search"></i></button>
+        </div>
     </form>
+
     {% if pessoas %}
         {% for pessoa in pessoas %}
             <div class="window text-white card" id="window{{pessoa.id}}"
@@ -23,10 +26,10 @@
                     <h6 style="color: #00ff00;">Ficha Criminal do {{pessoa.nome_completo}}</h6>
                     <button class="text-danger bg-black" onclick="fechar_modal('window{{pessoa.id}}')">X</button>
                 </div>
-
+                
                 <div class="card-body" style="overflow-y: auto;
                     overflow-x: hidden; display: flex; flex-direction: row;">
-                    <div style=" width: 99%; border-right: 1px solid #00ff00;">
+                    <div style=" width: 99%; ">
                         <h4 style="color: #00ff00;">Dados pessoais</h4>
                         <hr style="width: 100%; background-color: #00ff00;">
                         <div class="row mb-3" style="color: #00ff00;">
@@ -100,6 +103,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div style=" width: 99%; padding-left: 7px;"> 
                         <h4 style="color: #00ff00;">Dados crimainais</h4>
                         <hr style="width: 100%; background-color: #ddd;">

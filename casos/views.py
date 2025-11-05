@@ -15,6 +15,7 @@ from .models import *
 from casos.models import *
 from usuario.models import *
 from .forms import *
+from evidencias.models import *
 import json
 from django.views.decorators.http import require_http_methods
 import tempfile
@@ -47,79 +48,6 @@ def caso(request):
     
     form = EventoTimelineForm()
     return render(request, 'casos.html', {'form': form})
-
-class casoListView(LoginRequiredMixin, ListView):
-    
-    model = Caso
-    template_name = 'investigation/caso_list.html'
-    context_object_name = 'casos'
-    paginate_by = 20
-    
-    def get_queryset(self):
-        queryset = Caso.objects.filter(ativo=True).select_related(
-            'tipo_crime', 'investigador_principal', 'delegado_responsavel'
-        ).prefetch_related('envolvimentos__pessoa')
-        
-        # filtros
-        status = self.request.get.get('status')
-        if status:
-            queryset = queryset.filter(status=status)
-        
-        prioridade = self.request.get.get('prioridade')
-        if prioridade:
-            queryset = queryset.filter(prioridade=prioridade)
-        
-        tipo_crime = self.request.get.get('tipo_crime')
-        if tipo_crime:
-            queryset = queryset.filter(tipo_crime_id=tipo_crime)
-        
-        # busca
-        search = self.request.get.get('search')
-        if search:
-            queryset = queryset.filter(
-                Q(numero_caso__icontains=search) |
-                Q(titulo__icontains=search) |
-                Q(descricao__icontains=search)
-            )
-        
-        return queryset.order_by('-data_abertura')
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['status_choices'] = Caso.status_choices
-        context['prioridade_choices'] = Caso.prioridade_choices
-        context['tipos_crime'] = TipoCrime.objects.filter(ativo=True)
-        context['filtros_ativos'] = bool(self.request.get.get('status') or 
-                                       self.request.get.get('prioridade') or 
-                                       self.request.get.get('tipo_crime') or 
-                                       self.request.get.get('search'))
-        return context
-
-class casoDetailView(LoginRequiredMixin, DetailView):
-    
-    model = Caso
-    template_name = 'investigation/caso_detail.html'
-    context_object_name = 'caso'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        caso = self.object
-        
-        # envolvimentos por tipo
-        context['suspeitos'] = caso.envolvimentos.filter(tipo_envolvimento='suspeito', ativo=True)
-        context['vitimas'] = caso.envolvimentos.filter(tipo_envolvimento='vitima', ativo=True)
-        context['testemunhas'] = caso.envolvimentos.filter(tipo_envolvimento='testemunha', ativo=True)
-        
-        # evidências por status
-        context['evidencias'] = caso.evidencias.all().order_by('-data_coleta')
-        
-        # timeline
-        context['timeline'] = caso.eventos_timeline.all().order_by('data_hora')
-        
-        # arquivos
-        context['arquivos'] = caso.arquivos.all().order_by('-data_upload')
-        
-        return context
 
 @login_required
 def caso_create(request):
@@ -216,7 +144,7 @@ def relatorio_caso(request, caso_id):
     
     return render(request, 'investigation/relatorio_caso.html', context)
 
-
+@login_required
 @require_http_methods(["post"])
 def alterar_status_caso(request, caso_id):
     
@@ -270,56 +198,26 @@ def processar_busca_avancada(dados):
     
     termo = dados.get('termo')
     if termo:
-        # buscar casos
+       
         resultados['casos'] = Caso.objects.filter(
             Q(numero_caso__icontains=termo) |
             Q(titulo__icontains=termo) |
             Q(descricao__icontains=termo)
         )[:10]
         
-        # buscar pessoas
+       
         resultados['pessoas'] = Pessoa.objects.filter(
             Q(nome_completo__icontains=termo) |
             Q(nome_social__icontains=termo) |
             Q(cpf__icontains=termo)
         )[:10]
-        
-        # buscar evidências
+ 
         resultados['evidencias'] = Evidencia.objects.filter(
             Q(numero_evidencia__icontains=termo) |
             Q(descricao__icontains=termo)
         )[:10]
     
     return resultados
-
-
-# from django.shortcuts import render, get_object_or_404, redirect
-# from django.contrib.auth.decorators import login_required
-# from django.contrib import messages
-# from django.core.paginator import Paginator
-# from django.db.models import Q, Count
-# from django.http import JsonResponse, HttpResponse
-# from django.utils import timezone
-# from django.views.decorators.http import require_http_methods
-# from django.views.decorators.csrf import csrf_exempt
-# from django.contrib.auth.mixins import LoginRequiredMixin
-# from django.views.generic import ListView, DetailView, CreateView, UpdateView
-# from django.urls import reverse_lazy
-# from django.db import transaction
-# import json
-# from datetime import datetime, timedelta
-
-# from .models import (
-#     Caso, Pessoa, Evidencia, EnvolvimentoCaso, EventoTimeline,
-#     TipoCrime, TipoEvidencia, CadeiaCustomia, Arquivo, Comentario,
-#     LogAuditoria, Notificacao
-# )
-# from .forms import (
-#     CasoForm, PessoaForm, EvidenciaForm, EventoTimelineForm,
-#     ComentarioForm, EnvolvimentoCasoForm
-# )
-
-
 
 @login_required
 def list_case(request):
@@ -387,10 +285,18 @@ def list_case(request):
 def detail_case(request, caso_id):
  
     caso = get_object_or_404(Caso, id=caso_id, ativo=True)
+
     
-    # if not request.user.has_perm('casos.view_caso'):
-    #     messages.error(request, 'Você não tem permissão para ver este caso.')
-    #     return redirect('caso_lista')
+    caso = get_object_or_404(Caso, id=caso_id)
+    
+    eventos_caso = (
+        EventoTimeline.objects
+        .filter(caso=caso)
+        .select_related('investigador_responsavel')
+        .prefetch_related('evidencias_relacionadas', 'pessoas_envolvidas')
+        .order_by('data_hora')
+    )
+
     
     envolvimentos = EnvolvimentoCaso.objects.filter(
         caso=caso, ativo=True
@@ -407,32 +313,20 @@ def detail_case(request, caso_id):
     comentarios = Comentario.objects.filter(
         caso=caso
     ).select_related('autor').order_by('-data_comentario')
-    
-    
-   
-    # Arquivos
-    # arquivos = Arquivo.objects.filter(
-    #     caso=caso
-    # ).order_by('-data_upload')
-    
-    # Formulário de comentário
+
 
     paginator = Paginator(envolvimentos, 1)
     page = request.GET.get('page')
     objs = paginator.get_page(page)
-    print(objs.has_next(), objs.number)
 
-        
-    print(page)
 
     dados = []
-
+    
     image = PessoaReconhecimento.objects.filter(pessoa=objs.object_list[0].pessoa)
-    print(image)
+  
     foto = None
 
     for f in image:
-        print(f)
         foto = f.foto.url
 
     for v in objs.object_list:
@@ -475,14 +369,23 @@ def detail_case(request, caso_id):
             }
         )
 
-    paginatorEv = Paginator(evidencias, 1)
-    pageEv = request.GET.get('page')
-    objsEv = paginatorEv.get_page(pageEv)
+    paginator1 = Paginator(evidencias, 1)
+    page1 = request.GET.get('page')
+    objs1 = paginator1.get_page(page1)
+    
+    image_evidence = Arquivo.objects.filter(evidencia=objs1.object_list[0])
+
+    foto1 = None
+
+    for f in image_evidence:
+        foto1 = f.arquivo.url
+    print(foto1)
 
     evidencia_obj = []
-    for ev in objsEv.object_list:
+    for ev in objs1.object_list:
 
         evidencia_obj.append({
+            'foto1': foto1,
             'numero_evidencia' : ev.numero_evidencia,
             'caso' :{
                 'titulo': ev.caso.titulo,
@@ -523,9 +426,9 @@ def detail_case(request, caso_id):
             'data_criacao' : ev.data_criacao,
 
             'paginacao':{
-                'has_next': objsEv.has_next(),
-                'has_previous': objsEv.has_previous(),
-                'page_atual': objsEv.number,
+                'has_next': objs1.has_next(),
+                'has_previous': objs1.has_previous(),
+                'page_atual': objs1.number,
             },
             'dados': dados
         })
@@ -546,8 +449,9 @@ def detail_case(request, caso_id):
     else:
         context = {
             'caso': caso,
+            'eventos_caso': eventos_caso,
             'envolvimentos': objs,
-            'evidencia_obj': objsEv,
+            'evidencia_obj': objs1,
             'eventos': eventos,
             'tamanho_caso': len(envolvimentos),
             'tamanho_evidencia': len(evidencias),
@@ -764,25 +668,12 @@ def list_indiidual_involved(request):
 @login_required
 def detail_individual_invalid(request, pessoa_id):
 
-    pessoa = get_object_or_404(Pessoa, id=pessoa_id, ativo=True)
-    
-    aliases = pessoa.aliases.all()
-    
-    enderecos = Endereco.objects.filter(pessoa=pessoa, ativo=True)
-    
-    envolvimentos = EnvolvimentoCaso.objects.filter(
-        pessoa=pessoa, ativo=True
-    ).select_related('caso').order_by('-data_envolvimento')
-    
-    casos_envolvidos = [env.caso for env in envolvimentos]
+    envolvimento = get_object_or_404(EnvolvimentoCaso, id=pessoa_id, ativo=True)
+    pessoa = Pessoa.objects.get(id=envolvimento.pessoa.id)
     
     context = {
         'pessoa': pessoa,
-        'aliases': aliases,
-        'enderecos': enderecos,
-        'envolvimentos': envolvimentos,
-        'casos_envolvidos': casos_envolvidos,
-
+        'envolvimento': envolvimento,
     }
     
     return render(request, 'pessoas_envolvida/detail_individual_invalid.html', context)
@@ -795,8 +686,12 @@ def create_indiidual_involved(request, caso_id):
     if request.method == 'POST':
         form = PessoaEnvolvidaForm(request.POST)
         if form.is_valid():
+
             pessoa, envolvimentoCaso = form.save(caso=caso)
+
             pessoa.criado_por = request.user
+            envolvimentoCaso.criado_por = request.user
+            envolvimentoCaso.save()
             pessoa.save()
 
             foto_data = None
@@ -875,6 +770,7 @@ def create_indiidual_involved(request, caso_id):
                 ip_origem=request.META.get('REMOTE_ADDR'),
                 user_agent=request.META.get('HTTP_USER_AGENT', '')
             )
+            
             return render(request, 'pessoas_envolvida/create_indiidual_involved.html', 
                 {'form': form, 'caso': caso, 'sucesso': f'{pessoa.nome_completo} Criado(a) com sucesso!'})
         else:
@@ -890,10 +786,35 @@ def create_indiidual_involved(request, caso_id):
 
 def edit_indiidual_involved(request, id):
 
-    envolvimento = EnvolvimentoCaso.objects.get(pessoa_id=id)
-    print(envolvimento)
+    envolvimento = EnvolvimentoCaso.objects.get(id=id)
+    
+    
+    if request.method == 'POST':
 
-    return render(request, 'pessoas_envolvida/edit_indiidual_involved.html', {'envolvimento': envolvimento})
+        form = FormEnvolvimento(request.POST)
+
+        if form.is_valid():
+
+            env = form.save(envolvimento)
+
+            context = {
+                'success': 'Atualização dos dados feita com sucesso',
+                'envolvimento': envolvimento,
+                'form': form
+            }
+            return render(request, 'pessoas_envolvida/edit_indiidual_involved.html',context)
+        else:
+            context = {
+                'error': 'Erro ao atualizar os dados!',
+                'envolvimento': envolvimento,
+                'form': form
+            }
+            return render(request, 'pessoas_envolvida/edit_indiidual_involved.html',context)
+    else:
+        form = FormEnvolvimento()
+
+        return render(request, 'pessoas_envolvida/edit_indiidual_involved.html',
+        {'envolvimento': envolvimento, 'form': form})
 
 @login_required
 @require_http_methods(["POST"])
@@ -1187,7 +1108,6 @@ def list_event(request):
         eventos_json = []
         for evento in eventos:
             eventos_json.append({
-                # 'id': evento.id,
                 'title': evento.titulo,
                 'start': evento.data_hora.isoformat(),
                 'description': evento.descricao,
@@ -1211,12 +1131,19 @@ def list_event(request):
 
         return render(request, 'evento/list_event.html', context)
 
+@login_required
 def edit_event(request, id):
 
-    evento = EventoTimeline.objects.get(id=id)
+    evento = (EventoTimeline.objects
+        .filter(id=id)
+        .select_related('investigador_responsavel')
+        .prefetch_related('evidencias_relacionadas', 'pessoas_envolvidas')
+    )[0]
+
     caso = Caso.objects.get(eventos_timeline=id)
     pessoas = EnvolvimentoCaso.objects.filter(caso=caso)
     evidencias = Evidencia.objects.filter(caso=caso)
+
     investigadores = Usuario.objects.filter(
         cargo='investigador'
     )
@@ -1225,16 +1152,12 @@ def edit_event(request, id):
 
     if request.method == 'POST':
 
-        form = EventoTimelineForm(request.POST)
-        evento.tipo_evento = evento.get_tipo_evento_display()
-        evento.importancia = evento.get_importancia_display()
+        form = EventoTimelineForm(request.POST,instance=caso)
         dados_anteriores = serializers.serialize('json', [evento])
 
         if form.is_valid():
 
             event = form.save(evento=evento)
-            event.tipo_evento = event.get_tipo_evento_display()
-            event.importancia = event.get_importancia_display()
 
             LogAuditoria.objects.create(
                 usuario=request.user,
@@ -1252,12 +1175,11 @@ def edit_event(request, id):
             context = {
                 'form': form,
                 'pessoas': pessoas,
-                'evdencias': evidencias,
+                'evidencias': evidencias,
                 'evento': evento,
                 'investigadores': investigadores,
             }
 
-            evento.data_hora = evento.data_hora.strftime('%Y-%m-%dT%H:%M')
             messages.success(request, 'Atualização do evento feita com sucesso')
             return render(request, 'evento/edit_event.html', context)
         else:
@@ -1265,7 +1187,7 @@ def edit_event(request, id):
             context = {
                 'form': form,
                 'pessoas': pessoas,
-                'evdencias': evidencias,
+                'evidencias': evidencias,
                 'evento': evento,
                 'investigadores': investigadores,
             }
@@ -1282,14 +1204,16 @@ def edit_event(request, id):
             'form': form,
             'evento': evento,
             'pessoas': pessoas,
-            'evdencias': evidencias,
+            'evidencias': evidencias,
             'investigadores': investigadores,
         }
         return render(request, 'evento/edit_event.html', context)
+
 @login_required
 def detail_event(request, id):
 
     evento = EventoTimeline.objects.get(id=id)
+    print(evento.evidencias_relacionadas.all())
 
     return render(request, 'evento/detail_event.html', {'evento': evento})
 
@@ -1319,6 +1243,7 @@ def delete_event(request, id):
 
     return redirect('/list_event')
 
+@login_required
 def create_type_crime(request):
 
     form = TipoCrimeForm()
@@ -1344,7 +1269,7 @@ def create_type_crime(request):
 
     return render(request, 'tipo_crime/create_type_crime.html', {'form': form})
 
-
+@login_required
 def edit_type_crime(request, id):
 
     tipo_crime = TipoCrime.objects.get(id=id)
@@ -1380,6 +1305,7 @@ def edit_type_crime(request, id):
 
     return render(request, 'tipo_crime/edit_type_crime.html', {'form': form, 'tipo_crime': tipo_crime})
 
+@login_required
 def datail_type_crime(request, id):
 
     tipo_crime = TipoCrime.objects.get(id=id)
@@ -1387,6 +1313,7 @@ def datail_type_crime(request, id):
 
     return render(request, 'tipo_crime/detail_type_crime.html', {'tipo_crime': tipo_crime})
 
+@login_required
 def list_type_crime(request):
 
     tipos_crime = TipoCrime.objects.all()
@@ -1404,9 +1331,7 @@ def list_type_crime(request):
     }
     return render(request, 'tipo_crime/list_type_crime.html', context)
 
-
-
-
+@login_required
 def delete_typr_crime(request, id):
 
     crime = TipoCrime.objects.get(id=id)

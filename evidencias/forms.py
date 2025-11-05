@@ -131,6 +131,9 @@ class EvidenciaForm(forms.Form):
 
         ano_atual = timezone.now().year
 
+        if not self.cleaned_data['valor_estimado']:
+            self.cleaned_data['valor_estimado'] = float(0)
+
         if evidencia is None:
 
             numero = 0

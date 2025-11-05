@@ -207,14 +207,15 @@ class PessoaEnvolvidaForm(forms.Form):
 
         return cleaned_data
 
-    def save(self,caso, pessoa=None):
+    def save(self,caso=None, envolvimento=None):
         
-        telefone_principal=self.cleaned_data['telefone_principal']
-        telefone_secundario=self.cleaned_data['telefone_secundario']
-        telefone_principal = telefone_principal.replace(" ","")
-        telefone_secundario = telefone_secundario.replace(" ","")
 
-        if pessoa is None:
+        if envolvimento is None:
+
+            telefone_principal=self.cleaned_data['telefone_principal']
+            telefone_secundario=self.cleaned_data['telefone_secundario']
+            telefone_principal = telefone_principal.replace(" ","")
+            telefone_secundario = telefone_secundario.replace(" ","")
             
             altura = self.cleaned_data['altura']
             peso = self.cleaned_data['peso']
@@ -294,50 +295,40 @@ class PessoaEnvolvidaForm(forms.Form):
 
             return pessoa, envolvimentoCaso
             
-        else:
-            
-            altura = self.cleaned_data['altura']
-            peso = self.cleaned_data['peso']
+        else:        
 
-            if altura in (None, ""):
-
-                altura = None
-            elif isinstance(altura, str):
-                altura = altura.replace(',','.')
-                altura = Decimal(altura)
-
-            if peso in (None, ""):
-
-                peso = None
-            elif isinstance(peso, str):
-                peso = peso.replace(',','.')
-                peso = Decimal(peso)
-
+            print(envolvimento.id)
+            envolvimento.tipo_envolvimento=self.cleaned_data['tipo_envolvimento'],
+            envolvimento.observacoes=self.cleaned_data['observacoes'],
             
 
-            pessao.nome_completo=self.cleaned_data['nome_completo'],
-            pessao.nome_social=self.cleaned_data['nome_social'],
-            pessao.bi=self.cleaned_data['bi'],
-            pessao.data_nascimento=self.cleaned_data['data_nascimento'],
-            pessao.genero=self.cleaned_data['genero'],
-            pessao.estado_civil=self.cleaned_data['estado_civil'],
-            pessao.cor_olhos=self.cleaned_data['cor_olhos'],
-            pessao.altura=altura,
-            pessao.peso=peso,
-            pessao.cor_cabelo=self.cleaned_data['cor_cabelo'],
-            pessao.profissao=self.cleaned_data['profissao'],
-            pessao.escolaridade=self.cleaned_data['escolaridade'],
-            pessao.nacionalidade=self.cleaned_data['nacionalidade'],
-            pessao.telefone_principal=telefone_principal,
-            pessao.telefone_secundario=telefone_secundario,
-            pessao.email=self.cleaned_data['email'],
-            pessao.observacoes=self.cleaned_data['observacoes'],
-            
+            envolvimento.save()
 
-            pessoa.save()
-
-            return pessoa
+            return envolvimento
         
+class FormEnvolvimento(forms.Form):
+
+    tipo_envolvimento = forms.ChoiceField(
+        choices = EnvolvimentoCaso.TIPO_ENVOLVIMENTO_CHOICES,
+        required=True,
+        widget= forms.Select( attrs={'class': 'form-control'}
+    ))
+
+    descricao = forms.CharField(
+        required=False,
+        widget= forms.Textarea( attrs={'class': 'form-control'}
+    ))
+
+
+    def save(self, envolvimento):
+
+        envolvimento.tipo_envolvimento=self.cleaned_data['tipo_envolvimento']
+        envolvimento.descricao=self.cleaned_data['descricao']
+        
+
+        envolvimento.save()
+
+        return envolvimento
 
 class CasoForm(forms.Form):
     
@@ -664,6 +655,9 @@ class EventoTimelineForm(forms.Form):
             evento.observacoes=self.cleaned_data['observacoes']
 
             evento.save()
+
+            evento.pessoas_envolvidas.set(self.cleaned_data['pessoas_envolvidas'])
+            evento.evidencias_relacionadas.set(self.cleaned_data['evidencias_relacionadas'])
 
             return evento
     

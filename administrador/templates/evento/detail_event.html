@@ -79,6 +79,15 @@
                     <div class="col-sm-9">{{ evento.data_criacao|default:"Sem Informações"}}</div>
                 </div>
                 <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Pessoas envolvidas:</strong></div>
+                    {% for p in evento.pessoas_envolvidas.all %}
+                        <div class="col-sm-9">{{ p.nome_completo}}</div>{% if not frorloop.last %},{% endif %}
+                    
+                    {%empty%}
+                        <span>Nenhuma pessoa identificada</span>
+                    {% endfor %}
+                </div>
+                <div class="row mb-3">
                     <div class="col-sm-3"><strong>Criado por:</strong></div>
                     <div class="col-sm-9">{{ evento.criado_por.get_full_name}}</div>
                 </div>
