@@ -24,6 +24,50 @@
             </a>
             
         </div>
+
+        <div style="display: flex; width: 97%; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        
+            <form action="/list_case/" method="get"  style="width: 30%;"
+             class="btn-group btn-group-sm">
+               
+                <input type="search" name="search" style="border-radius: 4px 0px 0px 4px; "
+                class="form-control" placeholder="Número de caso ou Título ou Descrição">
+                <button class="btn btn-warning"><i class="bi bi-search"></i></button>
+            </form>
+
+            <form action="/list_case/" method="get" 
+             class="btn-group btn-group-sm">
+               
+                <select type="search" name="filter1" style="border-radius: 4px 0px 0px 4px;"
+                    class="form-control" placeholder="Prioridade ou Estado"
+                >
+                    <option value="">Selecione opção</option>
+                    <option value="aberto">Aberto</option>
+                    <option value="em_andamento">Em Andamento</option>
+                    <option value="suspenso">Suspenso</option>
+                    <option value="concluido">Concluído</option>
+                    <option value="arquivado">Arquivado</option>
+                    <option value="">______Dados do Estado____</option>
+                    <option value="1">Baixa</option>
+                    <option value="2">Normal</option>
+                    <option value="3">Alta</option>
+                    <option value="4">Urgente</option>
+                    <option value="5">Crítica</option>
+
+                </select>
+                <button class="btn btn-warning"><i class="bi bi-search"></i></button>
+            </form>
+
+            <form action="/list_case/" method="get" 
+             class="btn-group btn-group-sm">
+                
+                <input type="search" name="filter2" style="border-radius: 4px 0px 0px 4px;"
+                class="form-control" placeholder="B.I do Investigador">
+                <button class="btn btn-warning"><i class="bi bi-search"></i></button>
+            </form>
+            
+        </div>
+
         <div class="card" style="display:flex; width: 97%; align-self: center;">
 
             <form method="get" class="form-inline mb-3" style="padding: 12px; height: 7px;">
@@ -45,8 +89,21 @@
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>ID</th>
-                                <th>Título</th>
+                                <th>
+                                    ID 
+                                    <a 
+                                    href="?order_by=numero_caso{% if filter1 %}&filter1={{ filter1 }}{% endif %}{% if filter2 %}&filter2={{ filter2 }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                </th>
+                                <th>
+                                    Título 
+                                    <a href="?order_by=titulo{% if filter1 %}&filter1={{ filter1 }}{% endif %}{% if filter2 %}&filter2={{ filter2 }}{% endif %}{% if search %}&search={{ search }}{% endif %}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                </th>
                                 <th>Prioridade</th>
                                 <th>Tipo</th>
                                 <th>Estado</th>

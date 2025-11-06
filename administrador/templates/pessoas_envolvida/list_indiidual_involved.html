@@ -14,15 +14,17 @@
   
     <div style="display: flex; width: 100%; align-items: center; justify-content: center; flex-direction: column;">
         <h1 style="margin-left: 20px;" class="text-warning">Lista de pessoas envolvidas</h1>
-        <div style="display: flex; width: 97%; justify-content: space-between; align-items: center;">
+        <div style="display: flex; width: 97%; justify-content: space-between; align-items: center; margin-bottom: 6px;">
         
             <form action="/list_indiidual_involved/" method="get" 
              class="btn-group btn-group-sm">
                
-                <input type="search" name="nome" style="border-radius: 4px 0px 0px 4px;"
+                <input type="search" name="nome_filter" style="border-radius: 4px 0px 0px 4px;"
                 class="form-control" placeholder="Nome da pessoa">
+
                 <button class="btn btn-warning"><i class="bi bi-search"></i></button>
             </form>
+
             <form action="/list_indiidual_involved/" method="get" 
              class="btn-group btn-group-sm">
                 
@@ -53,10 +55,28 @@
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>Código do caso</th>
-                                <th>Nome</th>
+                                <th>
+                                    Código do caso
+                                    <a href="?order_by=numero_caso{% if bi %}&bi={{ bi }}{% endif %}{% if nome_filter %}&nome_filter={{ nome_filter }}{% endif %}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                </th>
+                                <th>
+                                    Nome
+                                    <a href="?order_by=nome_completo{% if bi %}&bi={{ bi }}{% endif %}{% if nome_filter %}&nome_filter={{ nome_filter }}{% endif %}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                </th>
                                 <th>Tipo de envolvimento</th>
-                                <th>Data de envolvimento</th>
+                                <th>
+                                    Data de envolvimento
+                                    <a href="?order_by=criado_por{% if bi %}&bi={{ bi }}{% endif %}{% if nome_filter %}&nome_filter={{ nome_filter }}{% endif %}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                </th>
                                 <th>Estado</th>
                                 <th>Opções</th>
                             </tr>

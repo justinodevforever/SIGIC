@@ -58,331 +58,333 @@
         </style>
     </head>
     <body style="background-color: #ddd;">
-        <form action="{% url 'edit_user' user.id%}" method="post" class="card"
-            style="display: flex; gap: 20px;  width: 80%; flex-direction: column;
-            padding: 10px; border-radius: 10px; background-color: #f8f9fa;
-            align-self: center; align-items: center; ">
+        <div style="width: 80%; height: 100%;">
+            <form action="{% url 'edit_user' user.id%}" method="post" class="card"
+                style="display: flex; gap: 20px;  width: 100%; flex-direction: column;
+                padding: 10px; border-radius: 10px; background-color: #f8f9fa;
+                align-self: center; align-items: center; ">
 
-            {% csrf_token %}
-            
-            <div class="d-flex justify-content-between" style="width: 100%;">
-                <h3 class="text-warning">Edição de usuário</h3>
-                <a href="/list_user/" class="btn btn-primary">Listar</a>
-            </div>
-            {% if sucesso %}
-                <div class="alert alert-success" role="alert">
-                    <strong>{{sucesso}}</strong>
-                </div>
-
-            {% elif erro%}
-
-                <div class="alert alert-danger" role="alert">
-                    <strong>{{erro}}</strong>
-                </div>
-            {% endif %}
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%;">
-                <label for="username" 
-                style="display: flex; flex-direction: column;  width: 100%;">
-
-                    <span >
-                        Nome do usuário
-                        <span class="text-danger">*</span>
-                    </span>
-                    <input type="text" style=" width: 100%;" oninput="this.value=this.value.toLowerCase().replace(' ', '-')"
-                        class="form-control" name="username" value="{{user.username}}"
-                        aria-describedby="helpId" autocomplete="off">
-                        
-                        {% if form.username.errors %}
-                            <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.username.errors}}
-                            </div>
-                        {% endif %}
-                </label>
-    
-                <label for="email" style="display: flex;
-                 width: 100%; flex-direction: column;">
-
-                    <span >
-                        E-mail 
-                        <span class="text-danger">*</span>
-                    </span>
-                    <input type="email" style=" width: 100%;" value="{{user.email}}"
-                    class="form-control" name="email" autocomplete="off"
-                    aria-describedby="helpId">
-
-
-                    {% if form.email.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.email.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
-    
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                <label for="first_name" style="display: flex;
-                flex-direction: column; width: 100%;">
-
-                    <span >
-                        Primeiro nome 
-                        <span class="text-danger">*</span>
-                    </span>
-                    <input type="text" style=" width: 100%;" value="{{user.first_name}}"  oninput="this.value=this.value.toUpperCase()"
-                    class="form-control" name="first_name" autocomplete="off"
-                    aria-describedby="helpId">
-
-                    {% if form.first_name.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.first_name.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            
-                <label for="last_name" style="display: flex; 
-                 flex-direction: column; width: 100%;">
-
-                    <span >
-                        Último nome
-                        <span class="text-danger">*</span>
-                    </span>
-                    <input type="text" style=" width: 100%;" value="{{user.last_name}}"  oninput="this.value=this.value.toUpperCase()"
-                    class="form-control" name="last_name" autocomplete="off"
-                    aria-describedby="helpId">
-
-                    {% if form.last_name.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.last_name.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-    
+                {% csrf_token %}
                 
-            </div>
+                <div class="d-flex justify-content-between" style="width: 100%;">
+                    <h3 class="text-warning">Edição de usuário</h3>
+                    <a href="/list_user/" class="btn btn-primary">Listar</a>
+                </div>
+                {% if sucesso %}
+                    <div class="alert alert-success" role="alert">
+                        <strong>{{sucesso}}</strong>
+                    </div>
 
-            <div class="form-group" 
+                {% elif erro%}
+
+                    <div class="alert alert-danger" role="alert">
+                        <strong>{{erro}}</strong>
+                    </div>
+                {% endif %}
+                <div class="form-group" 
                 style="display: flex; gap: 20px;  width: 100%;">
-                <label for="data_nascimento" 
-                style="display: flex; flex-direction: column;  width: 100%;">
+                    <label for="username" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
 
-                    <span >
-                        Data de nascimento
-                        <span class="text-danger">*</span>
-                    </span>
-                    <input type="date" style=" width: 100%;" value="{{user.data_nascimento}}"
-                        class="form-control" name="data_nascimento" 
-                        aria-describedby="helpId" autocomplete="off">
-                        
-                        {% if form.data_nascimento.errors %}
+                        <span >
+                            Nome do usuário
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="text" style=" width: 100%;" oninput="this.value=this.value.toLowerCase().replace(' ', '-')"
+                            class="form-control" name="username" value="{{user.username}}"
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.username.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.username.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+
+                    <label for="email" style="display: flex;
+                        width: 100%; flex-direction: column;">
+
+                        <span >
+                            E-mail 
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="email" style=" width: 100%;" value="{{user.email}}"
+                        class="form-control" name="email" autocomplete="off"
+                        aria-describedby="helpId">
+
+
+                        {% if form.email.errors %}
                             <div class="text-danger" style="margin-bottom: -40px; ">
-                                {{form.data_nascimento.errors}}
+                                {{form.email.errors}}
                             </div>
                         {% endif %}
-                </label>
-    
-                <label for="bi" style="display: flex;
-                 width: 100%; flex-direction: column;">
-
-                    <span >
-                        B.I 
-                        <span class="text-danger">*</span>
-                    </span>
-                    <input type="bi" style=" width: 100%;" value="{{user.bi|default:"Não informado"}}"
-                    class="form-control" name="bi" autocomplete="off"
-                    aria-describedby="helpId">
-
-
-                    {% if form.bi.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.bi.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
-
-            <div class="form-group" 
-                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                
-                <label for="genero" style="display: flex;
-                 flex-direction: column; width: 100%;">
-
-                    <span >
-                        Gênero 
-                        <span class="text-danger">*</span>
-                    </span>
-                    <select name="genero" class="form-control" >
-                        <option value="{{user.genero}}">{{user.get_genero_display}}</option>
-                        <option value="M">Masculino</option>
-                        <option value="F">Feminino</option>
-                        <option value="O">Outro</option>
-                    </select>
-
-                    {% if form.genero.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.genero.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-                
-                <label for="estado_civil" style="display: flex;
-                 flex-direction: column; width: 100%;">
-
-                    <span >
-                        Estado Civil
-                        <span class="text-danger">*</span>
-                    </span>
-                    <select name="estado_civil" class="form-control" >
-                        <option value="{{user.estado_civil}}">{{user.get_estado_civil_display}}</option>
-                        <option value="solteiro">Solteiro(a)</option>
-                        <option value="casado">Casado(a)</option>
-                        <option value="divorciado">Divorciado(a)</option>
-                        <option value="viuvo">Viúvo(a)</option>                
-                        <option value="uniao_estavel">União estável</option>                
-                    </select>
-
-                    {% if form.estado_civil.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.estado_civil.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
-    
-            <div class="form-group" 
-            style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                <label for="telefone" style="display: flex;
-                 flex-direction: column;  width: 100%;">
-
-                    <span >
-                        Telefone 
-                    </span>
-
-                    <input type="number" style=" width: 100%;" 
-                    class="form-control" name="telefone" value="{{user.telefone}}"
-                    aria-describedby="helpId" autocomplete="off">
-
-                    {% if form.telefone.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.telefone.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-    
-                <label for="matricula" style="display: flex;
-                 flex-direction: column;  width: 100%;">
-
-                    <span >
-                        Nº de distintivo
-                        <span class="text-danger">*</span>
-                    </span>
-
-                    <input type="text" style=" width: 100%;" value="{{user.matricula}}"
-                    class="form-control" name="matricula" 
-                    aria-describedby="helpId" autocomplete="off">
-
-                    {% if form.matricula.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.matricula.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
-    
-            <div class="form-group" 
-                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-                
-                <label for="departamento" style="display: flex;
-                 flex-direction: column; width: 100%;">
-
-                    <span >
-                        Cargo 
-                        <span class="text-danger">*</span>
-                    </span>
-                    <select name="cargo" class="form-control" >
-                        <option value="{{user.cargo}}">{{user.get_cargo_display}}</option>
-                        <option value="delegado">Delegado</option>
-                        <option value="investigador">Investigador</option>
-                        <option value="escrivao">Escrivão</option>
-                        <option value="perito">Perito</option>
-                        <option value="analista">Analista</option>
-                        <option value="chefe">Chefe de Departamento</option>
-                        <option value="admin">Administrador</option>
-                        
-                    </select>
-
-                    {% if form.cargo.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.cargo.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-                
-                <label for="departamento" style="display: flex;
-                 flex-direction: column; width: 100%;">
-
-                    <span >
-                        Nível de acesso 
-                        <span class="text-danger">*</span>
-                    </span>
-                    <select name="nivel_acesso" class="form-control" >
-                        <option value="{{user.nivel_acesso}}">{{user.get_nivel_acesso_display}}</option>
-                        <option value="1">Básico</option>
-                        <option value="2">Intermediário</option>
-                        <option value="3">Avançado</option>
-                        <option value="4">Total</option>                
-                    </select>
-
-                    {% if form.nivel_acesso.errors %}
-                        <div class="text-danger" style="margin-bottom: -40px; ">
-                            {{form.nivel_acesso.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-            </div>
-    
-            <div class="form-group" 
-                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
-
-                <label for="departamento" style="display: flex;
-                flex-direction: column; width: 100%;">
-                    
-                    <span >
-                        Departamento 
-                        <span class="text-danger">*</span>
-                    </span>
-                    <input type="text" style=" width: 100%;" value="{{user.departamento}}"  oninput="this.value=this.value.toUpperCase()"
-                    class="form-control" name="departamento" autocomplete="off"
-                    aria-describedby="helpId">
-
-                    {% if form.departamento.errors %}
-                        <div class="text-danger" style="margin-bottom: -30px; ">
-                            {{form.departamento.errors}}
-                        </div>
-                    {% endif %}
-                </label>
-                
-                <label for="id_is_active" style="display: flex; justify-content: center; align-items: center;
-                flex-direction: column; width: 100%;">
-                    Ativo?
-                    <label class="switch">
-                        <input type="checkbox" name="is_active" id="id_is_active" {% if user.is_active %}checked{% endif %}>
-                        <span class="slider"></span>
                     </label>
-                    {% if form.is_active.errors %}
-                        <div class="text-danger" style="margin-bottom: -30px; ">
-                            {{form.is_active.errors}}
-                        </div>
-                    {% endif %}
-                </label>
+                </div>
 
-            </div>
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="first_name" style="display: flex;
+                    flex-direction: column; width: 100%;">
 
-            <button type="submit" class="btn btn-success" 
-            style="width: 80%;">
-                Salvar alterações
-            </button>
-        </form> 
+                        <span >
+                            Primeiro nome 
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="text" style=" width: 100%;" value="{{user.first_name}}"  oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="first_name" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.first_name.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.first_name.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                
+                    <label for="last_name" style="display: flex; 
+                        flex-direction: column; width: 100%;">
+
+                        <span >
+                            Último nome
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="text" style=" width: 100%;" value="{{user.last_name}}"  oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="last_name" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.last_name.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.last_name.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+
+                    
+                </div>
+
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="data_nascimento" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                        <span >
+                            Data de nascimento
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="date" style=" width: 100%;" value="{{user.data_nascimento}}"
+                            class="form-control" name="data_nascimento" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.data_nascimento.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.data_nascimento.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+
+                    <label for="bi" style="display: flex;
+                        width: 100%; flex-direction: column;">
+
+                        <span >
+                            B.I 
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="bi" style=" width: 100%;" value="{{user.bi|default:"Não informado"}}"
+                        class="form-control" name="bi" autocomplete="off"
+                        aria-describedby="helpId">
+
+
+                        {% if form.bi.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.bi.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    
+                    <label for="genero" style="display: flex;
+                        flex-direction: column; width: 100%;">
+
+                        <span >
+                            Gênero 
+                            <span class="text-danger">*</span>
+                        </span>
+                        <select name="genero" class="form-control" >
+                            <option value="{{user.genero}}">{{user.get_genero_display}}</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Feminino</option>
+                            <option value="O">Outro</option>
+                        </select>
+
+                        {% if form.genero.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.genero.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                    
+                    <label for="estado_civil" style="display: flex;
+                        flex-direction: column; width: 100%;">
+
+                        <span >
+                            Estado Civil
+                            <span class="text-danger">*</span>
+                        </span>
+                        <select name="estado_civil" class="form-control" >
+                            <option value="{{user.estado_civil}}">{{user.get_estado_civil_display}}</option>
+                            <option value="solteiro">Solteiro(a)</option>
+                            <option value="casado">Casado(a)</option>
+                            <option value="divorciado">Divorciado(a)</option>
+                            <option value="viuvo">Viúvo(a)</option>                
+                            <option value="uniao_estavel">União estável</option>                
+                        </select>
+
+                        {% if form.estado_civil.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.estado_civil.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="telefone" style="display: flex;
+                        flex-direction: column;  width: 100%;">
+
+                        <span >
+                            Telefone 
+                        </span>
+
+                        <input type="number" style=" width: 100%;" 
+                        class="form-control" name="telefone" value="{{user.telefone}}"
+                        aria-describedby="helpId" autocomplete="off">
+
+                        {% if form.telefone.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.telefone.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+
+                    <label for="matricula" style="display: flex;
+                        flex-direction: column;  width: 100%;">
+
+                        <span >
+                            Nº de distintivo
+                            <span class="text-danger">*</span>
+                        </span>
+
+                        <input type="text" style=" width: 100%;" value="{{user.matricula}}"
+                        class="form-control" name="matricula" 
+                        aria-describedby="helpId" autocomplete="off">
+
+                        {% if form.matricula.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.matricula.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    
+                    <label for="departamento" style="display: flex;
+                        flex-direction: column; width: 100%;">
+
+                        <span >
+                            Cargo 
+                            <span class="text-danger">*</span>
+                        </span>
+                        <select name="cargo" class="form-control" >
+                            <option value="{{user.cargo}}">{{user.get_cargo_display}}</option>
+                            <option value="delegado">Delegado</option>
+                            <option value="investigador">Investigador</option>
+                            <option value="escrivao">Escrivão</option>
+                            <option value="perito">Perito</option>
+                            <option value="analista">Analista</option>
+                            <option value="chefe">Chefe de Departamento</option>
+                            <option value="admin">Administrador</option>
+                            
+                        </select>
+
+                        {% if form.cargo.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.cargo.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                    
+                    <label for="departamento" style="display: flex;
+                        flex-direction: column; width: 100%;">
+
+                        <span >
+                            Nível de acesso 
+                            <span class="text-danger">*</span>
+                        </span>
+                        <select name="nivel_acesso" class="form-control" >
+                            <option value="{{user.nivel_acesso}}">{{user.get_nivel_acesso_display}}</option>
+                            <option value="1">Básico</option>
+                            <option value="2">Intermediário</option>
+                            <option value="3">Avançado</option>
+                            <option value="4">Total</option>                
+                        </select>
+
+                        {% if form.nivel_acesso.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.nivel_acesso.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+
+                    <label for="departamento" style="display: flex;
+                    flex-direction: column; width: 100%;">
+                        
+                        <span >
+                            Departamento 
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="text" style=" width: 100%;" value="{{user.departamento}}"  oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="departamento" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.departamento.errors %}
+                            <div class="text-danger" style="margin-bottom: -30px; ">
+                                {{form.departamento.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                    
+                    <label for="id_is_active" style="display: flex; justify-content: center; align-items: center;
+                    flex-direction: column; width: 100%;">
+                        Ativo?
+                        <label class="switch">
+                            <input type="checkbox" name="is_active" id="id_is_active" {% if user.is_active %}checked{% endif %}>
+                            <span class="slider"></span>
+                        </label>
+                        {% if form.is_active.errors %}
+                            <div class="text-danger" style="margin-bottom: -30px; ">
+                                {{form.is_active.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+
+                </div>
+
+                <button type="submit" class="btn btn-success" 
+                style="width: 80%;">
+                    Salvar alterações
+                </button>
+            </form>
+        </div>
     </body>
     </html>
 {% endblock content %}

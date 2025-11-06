@@ -1,0 +1,813 @@
+{% extends 'principal.html' %}
+
+{% block content %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            .form-control{
+                height: 40px;
+            }
+          
+            .button-group {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 25px;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                border: none;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .btn-camera {
+                background: #667eea;
+                color: white;
+            }
+
+            .btn-camera:hover {
+                background: #5568d3;
+                transform: translateY(-2px);
+            }
+
+            .btn-upload {
+                background: #764ba2;
+                color: white;
+            }
+
+            .btn-upload:hover {
+                background: #643a8a;
+                transform: translateY(-2px);
+            }
+
+            .btn-submit {
+                background: #10b981;
+                color: white;
+                width: 100%;
+            }
+
+            .btn-submit:hover {
+                background: #059669;
+                transform: translateY(-2px);
+            }
+
+            .btn-submit:disabled {
+                background: #d1d5db;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .preview-container {
+                margin-bottom: 25px;
+                text-align: center;
+            }
+
+            #videoElement {
+                width: 100%;
+                max-width: 400px;
+                border-radius: 10px;
+                border: 3px solid #667eea;
+                display: none;
+            }
+
+            #canvas {
+                display: none;
+            }
+
+            #imagePreview {
+                max-width: 250;
+                max-height: 250px;
+                border-radius: 50%;
+                border: 3px solid #667eea;
+                display: none;
+                margin: 0 auto;
+            }
+
+            #captureBtn {
+                margin-top: 15px;
+                display: none;
+            }
+
+            #fileInput {
+                display: none;
+            }
+
+            .alert {
+                padding: 15px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                font-weight: 500;
+            }
+
+            .alert-success {
+                background: #d1fae5;
+                color: #065f46;
+                border: 2px solid #10b981;
+            }
+
+            .alert-error {
+                background: #fee2e2;
+                color: #991b1b;
+                border: 2px solid #ef4444;
+            }
+
+            .loading {
+                display: none;
+                text-align: center;
+                margin: 20px 0;
+            }
+
+            .spinner {
+                border: 4px solid #f3f3f3;
+                border-top: 4px solid #667eea;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                margin: 0 auto;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+
+            .icon {
+                width: 20px;
+                height: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div style=" height: 100%; width: 80%;" >
+
+            <form action="{% url 'edit_people' pessoa.id %}" method="post" class="card" enctype="multipart/form-data" 
+            style="display: flex; gap: 20px;  width: 100%; flex-direction: column;
+            background-color: #f8f9fa; padding: 10px; border-radius: 10px;
+            align-self: center; align-items: center; ">
+
+                {% csrf_token %}
+                
+                <div class="d-flex justify-content-between" style="width: 100%;">
+                    <h3 class="text-warning">Atualização de pessoa</h3>
+                    <a href="/list_people/" class="btn btn-primary">Listar</a>
+                </div>
+                
+                {% if sucesso %}
+                <div class="alert alert-success" role="alert">
+                    <strong>{{sucesso}}</strong>
+                </div>
+                
+                {% elif erro %}
+                
+                <div class="alert alert-danger" role="alert">
+                    <strong>{{erro}}</strong>
+                </div>
+                {% endif %}
+                
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="nome_completo" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                        <span >
+                            Nome completo
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="text" style=" width: 100%;" value="{{pessoa.nome_completo}}"
+                            oninput="this.value=this.value.toUpperCase()"
+                            class="form-control" name="nome_completo" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.nome_completo.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.nome_completo.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+
+                    <label for="nome_social" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Nome social
+                        <input type="text" style=" width: 100%;" value="{{pessoa.nome_social}}"
+                            class="form-control" name="nome_social" 
+                            oninput="this.value=this.value.toUpperCase()"
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                        {% if form.nome_social.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.nome_social.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="cor_olhos" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Cor de olhos
+                        <input type="text" style=" width: 100%;" value="{{pessoa.cor_olhos}}"
+                            oninput="this.value=this.value.toUpperCase()"
+                            class="form-control" name="cor_olhos" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.cor_olhos.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.cor_olhos.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+
+                    <label for="cor_cabelo" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Cor de cabelo
+                        <input type="text" style=" width: 100%;" value="{{pessoa.cor_cabelo}}"
+                            class="form-control" name="cor_cabelo" 
+                            oninput="this.value=this.value.toUpperCase()"
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                        {% if form.cor_cabelo.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.cor_cabelo.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="bi" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                        <span >
+                            BI/Passaporte
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="text" style=" width: 100%;" value="{{pessoa.bi}}"
+                            class="form-control" name="bi" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.bi.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.bi.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+
+                    <label for="nacionalidade" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
+
+                        <span >
+                            Nacionalidade
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="text" style=" width: 100%;" value="{{pessoa.nacionalidade}}"
+                        oninput="this.value=this.value.toUpperCase()"
+                            class="form-control" name="nacionalidade" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                        {% if form.nacionalidade.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.nacionalidade.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="profissao" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Profissão
+                        <input type="text" style=" width: 100%;" value="{{pessoa.profissao}}"
+                            class="form-control" name="profissao" 
+                            oninput="this.value=this.value.toUpperCase()"
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.profissao.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.profissao.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+
+                    <label for="escolaridade" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Nível acadêmico
+                        <input type="text" style=" width: 100%;" value="{{pessoa.escolaridade}}"
+                            class="form-control" name="escolaridade" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                        {% if form.escolaridade.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.escolaridade.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="telefone_principal" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Telefone Principal
+                        <input type="text" style=" width: 100%;" value="{{pessoa.telefone_principal}}"
+                            class="form-control" name="telefone_principal" id="telefone_principal"
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.telefone_principal.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.telefone_principal.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+
+                    <label for="telefone_secundario" 
+                        style="display: flex; flex-direction: column;  width: 100%;">
+
+                        Telefone segundário
+                        <input type="text" style=" width: 100%;" value="{{pessoa.telefone_secundario}}"
+                            class="form-control" name="telefone_secundario" id="telefone_secundario"
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                        {% if form.telefone_secundario.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.telefone_secundario.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+                
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%;">
+                    <label for="data_nascimento" 
+                    style="display: flex; flex-direction: column;  width: 100%;">
+
+                        <span >
+                            Data de nascimento
+                            <span class="text-danger">*</span>
+                        </span>
+                        <input type="date" style=" width: 100%;" value="{{pessoa.data_nascimento}}"
+                            class="form-control" name="data_nascimento" 
+                            aria-describedby="helpId" autocomplete="off">
+                            
+                            {% if form.data_nascimento.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.data_nascimento.errors}}
+                                </div>
+                            {% endif %}
+                    </label>
+        
+                    <label for="email" style="display: flex;
+                    width: 100%; flex-direction: column;">
+
+                        E-mail
+                        <input type="email" style=" width: 100%;" value="{{pessoa.email}}"
+                        class="form-control" name="email" autocomplete="off"
+                        aria-describedby="helpId">
+
+
+                        {% if form.email.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.email.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+        
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="altura" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        Altura
+                        <input type="text" style=" width: 100%;" id="altura" value="{{pessoa.altura}}"
+                        class="form-control" name="altura" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.altura.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.altura.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                
+                    <label for="peso" style="display: flex; 
+                    flex-direction: column; width: 100%;">
+
+                        Peso
+                        <input type="text" name="peso" style=" width: 100%;" id='peso' value="{{pessoa.peso}}"
+                        class="form-control" autocomplete="off"
+                        aria-describedby="helpId"> 
+
+                        {% if form.peso.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.peso.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+        
+                    
+                </div>
+        
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="observacoes" style="display: flex;
+                    flex-direction: column;  width: 100%;">
+
+                        observações 
+                        <textarea style=" width: 100%; height: 100px; resize: none;"
+                        class="form-control" name="observacoes" 
+                        aria-describedby="helpId" autocomplete="off">{{pessoa.observacoes}}</textarea>
+
+                        {% if form.observacoes.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.observacoes.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+        
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    
+                    <label for="genero" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        <span >
+                            Gênero 
+                            <span class="text-danger">*</span>
+                        </span>
+                        <select name="genero" class="form-control" >
+                            <option value="{{pessoa.genero}}">{{pessoa.get_genero_display}}</option>
+                            <option value="">Selecione Gênero</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Feminino</option>
+                            <option value="O">Outro</option>
+                        </select>
+
+                        {% if form.genero.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.genero.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                    
+                    <label for="estado_civil" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        <span >
+                            Estado Civil
+                            <span class="text-danger">*</span>
+                        </span>
+                        <select name="estado_civil" class="form-control" >
+                            <option value="{{pessoa.estado_civil}}">{{pessoa.get_estado_civil_display}}</option>
+                            <option value="solteiro">Solteiro(a)</option>
+                            <option value="casado">Casado(a)</option>
+                            <option value="divorciado">Divorciado(a)</option>
+                            <option value="viuvo">Viúvo(a)</option>                
+                            <option value="uniao_estavel">União estável</option>                
+                        </select>
+
+                        {% if form.estado_civil.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.estado_civil.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <h4>Alias</h4>
+                <hr style="width: 98%; margin-top: -30px;">
+
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    
+                    <label for="tipo_alias" style="display: flex;
+                    flex-direction: column; width: 100%;">
+                        <span >
+                            Tipos de alias
+                        </span>
+                        <select name="tipo_alias" class="form-control" >
+                            <option value="{{alias.tipo_alias}}">{{alias.get_tipo_alias_display}}</option>
+                            <option value="apelido">Apelido</option>
+                            <option value="nome_guerra">Nome de guerra</option>
+                            <option value="nome_falso">Nome Falso</option>
+                            <option value="outro">Outro</option>                
+                        </select>
+
+                        {% if form.tipo_alias.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.tipo_alias.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+
+                    <label for="nome_alias" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        <span >
+                        Nome alias
+                        </span>
+                        <input type="text" name="nome_alias" value="{{alias.nome_alias}}"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" autocomplete="off"
+                        aria-describedby="helpId"
+                        >
+
+                        {% if form.nome_alias.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.nome_alias.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <h4>Dados de endereço</h4>
+                <hr style="width: 98%; margin-top: -30px;">
+
+                <div class="form-group" 
+                    style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    
+                    <label for="tipo_endereco" style="display: flex;
+                    flex-direction: column; width: 100%;">
+                        
+                        Tipo de endereço
+                    
+                        <select name="tipo_endereco" class="form-control" >
+                            <option value="{{endereco.tipo}}">{{endereco.get_tipo_display}}</option>
+                            <option value="residencial">Residencial</option>
+                            <option value="comercial">Comercial</option>
+                            <option value="temporario">Temporário</option>
+                            <option value="antigo">Antigo</option>
+                        </select>
+
+                        {% if form.tipo.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.tipo.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+
+                    <label for="logradouro" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        Logradouro
+                        <input type="text" style=" width: 100%;" value="{{endereco.logradouro}}"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="logradouro" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.logradouro.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.logradouro.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="bairro" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        Bairro
+                        <input type="text" style=" width: 100%;" value="{{endereco.bairro}}"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="bairro" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.bairro.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.bairro.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                
+                    <label for="cidade" style="display: flex; 
+                    flex-direction: column; width: 100%;">
+
+                        Cidade
+                        <input type="text" style=" width: 100%; resize: none;" value="{{endereco.cidade}}"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="cidade" autocomplete="off"
+                        aria-describedby="helpId"> 
+
+                        {% if form.cidade.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.cidade.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="ponto_referencia" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        Ponto de referência
+                        <input type="text" style=" width: 100%;" value="{{endereco.ponto_referencia}}"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="ponto_referencia" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.ponto_referencia.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.ponto_referencia.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <div class="form-group" 
+                style="display: flex; gap: 20px;  width: 100%; margin-top: 10px;">
+                    <label for="numero" style="display: flex;
+                    flex-direction: column; width: 100%;">
+
+                        Número
+                        <input type="text" style=" width: 100%;" value="{{endereco.numero}}"
+                        class="form-control" name="numero" autocomplete="off"
+                        aria-describedby="helpId">
+
+                        {% if form.numero.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.numero.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                
+                    <label for="complemento" style="display: flex; 
+                    flex-direction: column; width: 100%;">
+
+                        Complemento
+                        <input type="text" style=" width: 100%; resize: none;" value="{{endereco.complemento}}"
+                        oninput="this.value=this.value.toUpperCase()"
+                        class="form-control" name="complemento" autocomplete="off"
+                        aria-describedby="helpId"> 
+
+                        {% if form.complemento.errors %}
+                            <div class="text-danger" style="margin-bottom: -40px; ">
+                                {{form.complemento.errors}}
+                            </div>
+                        {% endif %}
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-submit" >
+                    <i class="bi bi-check"></i>
+                    Cadastrar Pessoa
+                </button>
+                
+        </form>
+    </div>
+
+        <script>
+            $(document).ready(function(){
+                $('#altura').mask('0,00', {reverse: true})
+                $('#peso').mask('000,00', {reverse: true})
+                $('#telefone_principal').mask('900 000 000', {reverse: true})
+                $('#telefone_secundario').mask('900 000 000', {reverse: true})
+            })
+        </script>
+
+        <script>
+            const video = document.getElementById('videoElement');
+            const canvas = document.getElementById('canvas');
+            const imagePreview = document.getElementById('imagePreview');
+            const captureBtn = document.getElementById('captureBtn');
+            const openCameraBtn = document.getElementById('openCameraBtn');
+            const uploadBtn = document.getElementById('uploadBtn');
+            const fileInput = document.getElementById('fileInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const alertBox = document.getElementById('alertBox');
+            const loading = document.querySelector('.loading');
+            const stopCameraBtn = document.getElementById('stopCameraBtn');
+            const fotoBase64Input = document.getElementById('fotoBase64Input');
+            let stream = null;
+            let fotoBase64 = null;
+
+            function stopCamera() {
+              
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                video.style.display = 'none';
+                captureBtn.style.display = 'none';
+                stopCameraBtn.style.display = 'none';
+                openCameraBtn.innerHTML = `
+                    <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                    </svg>
+                    Capturar Foto
+                `;
+            }
+            
+            function showAlert(message, type) {
+                alertBox.textContent = message;
+                alertBox.className = `alert alert-${type}`;
+                alertBox.style.display = 'block';
+                setTimeout(() => {
+                    alertBox.style.display = 'none';
+                }, 5000);
+            }
+
+            openCameraBtn.addEventListener('click', async () => {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    captureBtn.style.display = 'inline-block';
+                    imagePreview.style.display = 'none';stopCameraBtn.style.display = 'block';
+                    openCameraBtn.textContent = '🔴 Câmera Ativa';
+                } catch (err) {
+                    showAlert('Erro ao acessar a câmera: ' + err.message, 'error');
+                }
+            });
+
+
+            function base64ToFile(base64String, fileName = "foto.jpg") {
+                const arr = base64String.split(",");
+                const mime = arr[0].match(/:(.*?);/)[1]; // ex: image/jpeg
+                const bstr = atob(arr[1]); // decodifica base64
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+
+                return new File([u8arr], fileName, { type: mime });
+            }
+
+
+            captureBtn.addEventListener('click', () => {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0);
+                
+                fotoBase64 = canvas.toDataURL('image/jpeg');
+                fotoBase64Input.value = fotoBase64;
+                imagePreview.src = fotoBase64;
+
+                imagePreview.style.display = 'block'
+                video.style.display = 'none';
+                captureBtn.style.display = 'none';
+
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                
+                openCameraBtn.textContent = '📸 Capturar Foto';
+                submitBtn.disabled = false;
+                showAlert('Foto capturada com sucesso!', 'success');
+            });
+
+            uploadBtn.addEventListener('click', () => {
+                fileInput.type = "file";
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onload = (event) => {
+                        fotoBase64 = reader.result;
+                        imagePreview.src = fotoBase64;
+                        imagePreview.style.display = 'block';
+                        video.style.display = 'none';
+                        captureBtn.style.display = 'none';
+                        submitBtn.disabled = false;
+                        showAlert('Imagem carregada com sucesso!', 'success');
+                    };
+                }
+            });
+
+            
+        </script>
+    </body>
+    </html>
+{% endblock content %}

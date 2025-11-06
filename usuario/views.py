@@ -10,10 +10,20 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from datetime import datetime, timedelta
+from django.core.files.base import ContentFile
+from .models import PessoaReconhecimento, HistoricoReconhecimento
+from deepface import DeepFace
+import base64
+import json
+import numpy as np
+from django.core import serializers
+
 from .models import *
 from casos.models import *
 from usuario.models import *
 from .forms import *
+from casos.forms import *
+from casos.models import *
 
 
 def list_researcher(request):
@@ -61,17 +71,6 @@ def buscar_pessoas(request):
         })
     
     return JsonResponse({'results': results})
-
-
-
-from django.http import JsonResponse
-from django.core.files.base import ContentFile
-from .models import PessoaReconhecimento, HistoricoReconhecimento
-from deepface import DeepFace
-import base64
-import json
-import numpy as np
-from casos.models import Caso, EnvolvimentoCaso
 
 @login_required
 def index(request):
@@ -266,7 +265,6 @@ def cadastrar_pessoa(request):
             if not nome or not foto_data:
                 return JsonResponse({'success': False, 'message': 'Dados incompletos'})
 
-            # Verificar formato base64
             if ';base64,' in foto_data:
                 format, imgstr = foto_data.split(';base64,')
                 ext = format.split('/')[-1]
@@ -274,10 +272,7 @@ def cadastrar_pessoa(request):
                 imgstr = foto_data
                 ext = 'jpg'
 
-
-            # Decodificar imagem
             foto = ContentFile(base64.b64decode(imgstr), name=f'{nome}.{ext}')
-
             
             pessoa = PessoaReconhecimento.objects.create(nome=nome, foto=foto)
 
@@ -358,7 +353,7 @@ def verificar_face(request):
                 verification = DeepFace.verify(
                     img1_path=historico.foto_verificacao.path,
                     img2_path=pessoa.foto.path,
-                    detector_backend=backends[4],  # fastmtcnn
+                    detector_backend=backends[4],
                     model_name='ArcFace',
                     align=True,
                     enforce_detection=False
@@ -368,13 +363,11 @@ def verificar_face(request):
                 distance = verification.get('distance', None)
                 confidence = verification.get('confidence', None)
 
-                # Para ArcFace: menor distância = melhor match
                 if verified and distance is not None and distance < melhor_distancia:
                     melhor_match = pessoa
                     melhor_distancia = distance
                     melhor_confianca = confidence or (100 - distance * 100)
 
-            # 🧠 Depois do loop, decide se reconheceu ou não
             if melhor_match:
                 historico.pessoa = melhor_match
                 historico.reconhecido = True
@@ -428,14 +421,171 @@ def listar_pessoas(request):
     pessoas = Pessoa.objects.all().values('id', 'nome', 'foto', 'data_cadastro')
     return JsonResponse({'pessoas': list(pessoas)})
 
+
 @login_required
-def deletar_pessoa(request, pessoa_id):
-    if request.method == 'DELETE':
-        try:
-            pessoa = Pessoa.objects.get(id=pessoa_id)
-            pessoa.delete()
-            return JsonResponse({'success': True, 'message': 'Pessoa deletada'})
-        except Pessoa.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Pessoa não encontrada'})
-    return JsonResponse({'success': False, 'message': 'Método não permitido'})
- 
+def list_people(request):
+
+    pessoas = Pessoa.objects.all()
+    
+    bi = request.GET.get('bi')
+    nome = request.GET.get('nome')
+    per_page = request.GET.get('per_page', 10)
+    page = request.GET.get('page', 1)
+
+    if nome:
+        pessoas = pessoas.filter(nome_completo__icontains=nome)
+
+    if bi:
+        pessoas = pessoas.filter(bi__icontains=bi)
+
+    paginator = Paginator(pessoas, per_page)
+
+    obj = paginator.page(page)
+
+    context={
+        'pessoas': obj,
+        'per_page': per_page,
+    }
+   
+    return render(request, 'pessoa/list_people.html', context)
+
+@login_required
+def detail_people(request, id):
+
+    pessoa = Pessoa.objects.get(id=id)
+
+    return render(request, 'pessoa/detail_people.html', {'pessoa': pessoa})
+
+@login_required
+def edit_people(request, id):
+    pessoa = Pessoa.objects.get(id=id)
+
+    alias = None
+    endereco = None
+
+    try:
+
+        alias = AliasPessoa.objects.get(pessoa=pessoa)
+
+    except AliasPessoa.DoesNotExist:
+        pass
+
+    try:
+        
+        endereco = Endereco.objects.get(pessoa=pessoa)
+
+    except Endereco.DoesNotExist:
+        pass
+
+    if request.method == 'POST':
+
+        form = EditPessoaForm(request.POST)
+
+        objetos = [obj for obj in [pessoa, endereco, alias] if obj is not None]
+
+        dados_anteriores = serializers.serialize('json', objetos)
+
+        if form.is_valid():
+
+            pessoa, endereco, alias = form.save(pessoa=pessoa)
+            endereco.save()
+
+            objetos_novo = [obj for obj in [pessoa, endereco, alias] if obj is not None]
+
+            LogAuditoria.objects.create(
+                usuario=request.user,
+                acao='update',
+                modelo='Pessoa, Endereco, alias',
+                objeto_id=str(pessoa.id),
+                descricao=f'Pessoa, Endereço e alias Atualizados : {pessoa.nome_completo}',
+                ip_origem=request.META.get('REMOTE_ADDR'),
+                user_agent=request.META.get('HTTP_USER_AGENT', ''),
+                dados_anteriores = dados_anteriores,
+                dados_novos = serializers.serialize('json', objetos_novo)
+            )
+            context={
+                'pessoa': pessoa, 
+                'form': form,
+                'sucesso': 'Atualização feita com sucesso!',
+                'endereco': endereco,
+                'alias': alias
+            }
+            pessoa.data_nascimento = pessoa.data_nascimento.strftime('%Y-%m-%d')
+            return render(request, 'pessoa/edit_people.html', context)
+        else:
+            context={
+                'pessoa': pessoa, 
+                'form': form,
+                'erro': 'Erro ao Atualizar os dados!',
+                'endereco': endereco,
+                'alias': alias
+            }
+            pessoa.data_nascimento = pessoa.data_nascimento.strftime('%Y-%m-%d')
+        
+            return render(request, 'pessoa/edit_people.html', context)
+        
+    else:
+        form = EditPessoaForm()
+        context={
+                'pessoa': pessoa, 
+                'form': form,
+                'endereco': endereco,
+                'alias': alias
+            }
+        
+        pessoa.data_nascimento = pessoa.data_nascimento.strftime('%Y-%m-%d')
+
+        return render(request, 'pessoa/edit_people.html', context)
+    
+@login_required
+@require_http_methods(["POST"])           
+def delete_people(request, id):
+
+    pessoa = Pessoa.objects.get(id=id)
+
+    alias = None
+    endereco = None
+
+    try:
+
+        alias = AliasPessoa.objects.get(pessoa=pessoa)
+
+    except AliasPessoa.DoesNotExist:
+        pass
+
+    try:
+        
+        endereco = Endereco.objects.get(pessoa=pessoa)
+
+    except Endereco.DoesNotExist:
+        pass
+
+    
+    dados = json.dumps(request.body)
+
+    password = dados.get('password')
+
+    userLogin = request.user
+
+    if not userLogin.check_password(password):
+         return JsonResponse({'erro': 'Credinciais inválidas'}, status=403)
+
+    pessoa.delete()
+
+    if alias:
+        alias.delete()
+
+    if endereco:
+        endereco.delete()
+
+    LogAuditoria.objects.create(
+        usuario=request.user,
+        acao='delete',
+        modelo='Usuaurio, Endereco, Alias',
+        objeto_id=str(pessoa.id),
+        descricao=f'Pessoa eliminada do sistema: {pessoa.nome_completo}',
+        ip_origem=request.META.get('REMOTE_ADDR'),
+        user_agent=request.META.get('HTTP_USER_AGENT', '')
+    )
+
+    return redirect('list_people')

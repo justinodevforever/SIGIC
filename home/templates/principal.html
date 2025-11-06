@@ -402,6 +402,13 @@
                     <span>Configurações</span>
                 </a>
             </div>
+
+            <div class="nav-item">
+                <a href="/list_people/" class="nav-link" id="pessoa" title="Pessoas">
+                    <i class="bi bi-person-badge"></i>
+                    <span>Pessoas</span>
+                </a>
+            </div>
             
             <div class="nav-item">
                 <a href="/list_user/" class="nav-link" id="criar_usuario" title="Usuário">
@@ -586,7 +593,15 @@
         const settings = document.getElementById('settings')
         const tipo_crime = document.getElementById('tipo_crime')
         const upload = document.getElementById('upload')
+        const pessoa = document.getElementById('pessoa')
 
+        if(
+         
+            window.location.pathname == '/list_people/'
+
+        ){
+            pessoa.classList.add('active')
+        }
         if(
          
             window.location.pathname == '/list_upload_file/' ||

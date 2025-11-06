@@ -207,105 +207,91 @@ class PessoaEnvolvidaForm(forms.Form):
 
         return cleaned_data
 
-    def save(self,caso=None, envolvimento=None):
+    def save(self,caso=None): 
+
+        telefone_principal=self.cleaned_data['telefone_principal']
+        telefone_secundario=self.cleaned_data['telefone_secundario']
+        telefone_principal = telefone_principal.replace(" ","")
+        telefone_secundario = telefone_secundario.replace(" ","")
+        
+        altura = self.cleaned_data['altura']
+        peso = self.cleaned_data['peso']
+
+        if altura in (None, ""):
+
+            altura = None
+        elif isinstance(altura, str):
+            altura = altura.replace(',','.')
+            altura = Decimal(altura)
+
+        if peso in (None, ""):
+
+            peso = None
+        elif isinstance(peso, str):
+            peso = peso.replace(',','.')
+            peso = Decimal(peso)
+
+        pessoa = Pessoa(
+
+            nome_completo=self.cleaned_data['nome_completo'],
+            nome_social=self.cleaned_data['nome_social'],
+            bi=self.cleaned_data['bi'],
+            data_nascimento=self.cleaned_data['data_nascimento'],
+            genero=self.cleaned_data['genero'],
+            estado_civil=self.cleaned_data['estado_civil'],
+            cor_olhos=self.cleaned_data['cor_olhos'],
+            altura=altura,
+            peso=peso,
+            cor_cabelo=self.cleaned_data['cor_cabelo'],
+            profissao=self.cleaned_data['profissao'],
+            escolaridade=self.cleaned_data['escolaridade'],
+            nacionalidade=self.cleaned_data['nacionalidade'],
+            telefone_principal=telefone_principal,
+            telefone_secundario=telefone_secundario,
+            email=self.cleaned_data['email'],
+            observacoes=self.cleaned_data['observacoes'],
+        )
+
+        pessoa.save()
+
         
 
-        if envolvimento is None:
+        envolvimentoCaso = EnvolvimentoCaso(
+            descricao=self.cleaned_data['descricao'],
+            caso=caso,
+            pessoa=pessoa,
+            tipo_envolvimento=self.cleaned_data['tipo_envolvimento'],
+        )
 
-            telefone_principal=self.cleaned_data['telefone_principal']
-            telefone_secundario=self.cleaned_data['telefone_secundario']
-            telefone_principal = telefone_principal.replace(" ","")
-            telefone_secundario = telefone_secundario.replace(" ","")
-            
-            altura = self.cleaned_data['altura']
-            peso = self.cleaned_data['peso']
+        envolvimentoCaso.save()
 
-            if altura in (None, ""):
-
-                altura = None
-            elif isinstance(altura, str):
-                altura = altura.replace(',','.')
-                altura = Decimal(altura)
-
-            if peso in (None, ""):
-
-                peso = None
-            elif isinstance(peso, str):
-                peso = peso.replace(',','.')
-                peso = Decimal(peso)
-
-            pessoa = Pessoa(
-
-                nome_completo=self.cleaned_data['nome_completo'],
-                nome_social=self.cleaned_data['nome_social'],
-                bi=self.cleaned_data['bi'],
-                data_nascimento=self.cleaned_data['data_nascimento'],
-                genero=self.cleaned_data['genero'],
-                estado_civil=self.cleaned_data['estado_civil'],
-                cor_olhos=self.cleaned_data['cor_olhos'],
-                altura=altura,
-                peso=peso,
-                cor_cabelo=self.cleaned_data['cor_cabelo'],
-                profissao=self.cleaned_data['profissao'],
-                escolaridade=self.cleaned_data['escolaridade'],
-                nacionalidade=self.cleaned_data['nacionalidade'],
-                telefone_principal=telefone_principal,
-                telefone_secundario=telefone_secundario,
-                email=self.cleaned_data['email'],
-                observacoes=self.cleaned_data['observacoes'],
-            )
-
-            pessoa.save()
-
-            
-
-            envolvimentoCaso = EnvolvimentoCaso(
-                descricao=self.cleaned_data['descricao'],
-                caso=caso,
+        if self.cleaned_data['tipo_endereco']:
+            endereco = Endereco(
                 pessoa=pessoa,
-                tipo_envolvimento=self.cleaned_data['tipo_envolvimento'],
+                tipo=self.cleaned_data['tipo_endereco'],
+                logradouro=self.cleaned_data['logradouro'],
+                numero=self.cleaned_data['numero'],
+                complemento=self.cleaned_data['complemento'],
+                bairro=self.cleaned_data['bairro'],
+                ponto_referencia=self.cleaned_data['ponto_referencia'],
+                cidade=self.cleaned_data['cidade'],
+                estado=self.cleaned_data['estado'],
             )
 
-            envolvimentoCaso.save()
+            endereco.save()
 
-            if self.cleaned_data['tipo_endereco']:
-                endereco = Endereco(
-                    pessoa=pessoa,
-                    tipo=self.cleaned_data['tipo_endereco'],
-                    logradouro=self.cleaned_data['logradouro'],
-                    numero=self.cleaned_data['numero'],
-                    complemento=self.cleaned_data['complemento'],
-                    bairro=self.cleaned_data['bairro'],
-                    ponto_referencia=self.cleaned_data['ponto_referencia'],
-                    cidade=self.cleaned_data['cidade'],
-                    estado=self.cleaned_data['estado'],
-                )
+        if self.cleaned_data['tipo_alias']:
 
-                endereco.save()
+            alias = AliasPessoa(
+                pessoa=pessoa,
+                tipo_alias=self.cleaned_data['tipo_alias'],
+                nome_alias=self.cleaned_data['nome_alias'],
+            )
 
-            if self.cleaned_data['tipo_alias']:
+            alias.save()
 
-                alias = AliasPessoa(
-                    pessoa=pessoa,
-                    tipo_alias=self.cleaned_data['tipo_alias'],
-                    nome_alias=self.cleaned_data['nome_alias'],
-                )
+        return pessoa, envolvimentoCaso
 
-                alias.save()
-
-            return pessoa, envolvimentoCaso
-            
-        else:        
-
-            print(envolvimento.id)
-            envolvimento.tipo_envolvimento=self.cleaned_data['tipo_envolvimento'],
-            envolvimento.observacoes=self.cleaned_data['observacoes'],
-            
-
-            envolvimento.save()
-
-            return envolvimento
-        
 class FormEnvolvimento(forms.Form):
 
     tipo_envolvimento = forms.ChoiceField(

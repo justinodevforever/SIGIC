@@ -226,24 +226,28 @@ def list_case(request):
         'tipo_crime', 'investigador_principal', 'delegado_responsavel'
     )
     
-    status_filter = request.GET.get('status')
-    tipo_filter = request.GET.get('tipo_crime')
-    prioridade_filter = request.GET.get('prioridade')
-    investigador_filter = request.GET.get('investigador')
+    filter1 = request.GET.get('filter1')
+   
+    filter2 = request.GET.get('filter2')
     search = request.GET.get('search')
     per_page = request.GET.get('per_page', 20)
-    
-    if status_filter:
-        casos = casos.filter(status=status_filter)
-    
-    if tipo_filter:
-        casos = casos.filter(tipo_crime_id=tipo_filter)
-    
-    if prioridade_filter:
-        casos = casos.filter(prioridade=prioridade_filter)
-    
-    if investigador_filter:
-        casos = casos.filter(investigador_principal_id=investigador_filter)
+    page = request.GET.get('page')
+
+    if filter1:
+
+        try:
+            filter1 = int(filter1)
+            casos = casos.filter(
+                prioridade=filter1
+            )
+
+        except Exception as e:
+            casos = casos.filter(
+                status=filter1
+            )
+   
+    if filter2:
+        casos = casos.filter(investigador_principal__bi__icontains=filter2)
     
     if search:
         casos = casos.filter(
@@ -256,7 +260,6 @@ def list_case(request):
     casos = casos.order_by(order_by)
     
     paginator = Paginator(casos, per_page)
-    page = request.GET.get('page')
     casos = paginator.get_page(page)
     
     tipos_crime = TipoCrime.objects.filter(ativo=True)
@@ -270,13 +273,11 @@ def list_case(request):
         'status_choices': Caso.STATUS_CHOICES,
         'prioridade_choices': Caso.PRIORIDADE_CHOICES,
         'per_page': per_page,
-        'current_filters': {
-            'status': status_filter,
-            'tipo_crime': tipo_filter,
-            'prioridade': prioridade_filter,
-            'investigador': investigador_filter,
-            'search': search,
-        }
+        
+        'filter1': filter1,
+        'filter2': filter2,
+        'search': search,
+        
     }
     
     return render(request, 'caso/list_case.html', context)
@@ -628,25 +629,30 @@ def criminal_record(request):
 def list_indiidual_involved(request):
     
     envolvimentos = EnvolvimentoCaso.objects.filter(pessoa__ativo=True)
-    print(envolvimentos)
+   
     
-    nome_filter = request.GET.get('nome')
+    nome_filter = request.GET.get('nome_filter')
     bi_filter = request.GET.get('bi')
-    tipo_filter = request.GET.get('tipo_pessoa')
     per_page = request.GET.get('per_page', 20)
     
     if nome_filter:
-        envolvimentos = envolvimentos.filter(pessoa_pessoanome_completo__icontains=nome_filter)
+        envolvimentos = envolvimentos.filter(pessoa__nome_completo__icontains=nome_filter)
     
     if bi_filter:
         envolvimentos = envolvimentos.filter(pessoa__bi=bi_filter)
     
-    if tipo_filter:
-        envolvimentos = envolvimentos.filter(
-            tipo_envolvimento=tipo_filter
-        ).distinct()
     
-    envolvimentos = envolvimentos.order_by('pessoa__nome_completo')
+    order_by = request.GET.get('order_by', '-criado_por')
+
+    if order_by == 'numero_caso':
+
+        envolvimentos = envolvimentos.order_by(f'caso__{order_by}')
+
+    elif order_by == 'nome_completo':
+        envolvimentos = envolvimentos.order_by(f'pessoa__{order_by}')
+
+    else:
+       envolvimentos =  envolvimentos.order_by(order_by)
     
     paginator = Paginator(envolvimentos, per_page)
     page = request.GET.get('page')
@@ -655,12 +661,8 @@ def list_indiidual_involved(request):
     context = {
         'envolvimentos': obj,
         'per_page': per_page,
-        'tipo_choices': EnvolvimentoCaso.TIPO_ENVOLVIMENTO_CHOICES,
-        'current_filters': {
-            'nome': nome_filter,
-            'bi': bi_filter,
-            'tipo_pessoa': tipo_filter,
-        }
+        'nome_filter': nome_filter,
+        'bi': bi_filter,
     }
     
     return render(request, 'pessoas_envolvida/list_indiidual_involved.html', context)

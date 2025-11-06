@@ -78,42 +78,36 @@ def create_evidence(request, caso_id):
 
 @login_required
 def list_evidence(request):
+  
+    evidencias = Evidencia.objects.all()
 
-    if request.method == 'POST':
+    search = request.GET.get('search')
+    order_by = request.GET.get('order_by', '-data_criacao')
+    page = request.GET.get('page', 1)
+    per_page = request.GET.get('per_page', 20)
 
-        numero_evidencia = request.POST['numero_evidencia']
-        evidencias = Evidencia.objects.filter(numero_evidencia__icontains=numero_evidencia)
+    print(search)
 
-        per_page = request.GET.get('per_page', 20)
-        paginator = Paginator(evidencias, per_page)
-        page = request.GET.get('page', 1)
+    if search:
+        evidencias = evidencias.filter(numero_evidencia=search)
 
-        objs = paginator.page(page)
-
-        context={
-            'evidencias': objs,
-            'per_page': per_page,
-        }
-
-        return render(request, 'evidencia/list_evidence.html', context)
+    if order_by == 'numero_caso':
+        evidencias = evidencias.order_by(f'caso__{order_by}')
 
     else:
+        evidencias = evidencias.order_by(order_by)
 
-        evidencias = Evidencia.objects.all()
 
-        page = request.GET.get('page', 1)
-        per_page = request.GET.get('per_page', 20)
+    paginator = Paginator(evidencias, per_page)
+    objs = paginator.page(page)
 
-        paginator = Paginator(evidencias, per_page)
+    context={
+        'evidencias': objs,
+        'per_page': per_page,
+        'search': search
+    }
 
-        objs = paginator.page(page)
-
-        context={
-            'evidencias': objs,
-            'per_page': per_page,
-        }
-
-        return render(request, 'evidencia/list_evidence.html', context)
+    return render(request, 'evidencia/list_evidence.html', context)
 
 @login_required
 def detail_evidence(request, id):
