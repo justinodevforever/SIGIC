@@ -10,7 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --laranja: #FF8C42;
+            --amarelo: #ffc107;
             --azul-escuro: #1A3A52;
             --azul-medio: #2E5C7E;
             --cinza-claro: #F5F7FA;
@@ -38,7 +38,7 @@
 
         .header-bg {
             height: 150px;
-            background: linear-gradient(135deg, var(--azul-escuro) 0%, var(--laranja) 100%);
+            background: linear-gradient(135deg, var(--azul-escuro) 0%, var(--amarelo) 100%);
             position: relative;
         }
 
@@ -52,7 +52,7 @@
             height: 140px;
             border-radius: 50%;
             background: var(--branco);
-            border: 5px solid var(--laranja);
+            border: 5px solid var(--amarelo);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -71,14 +71,14 @@
 
         .profile-role {
             font-size: 1.1rem;
-            color: var(--laranja);
+            color: var(--amarelo);
             font-weight: 600;
             margin-bottom: 20px;
         }
 
         .profile-badge {
             display: inline-block;
-            background: linear-gradient(135deg, var(--laranja) 0%, #FF6B42 100%);
+            background: linear-gradient(135deg, var(--amarelo) 0%, #1e3a5f 100%);
             color: var(--branco);
             padding: 8px 16px;
             border-radius: 25px;
@@ -94,7 +94,7 @@
             padding: 25px;
             margin-bottom: 25px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            border-left: 5px solid var(--laranja);
+            border-left: 5px solid var(--amarelo);
             transition: all 0.3s ease;
         }
 
@@ -114,7 +114,7 @@
         }
 
         .section-title i {
-            color: var(--laranja);
+            color: var(--amarelo);
             font-size: 1.5rem;
         }
 
@@ -139,7 +139,7 @@
         }
 
         .info-label i {
-            color: var(--laranja);
+            color: var(--amarelo);
         }
 
         .info-value {
@@ -162,7 +162,7 @@
             text-align: center;
             box-shadow: 0 8px 25px rgba(0,0,0,0.08);
             transition: all 0.3s ease;
-            border-top: 4px solid var(--laranja);
+            border-top: 4px solid var(--amarelo);
         }
 
         .stat-card:hover {
@@ -173,7 +173,7 @@
         .stat-number {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--laranja);
+            color: var(--amarelo);
             margin-bottom: 5px;
         }
 
@@ -195,12 +195,12 @@
             gap: 8px;
         }
 
-        .btn-laranja {
-            background: linear-gradient(135deg, var(--laranja) 0%, #FF6B42 100%);
+        .btn-amarelo {
+            background: linear-gradient(135deg, var(--amarelo) 0%, #1e3a5f 100%);
             color: var(--branco);
         }
 
-        .btn-laranja:hover {
+        .btn-amarelo:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(255, 140, 66, 0.3);
             color: var(--branco);
@@ -248,11 +248,9 @@
     </style>
 </head>
 <body>
-   
 
-    <!-- Container Principal -->
     <div class="profile-container">
-        <!-- Header Perfil -->
+      
         <div class="profile-header">
             <div class="header-bg"></div>
             <div class="profile-content">
@@ -260,17 +258,17 @@
                     <i class="fas fa-user-secret"></i>
                 </div>
                 <h1 class="profile-name">{{request.user.get_full_name}}</h1>
-                <p class="profile-role">{{request.user.cargo}}</p>
+                <p class="profile-role text-white badge bg-primary">{{request.user.get_cargo_display}}</p>
                 <span class="profile-badge">
                     <i class="fas fa-check-circle"></i> Perfil Ativo
                 </span>
                 <div>
-                    <button class="btn btn-custom btn-laranja">
+                    <a href="/edit_perfil/" class="btn btn-custom btn-amarelo">
                         <i class="fas fa-edit"></i> Editar Perfil
-                    </button>
-                    <button class="btn btn-custom btn-azul">
+                    </a>
+                    <a class="btn btn-custom btn-azul">
                         <i class="fas fa-key"></i> Alterar Senha
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
@@ -278,15 +276,15 @@
         <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number">24</div>
+                <div class="stat-number">{{casos}}</div>
                 <div class="stat-label">Casos Resolvidos</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">8</div>
+                <div class="stat-number">{{casosAtivos}}</div>
                 <div class="stat-label">Casos Ativos</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">98%</div>
+                <div class="stat-number">{{percentagens}}%</div>
                 <div class="stat-label">Taxa de Sucesso</div>
             </div>
             <div class="stat-card">

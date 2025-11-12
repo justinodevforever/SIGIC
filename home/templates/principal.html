@@ -37,6 +37,7 @@
             --light-gray: #f8f9fa;
             --border-color: #e0e6ed;
         }
+
         textarea{
             resize: none;
         }
@@ -318,7 +319,7 @@
             </div>
 
             <div class="nav-item">
-                <a href="/list_indiidual_involved/" class="nav-link" id="envolvimento" title="Envolvimento Casos">
+                <a href="/list_individual_involved/" class="nav-link" id="envolvimento" title="Envolvimento Casos">
                     <i class="bi bi-folder2-open"></i>
                     <span>Envolvimento Casos</span>
                 </a>
@@ -666,8 +667,8 @@
 
         if(
             window.location.pathname.split('/')[1] == 'detail_individual_invalid'||
-            window.location.pathname.split('/')[1] == 'edit_indiidual_involved'||
-            window.location.pathname == '/list_indiidual_involved/'
+            window.location.pathname.split('/')[1] == 'edit_individual_involved'||
+            window.location.pathname == '/list_individual_involved/'
 
         ){
             envolvimento.classList.add('active')
@@ -716,7 +717,7 @@
             window.location.pathname.split('/')[1] == 'create_evidence'||
             window.location.pathname.split('/')[1] == 'create_event'||
             window.location.pathname.split('/')[1] == 'detail_case'||
-            window.location.pathname.split('/')[1] == 'create_indiidual_involved'||
+            window.location.pathname.split('/')[1] == 'create_individual_involved'||
             window.location.pathname == '/list_case/'
 
         ){

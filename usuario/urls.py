@@ -4,6 +4,9 @@ from django.conf.urls.static import static
 from .views import *
 
 urlpatterns = [
+    path('perfil/', perfil, name='perfil' ),
+    path('edit_perfil/', edit_perfil, name='edit_perfil' ),
+
     path('reconhecimento/', index, name='index'),
     path('cadastrar/', cadastrar_pessoa, name='cadastrar_pessoa'),
     path('verificar/', verificar_face, name='verificar_face'),

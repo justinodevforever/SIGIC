@@ -26,15 +26,29 @@ from django.core import serializers
 
 def list_suspect(request):
 
-    suspeitos = EnvolvimentoCaso.objects.filter(tipo_envolvimento='suspeito').order_by('caso__numero_caso')
+    suspeitos = EnvolvimentoCaso.objects.filter(tipo_envolvimento='suspeito')
 
     page = request.GET.get('page')
     per_page = request.GET.get('per_page', 20)
+    bi = request.GET.get('bi')
+    order_by = request.GET.get('order_by', 'caso__numero_caso')
+
+    if bi:
+        suspeitos = suspeitos.filter(pessoa__bi=bi)
+    
+    suspeitos = suspeitos.order_by(order_by)
 
     paginator = Paginator(suspeitos, per_page)
     objec = paginator.get_page(page)
 
-    return render(request, 'caso/suspect.html', {'suspeitos': objec, 'per_page': per_page})
+    context = {
+        'suspeitos': objec,
+        'per_page': per_page,
+        'bi': bi,
+        'order_by': order_by
+    }
+
+    return render(request, 'caso/suspect.html', context)
     
 def detail_suspect(request, id):
 
@@ -626,7 +640,7 @@ def criminal_record(request):
 
 
 @login_required
-def list_indiidual_involved(request):
+def list_individual_involved(request):
     
     envolvimentos = EnvolvimentoCaso.objects.filter(pessoa__ativo=True)
    
@@ -681,7 +695,7 @@ def detail_individual_invalid(request, pessoa_id):
     return render(request, 'pessoas_envolvida/detail_individual_invalid.html', context)
 
 @login_required
-def create_indiidual_involved(request, caso_id):
+def create_individual_involved(request, caso_id):
 
     caso = Caso.objects.get(id=caso_id)
     
@@ -786,7 +800,7 @@ def create_indiidual_involved(request, caso_id):
     return render(request, 'pessoas_envolvida/create_indiidual_involved.html', 
     {'form': form, 'caso': caso})
 
-def edit_indiidual_involved(request, id):
+def edit_individual_involved(request, id):
 
     envolvimento = EnvolvimentoCaso.objects.get(id=id)
     
@@ -1082,56 +1096,33 @@ def create_event(request, caso_id):
 @login_required
 def list_event(request):
 
+    eventos = EventoTimeline.objects.all()
 
-    if request.method == 'POST':
-        numero_caso = request.POST['numero_caso']
+    numero_caso = request.GET.get('numero_caso')
+    order_by = request.GET.get('order_by', '-data_hora')
+    page = request.GET.get('page')
+    per_page = request.GET.get('per_page', 20)
 
-        eventos = EventoTimeline.objects.filter(
-            caso__numero_caso__icontains=numero_caso
-            ).order_by('-data_hora')
-        
-        page = request.GET.get('page')
-        per_page = request.GET.get('per_page', 20)
+    if numero_caso:
+        eventos = eventos.filter(
+            caso__numero_caso=numero_caso
+            )
+    
+    eventos = eventos.order_by(order_by)
 
-        paginator = Paginator(eventos, per_page)
-        objs = paginator.get_page(page)
-        
-        context = {
-            'eventos': objs,
-            'per_page':per_page
-        }
-
-        return render(request, 'evento/list_event.html', context)
-
-    else:
-
-        eventos = EventoTimeline.objects.all().order_by('data_hora')
-
-        eventos_json = []
-        for evento in eventos:
-            eventos_json.append({
-                'title': evento.titulo,
-                'start': evento.data_hora.isoformat(),
-                'description': evento.descricao,
-                'type': evento.tipo_evento,
-                'importance': evento.importancia
-            })
-        
-        page = request.GET.get('page')
-        per_page = request.GET.get('per_page', 20)
-
-        paginator = Paginator(eventos, per_page)
-        objs = paginator.get_page(page)
-        
-        context = {
-            'eventos': objs,
-            'eventos_json': json.dumps(eventos_json),
-            'per_page':per_page,
-        }
+    paginator = Paginator(eventos, per_page)
+    objs = paginator.get_page(page)
+    
+    context = {
+        'eventos': objs,
+        'per_page':per_page,
+        'numero_caso': numero_caso,
+        'order_by': order_by
+    }
 
 
 
-        return render(request, 'evento/list_event.html', context)
+    return render(request, 'evento/list_event.html', context)
 
 @login_required
 def edit_event(request, id):
@@ -1323,13 +1314,17 @@ def list_type_crime(request):
 
     per_page = request.GET.get('per_page', 20)
     page = request.GET.get('page', 1)
+    order_by = request.GET.get('order_by', 'nome')
+
+    tipos_crime =  tipos_crime.order_by(order_by)
 
     paginator = Paginator(tipos_crime, per_page)
     obj = paginator.get_page(page)
 
     context = {
         'tipos_crimes': obj,
-        'per_page':per_page
+        'per_page':per_page,
+        'order_by':order_by
     }
     return render(request, 'tipo_crime/list_type_crime.html', context)
 

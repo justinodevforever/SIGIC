@@ -160,10 +160,6 @@ class EditUserForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     
-    cargo = forms.CharField(
-        required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
     is_active = forms.BooleanField(
         required=False,
         widget=forms.CheckboxInput(attrs={'class': 'form-control'})
@@ -236,6 +232,94 @@ class EditUserForm(forms.Form):
         self.instance.telefone = self.cleaned_data['telefone']
         self.instance.is_active = self.cleaned_data['is_active']
         self.instance.ativo = self.cleaned_data['is_active']
+
+        self.instance.save()
+
+        return self.instance
+    
+class EditPerfilForm(forms.Form):
+    
+
+    username = forms.CharField(
+        required=True,
+        widget= forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    first_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    last_name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    departamento = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    telefone = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    email = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    
+    bi = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    data_nascimento = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    estado_civil = forms.ChoiceField(
+        choices=Usuario.ESTADO_CIVIL_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    genero = forms.ChoiceField(
+        choices=Usuario.GENERO_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    def __init__(self, *args, **kwargs):
+
+        self.instance = kwargs.pop('instance', None)
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        username = cleaned_data.get('username')
+       
+        try:
+            if username:
+                user = Usuario.objects.get(username=username)
+
+                if user and self.instance.id != user.id:
+
+                    self.add_error('username', 'Esse nome do usuário já existe!')
+
+        except Usuario.DoesNotExist:
+            pass
+
+        return cleaned_data
+    
+    def save(self):
+
+        self.instance.username = self.cleaned_data['username']
+        self.instance.last_name = self.cleaned_data['last_name']
+        self.instance.first_name = self.cleaned_data['first_name']
+        self.instance.departamento = self.cleaned_data['departamento']
+        self.instance.email = self.cleaned_data['email']
+        self.instance.estado_civil = self.cleaned_data['estado_civil']
+        self.instance.genero = self.cleaned_data['genero']
+        self.instance.bi = self.cleaned_data['bi']
+        self.instance.telefone = self.cleaned_data['telefone']
 
         self.instance.save()
 

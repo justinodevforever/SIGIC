@@ -20,6 +20,19 @@
             <h1 style="margin-left: 20px;" class="text-warning">Lista de arquivos de evidência</h1>            
         </div>
 
+        <div style="display: flex; width: 97%; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+
+            <form action="/list_upload_file/" method="get" 
+                class="btn-group btn-group-sm">
+
+                <input type="search" name="numero_evidenvia" style="border-radius: 4px 0px 0px 4px;"
+                class="form-control" placeholder="Número da evidência">
+
+                <button class="btn btn-warning"><i class="bi bi-search"></i></button>
+
+            </form>
+        </div>
+
         <div class="card" style="display:flex; width: 97%; align-self: center;">
 
             <form method="get" class="form-inline mb-3" style="padding: 12px; height: 7px;">
@@ -41,7 +54,14 @@
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>Número de evidência</th>
+                                <th>
+                                    Número de evidência
+                                    <a href="?order_by=evidencia__numero_evidencia{% if numero_evidenvia %}&numero_evidenvia={{ numero_evidenvia|urlencode  }}{% endif %}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                    <a href="/list_upload_file/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
+                                </th>
                                 <th>Tipo de evidência</th>
                                 <th>Nome do arquivo</th>
                                 <th>Tipo de arquivo</th>

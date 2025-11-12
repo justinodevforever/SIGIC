@@ -86,7 +86,6 @@ def list_evidence(request):
     page = request.GET.get('page', 1)
     per_page = request.GET.get('per_page', 20)
 
-    print(search)
 
     if search:
         evidencias = evidencias.filter(numero_evidencia=search)
@@ -322,11 +321,14 @@ def edit_expertise(request, id):
 @login_required
 def list_evidence_expertise(request):
 
-    tipo = request.GET.get('tipo')
-   
+    pericas = Pericia.objects.all()
 
+    tipo = request.GET.get('tipo')
     numero_evidencia = request.GET.get('numero_evidencia')
-    pericas = Pericia.objects.all().order_by('-data_criacao')
+    order_by = request.GET.get('order_by', '-data_criacao')
+    page = request.GET.get('page', 1)
+    per_page = request.GET.get('per_page', 20)
+
 
     if numero_evidencia:
 
@@ -335,15 +337,14 @@ def list_evidence_expertise(request):
     if tipo:
         pericas = Pericia.objects.filter(tipo__icontains=tipo)
 
+    pericas = pericas.order_by(order_by)
+
     for p in pericas:
         if len(p.conclusao) > 20:
             p.conclusao = f'{p.conclusao[:20]}...'
 
         if len(p.resultado) > 20:
             p.resultado = f'{p.resultado[:20]}...'
-
-    page = request.GET.get('page', 1)
-    per_page = request.GET.get('per_page', 20)
 
     paginator = Paginator(pericas, per_page)
 
@@ -352,6 +353,9 @@ def list_evidence_expertise(request):
     context={
         'pericias': objs,
         'per_page': per_page,
+        'numero_evidencia': numero_evidencia,
+        'tipo': tipo,
+        'order_by': order_by
     }
 
     return render(request, 'pericia/list_evidence_expertise.html', context)
@@ -424,7 +428,7 @@ def moviment_evidence(request, id):
             messages.success(request, 'Movimentação de evidência feita com sucesso!')
             return render(request, 'evidencia/moviment.html', context)
         else:
-            messages.success(request, 'Erro ao fazer movimentação de evidência!')
+            messages.error(request, 'Erro ao fazer movimentação de evidência!')
             return render(request, 'evidencia/moviment.html', context)
     else:
         form = CadeiaCustodiaForm()
@@ -538,6 +542,13 @@ def list_upload_file(request):
 
     per_page = request.GET.get('per_page', 10)
     page = request.GET.get('page', 1)
+    numero_evidenvia = request.GET.get('numero_evidenvia')
+    order_by = request.GET.get('order_by', 'data_upload')
+
+    if numero_evidenvia:
+        arquivos = arquivos.filter(evidencia__numero_evidencia=numero_evidenvia)
+
+    arquivos = arquivos.order_by(order_by)
 
     paginator = Paginator(arquivos, per_page)
 
@@ -545,7 +556,9 @@ def list_upload_file(request):
 
     context = {
         'arquivos': obj,
-        'per_page': per_page
+        'per_page': per_page,
+        'numero_evidenvia':numero_evidenvia,
+        'order_by': order_by
     }
 
     return render(request, 'upload_file/list_upload_file.html', context)

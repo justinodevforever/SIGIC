@@ -18,6 +18,28 @@
             </a>
             
         </div>
+
+        <div style="display: flex; width: 97%; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        
+            <form action="/list_user/" method="get" 
+             class="btn-group btn-group-sm">
+               
+                <input type="search" name="nome_filter" style="border-radius: 4px 0px 0px 4px;"
+                class="form-control" placeholder="Nome dao usário">
+
+                <button class="btn btn-warning"><i class="bi bi-search"></i></button>
+            </form>
+
+            <form action="/list_user/" method="get" 
+             class="btn-group btn-group-sm">
+                
+                <input type="search" name="bi" style="border-radius: 4px 0px 0px 4px;"
+                class="form-control" placeholder="Número de B.I">
+                <button class="btn btn-warning"><i class="bi bi-search"></i></button>
+            </form>
+            
+        </div>
+
         <div class="card" style="display:flex; width: 97%; align-self: center;">
 
             <form method="get" class="form-inline mb-3" style="padding: 12px; height: 7px;">
@@ -39,7 +61,14 @@
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>Nome</th>
+                                <th>
+                                    Nome
+                                    <a href="?order_by=first_name{% if bi %}&bi={{ bi }}{% endif %}{% if nome_filter %}&nome_filter={{ nome_filter }}{% endif %}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                    <a href="/list_user/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
+                                </th>
                                 <th>Nº de distintivo</th>
                                 <th>Telefone</th>
                                 <th>Cargo</th>

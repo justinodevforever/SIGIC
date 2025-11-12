@@ -25,6 +25,80 @@ from .forms import *
 from casos.forms import *
 from casos.models import *
 
+def perfil(request):
+    user = Usuario.objects.get(id=request.user.id)
+
+    
+    if request.user.cargo == 'investigador':
+
+        casos = Caso.objects.filter(
+            Q(investigador_principal=request.user) |
+            Q(investigadores_apoio=request.user) 
+        ).count()
+
+        casosResolvidos = Caso.objects.filter(
+           Q( Q(investigador_principal=request.user) |
+            Q(investigadores_apoio=request.user)) &
+            Q(status='concluido')
+        ).count()
+
+        casosAtivos = Caso.objects.filter(
+           Q( Q(investigador_principal=request.user) |
+            Q(investigadores_apoio=request.user)) &
+            Q(status='aberto')
+        ).count()
+
+    if request.user.cargo == 'delegado':
+
+        casos = Caso.objects.filter(delegado_responsavel=request.user).count()
+        casosResolvidos = Caso.objects.filter(
+            Q(delegado_responsavel=request.user) &
+            Q(status='concluido')
+            ).count()
+        
+        casosAtivos = Caso.objects.filter(
+            Q(delegado_responsavel=request.user) &
+             Q(status='aberto')
+            ).count()
+        
+    if casosResolvidos > 0:
+        percentagens = ( casosResolvidos / casos ) * 100
+    else:
+        percentagens = 0
+   
+
+    context = {
+        'user': user,
+        'percentagens': percentagens,
+        'casos': casos,
+        'casosAtivos': casosAtivos
+    }
+
+    return render(request, 'perfil.html', context)
+
+def edit_perfil(request):
+
+    if request.method == 'POST':
+
+        form = EditPerfilForm(request.POST, instance=request.user)
+
+        if form.is_valid():
+
+            us = form.save()
+
+            request.user.data_nascimento = request.user.data_nascimento.strftime('%Y-%m-%d')
+            return render(request, 'edit_perfil.html', {'form': form, 'sucesso':'Atualização do perfil Feita com sucesso!'})
+        
+        else:
+
+            request.user.data_nascimento = request.user.data_nascimento.strftime('%Y-%m-%d')
+            return render(request, 'edit_perfil.html', {'form': form, 'erro': 'erro ao atualizar o perfil!'})
+    else:
+
+        form = EditPerfilForm()
+
+        request.user.data_nascimento = request.user.data_nascimento.strftime('%Y-%m-%d')
+        return render(request, 'edit_perfil.html', {'form': form})
 
 def list_researcher(request):
     
@@ -33,9 +107,13 @@ def list_researcher(request):
     page = request.GET.get('page', 1)
     per_page = request.GET.get('per_page', 20)
     distintivo = request.GET.get('distintivo')
+    order_by = request.GET.get('order_by', 'data_criacao')
 
     if distintivo:
+        
         researchers = Usuario.objects.filter(matricula=distintivo.strip())
+
+    researchers = researchers.order_by(order_by)
 
     paginator = Paginator(researchers, per_page)
 
@@ -194,24 +272,35 @@ def edit_user(request, id):
 @login_required
 def list_user(request):
 
-    try:
-        users = Usuario.objects.all()
+    users = Usuario.objects.all()
 
-        num_page = request.GET.get('page', 1)
-        per_page = request.GET.get('per_page', 20)
+    num_page = request.GET.get('page', 1)
+    per_page = request.GET.get('per_page', 20)
 
-        paginator = Paginator(users, per_page)
+    nome_filter = request.GET.get('nome_filter')
+    bi = request.GET.get('bi')
+    order_by = request.GET.get('order_by', 'data_criacao')
 
-        objetos = paginator.page(num_page)
+    if nome_filter:
+        users = users.filter(first_name__icontains=nome_filter)
 
-    except PageNotAnInteger:
+    if bi:
+        users = users.filter(bi=bi)
 
-      objetos = paginator.page(1)
+    users = users.order_by(order_by)
 
-    except EmptyPage:
-      objetos = paginator.page(paginator.num_pages)
+    paginator = Paginator(users, per_page)
 
-    return render(request, 'usuario/list_user.html', {'users': objetos,'per_page': per_page,})
+    objetos = paginator.page(num_page)
+    
+    context = {
+        'users': objetos,
+        'per_page': per_page,
+        'nome_filter': nome_filter,
+        'bi': bi
+    }
+
+    return render(request, 'usuario/list_user.html', context)
 
 @login_required
 def view_user(request, id):
@@ -431,6 +520,7 @@ def list_people(request):
     nome = request.GET.get('nome')
     per_page = request.GET.get('per_page', 10)
     page = request.GET.get('page', 1)
+    order_by = request.GET.get('order_by', '-data_criacao')
 
     if nome:
         pessoas = pessoas.filter(nome_completo__icontains=nome)
@@ -438,13 +528,16 @@ def list_people(request):
     if bi:
         pessoas = pessoas.filter(bi__icontains=bi)
 
+    pessoas = pessoas.order_by(order_by)
     paginator = Paginator(pessoas, per_page)
-
     obj = paginator.page(page)
 
     context={
         'pessoas': obj,
         'per_page': per_page,
+        'nome': nome,
+        'bi': bi,
+        'order_by': order_by
     }
    
     return render(request, 'pessoa/list_people.html', context)

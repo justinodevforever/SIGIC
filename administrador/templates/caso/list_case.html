@@ -96,6 +96,7 @@
                                     >
                                         <i class="bi bi-arrow-down-up"></i>
                                     </a>
+                                    <a href="/list_case/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
                                 </th>
                                 <th>
                                     Título 
@@ -103,6 +104,7 @@
                                     >
                                         <i class="bi bi-arrow-down-up"></i>
                                     </a>
+                                    <a href="/list_case/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
                                 </th>
                                 <th>Prioridade</th>
                                 <th>Tipo</th>
@@ -136,7 +138,7 @@
                                 <td>{{caso.get_status_display}}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm" >
-                                    <a href="{% url 'create_indiidual_involved' caso.id%}" 
+                                    <a href="{% url 'create_individual_involved' caso.id%}" 
                                     title='Pessoas Envolvidas' class="btn btn-outline-success" >
                                         <i class="bi bi-person-plus"></i>
                                         

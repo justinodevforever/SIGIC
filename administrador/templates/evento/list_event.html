@@ -10,16 +10,21 @@
 <body>
   
     <div style="display: flex; width: 100%; align-items: center; justify-content: center; flex-direction: column;">
+        
         <div style="display: flex; width: 97%; justify-content: space-between; align-items: center;">
             <h1 style="margin-left: 20px;" class="text-warning">Lista de eventos</h1>
-            <form action="/list_event/" method="post" 
+
+            <form action="/list_event/" method="get" 
              class="btn-group btn-group-sm">
-                {% csrf_token %}
+              
                 <input type="search" name="numero_caso" style="border-radius: 4px 0px 0px 4px;"
                 class="form-control" placeholder="Número de caso">
                 <button class="btn btn-warning"><i class="bi bi-search"></i></button>
+
             </form>
+
         </div>
+
         <div class="card" style="display:flex; width: 97%; align-self: center;">
 
             <form method="get" class="form-inline mb-3" style="padding: 12px; height: 7px;">
@@ -41,8 +46,22 @@
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>ID caso</th>
-                                <th>Título</th>
+                                <th>
+                                    ID caso
+                                    <a href="?order_by=caso__numero_caso{% if numero_caso %}&numero_caso={{ numero_caso  }}{%endif%}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                    <a href="/list_event/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
+                                </th>
+                                <th>
+                                    Título
+                                    <a href="?order_by=titulo{% if numero_caso %}&numero_caso={{ numero_caso  }} {%endif%}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                    <a href="/list_event/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
+                                </th>
                                 <th>Tipo</th>
                                 <th>Importância</th>
                                 <th>Localização</th>

@@ -1,0 +1,453 @@
+{% extends 'principal.html' %}
+
+
+{% block content %}
+    <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil</title>
+    <style>
+
+
+        :root {
+            --amarelo: #ffc107;
+            --azul-escuro: #1A3A52;
+            --azul-medio: #2E5C7E;
+            --cinza-claro: #F5F7FA;
+            --branco: #FFFFFF;
+        }
+
+
+        .container-perfil {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background: var(--branco);
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--azul-escuro) 0%, var(--azul-medio) 100%);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            border-radius: 10px 10px 0px 0px;
+        }
+
+        .header h1 {
+            color: var(--branco);
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--amarelo);
+            font-size: 0.95em;
+        }
+
+        .profile-picture-section {
+            padding: 40px;
+            text-align: center;
+            background: var(--cinza-claro);
+            border-bottom: 3px solid var(--amarelo);
+        }
+
+        .profile-picture-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid var(--amarelo);
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .change-photo-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: var(--amarelo);
+            color: var(--azul-escuro);
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .change-photo-btn:hover {
+            transform: scale(1.1);
+            background: var(--azul-medio);
+            color: var(--amarelo);
+        }
+
+        .form-section {
+            padding: 40px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            color: var(--azul-escuro);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--amarelo);
+            box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .section-title {
+            color: var(--azul-escuro);
+            font-size: 1.3em;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--amarelo);
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--amarelo);
+            margin-right: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--amarelo) 0%, #ffdb4d 100%);
+            color: var(--azul-escuro);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--branco);
+            color: var(--azul-escuro);
+            border: 2px solid var(--azul-medio);
+        }
+
+        .btn-secondary:hover {
+            background: var(--cinza-claro);
+        }
+
+        .password-toggle {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            color: var(--azul-medio);
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .password-toggle input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .form-section {
+                padding: 30px 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid var(--amarelo);
+            color: var(--azul-escuro);
+        }
+    </style>
+</head>
+<body>
+    <div style="width: 80%; height: 100%; padding-bottom: 20px;">
+        <div class="container-perfil">
+            <div class="header">
+                <h1>Editar Perfil</h1>
+                <p>Mantenha suas informações sempre atualizadas</p>
+            </div>
+
+            <div class="profile-picture-section">
+                <div class="profile-picture-wrapper">
+                    <i class="bi bi-person-circle" style="width: 200px; height: 200px;"></i>
+                    <button class="change-photo-btn" title="Alterar foto">📷</button>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="alert alert-info">
+                    <span>ℹ️</span>
+                    <span>Preencha todos os campos obrigatórios para salvar as alterações</span>
+                </div>
+
+                {% if sucesso %}
+                    <div class="alert alert-success" role="alert">
+                        <strong>{{sucesso}}</strong>
+                    </div>
+
+                {% elif erro%}
+
+                    <div class="alert alert-danger" role="alert">
+                        <strong>{{erro}}</strong>
+                    </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'edit_perfil' %}" enctype="multipart/form-data">
+
+                    {%csrf_token%}
+
+                    <div class="section-title">Informações Pessoais</div>
+                    
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label for="first_name">Nome Completo *</label>
+                            <input type="text" id="first_name" name="first_name" oninput="this.value=value.toUpperCase()"
+                            value="{{request.user.first_name}}" 
+                            required
+                            >
+                            {% if form.first_name.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.first_name.errors}}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="last_name">Último nome *</label>
+                            <input type="text" id="last_name" name="last_name" oninput="this.value=value.toUpperCase()"
+                            value="{{request.user.last_name}}" 
+                            required
+                            >
+
+                            {% if form.last_name.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.last_name.errors}}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="username">Nome de Usuário *</label>
+                            <input type="text" id="username" name="username" value="{{request.user.username}}" required>
+
+                            {% if form.username.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.username.errors}}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">E-mail *</label>
+                            <input type="email" id="email" name="email" value="{{request.user.email}}" required>
+
+                            {% if form.email.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.email.errors}}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefone">Telefone</label>
+                            <input type="tel" id="telefone" name="telefone" value="(+244) {{request.user.telefone}}">
+
+                            {% if form.telefone.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.telefone.errors}}
+                                </div>
+                            {% endif %}
+                            
+                        </div>
+
+                        <div class="form-group">
+                            <label for="data_nascimento">Data de Nascimento</label>
+                            <input type="date" id="data_nascimento" name="data_nascimento" value="{{request.user.data_nascimento}}">
+
+                            {% if form.data_nascimento.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.data_nascimento.errors}}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bi">Número de B.I</label>
+                            <input type="text" id="bi" name="bi" value="{{request.user.bi}}">
+
+                            {% if form.bi.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.bi.errors}}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="genero">Gênero</label>
+                            <select id="genero" name="genero">
+                                <option value="{{request.user.genero}}" selected>{{request.user.get_genero_display}}</option>
+                                <option value="M" >Masculino</option>
+                                <option value="F">Feminino</option>
+                                <option value="O">Outro</option>
+                            </select>
+
+                            {% if form.genero.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.genero.errors}}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="form-group">
+                            <label for="estado_civil">Estado civil</label>
+                            <select id="estado_civil" name="estado_civil">
+                                <option value="{{request.user.estado_civil}}" selected>{{request.user.get_estado_civil_display}}</option>
+                                <option value="solteiro">Solteiro(a)</option>
+                                <option value="casado">Casado(a)</option>
+                                <option value="divorciado">Divorciado(a)</option>
+                                <option value="viuvo">Viúvo(a)</option>                
+                                <option value="uniao_estavel">União estável</option>  
+                            </select>
+
+                            {% if form.estado_civil.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.estado_civil.errors}}
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                        
+                    </div>
+
+                    <div class="section-title">Informações profissional</div>
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label for="departamento">Departamento</label>
+                            <input type="text" id="departamento" name="departamento" oninput="this.value=value.toUpperCase()"
+                            value="{{request.user.departamento}}">
+
+                            {% if form.departamento.errors %}
+                                <div class="text-danger" style="margin-bottom: -40px; ">
+                                    {{form.departamento.errors}}
+                                </div>
+                            {% endif %}
+
+                        </div>                       
+
+                    </div>
+
+                    <div class="section-title">Sobre Você</div>
+                    
+                    <div class="form-group full-width">
+                        <label for="biografia">Biografia</label>
+                        <textarea id="biografia" name="biografia" placeholder="Conte um pouco sobre você...">Desenvolvedor apaixonado por tecnologia e inovação.</textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" onclick="window.history.back()" class="btn btn-secondary">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+{% endblock content %}

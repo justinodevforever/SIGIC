@@ -15,7 +15,7 @@
     <div style="display: flex; width: 100%; align-items: center; justify-content: center; flex-direction: column;">
         
         <div style="display: flex; width: 97%; justify-content: space-between; align-items: center;">
-            <h1 class="text-warning">Lista de pessoas envolvidas</h1>
+            <h1 class="text-warning">Lista de tipo de crime</h1>
             <a href="/create_type_crime/" class="btn btn-success" style="display:flex; height: 40px; gap: 10px;">
                 <i class="bi bi-plus-circle" aria-hidden="true"></i></i>Novo
             </a>
@@ -42,8 +42,22 @@
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>Tipo de Crime</th>
-                                <th>Gravidade</th>
+                                <th>
+                                    Tipo de Crime
+                                    <a href="?order_by=nome"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                    <a href="/list_type_crime/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
+                                </th>
+                                <th>
+                                    Gravidade
+                                    <a href="?order_by=gravidade"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                    <a href="/list_type_crime/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
+                                </th>
                                 <th>Opções</th>
                             </tr>
                         </thead>

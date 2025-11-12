@@ -15,10 +15,11 @@
 
             <form action="/list_researcher/" method="get" 
              class="btn-group btn-group-sm">
-                {% csrf_token %}
+               
                 <input type="search" name="distintivo" style="border-radius: 4px 0px 0px 4px;"
                 class="form-control" placeholder="Número de distintivo">
                 <button class="btn btn-warning" type="submit"><i class="bi bi-search"></i></button>
+
             </form>
 
         </div>
@@ -43,7 +44,14 @@
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>Nome Completo</th>
+                                <th>
+                                    Nome Completo
+                                    <a href="?order_by=first_name{% if distintivo %}&distintivo={{ distintivo }}{% endif %}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                    <a href="/list_researcher/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
+                                </th>
                                 <th>Departamento</th>
                                 <th>Distintivo</th>
                                 <th>Nível de acesso</th>

@@ -16,7 +16,7 @@
         <h1 style="margin-left: 20px;" class="text-warning">Lista de pessoas envolvidas</h1>
         <div style="display: flex; width: 97%; justify-content: space-between; align-items: center; margin-bottom: 6px;">
         
-            <form action="/list_indiidual_involved/" method="get" 
+            <form action="/list_individual_involved/" method="get" 
              class="btn-group btn-group-sm">
                
                 <input type="search" name="nome_filter" style="border-radius: 4px 0px 0px 4px;"
@@ -25,7 +25,7 @@
                 <button class="btn btn-warning"><i class="bi bi-search"></i></button>
             </form>
 
-            <form action="/list_indiidual_involved/" method="get" 
+            <form action="/list_individual_involved/" method="get" 
              class="btn-group btn-group-sm">
                 
                 <input type="search" name="bi" style="border-radius: 4px 0px 0px 4px;"
@@ -61,6 +61,7 @@
                                     >
                                         <i class="bi bi-arrow-down-up"></i>
                                     </a>
+                                    <a href="/list_individual_involved/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
                                 </th>
                                 <th>
                                     Nome
@@ -68,6 +69,7 @@
                                     >
                                         <i class="bi bi-arrow-down-up"></i>
                                     </a>
+                                    <a href="/list_individual_involved/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
                                 </th>
                                 <th>Tipo de envolvimento</th>
                                 <th>
@@ -76,6 +78,7 @@
                                     >
                                         <i class="bi bi-arrow-down-up"></i>
                                     </a>
+                                    <a href="/list_individual_involved/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
                                 </th>
                                 <th>Estado</th>
                                 <th>Opções</th>
@@ -106,7 +109,7 @@
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         
-                                        <a href="{% url 'edit_indiidual_involved' env.id %}" 
+                                        <a href="{% url 'edit_individual_involved' env.id %}" 
                                             class="btn btn-outline-warning" title="Editar">
                                             <i class="fas bi-pencil-square"></i>
                                         </a>

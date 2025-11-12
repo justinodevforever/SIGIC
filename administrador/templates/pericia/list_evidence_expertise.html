@@ -16,13 +16,22 @@
                 <i class="bi bi-plus-circle" aria-hidden="true"></i></i>Novo
             </a>
         </div>
-        <div style="display: flex; width: 97%; justify-content: space-between; align-items: center;">
-            
+
+        <div style="display: flex; width: 97%; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+           
             <form action="/list_evidence_expertise/" method="get" 
-             class="btn-group btn-group-sm" style="margin-bottom: 10px;">
-                {% csrf_token %}
-                <input type="search" name="tipo" style="border-radius: 4px 0px 0px 4px;"
-                class="form-control" placeholder="tipo de perícia">
+             class="btn-group btn-group-sm" style="width: 300px;">
+              
+                <select name="tipo" style="border-radius: 4px 0px 0px 4px;"
+                    class="form-control" placeholder="tipo de perícia">
+
+                    <option value="">Selecione</option>
+                    <option value="DNA">DNA</option>
+                    <option value="BALISTICA">Balística</option>
+                    <option value="TOXICOLOGIA">Toxicologia</option>
+                    <option value="DIGITAIS">Digitais</option>
+
+                </select>
                 <button class="btn text-white"  style="background-color: #2c5aa0;"><i class="bi bi-search"></i></button>
             </form>
 
@@ -35,6 +44,7 @@
             </form>
 
         </div>
+
         <div class="card" style="display:flex; width: 97%; align-self: center;">
 
             <form method="get" class="form-inline mb-3" style="padding: 12px; height: 7px;">
@@ -56,11 +66,25 @@
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>Número da evidência</th>
+                                <th>
+                                    Número da evidência
+                                    <a href="?order_by=evidencia__numero_evidencia{% if tipo %}&tipo={{ tipo  }}{% endif %}{% if numero_evidencia %}&numero_evidencia={{ numero_evidencia}}{% endif %}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                    <a href="/list_evidence_expertise/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
+                                </th>
                                 <th>Tipo</th>
                                 <th>Resultado</th>
                                 <th>Conclusão</th>
-                                <th>Data da criação</th>
+                                <th>
+                                    Data da criação
+                                    <a href="?order_by=data_criacao{% if tipo %}&tipo={{ tipo  }}{% endif %}{% if numero_evidencia %}&numero_evidencia={{ numero_evidencia}}{% endif %}"
+                                    >
+                                        <i class="bi bi-arrow-down-up"></i>
+                                    </a>
+                                    <a href="/list_evidence_expertise/"> <i class="bi bi-eraser" style="font-size: 1.1rem; margin-left: 5px;"></i></a>
+                                </th>
                                 <th>Opções</th>
                             </tr>
                         </thead>
