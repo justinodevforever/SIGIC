@@ -14,7 +14,7 @@ DEBUG = os.getenv('DEBUG')
 BASE_URL = os.getenv('BASE_URL', default='http://localhost:8000')
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.30.96', 'localhost', '127.0.0.1']
 
 
 INSTALLED_APPS = [
